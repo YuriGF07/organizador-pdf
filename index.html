@@ -1,684 +1,96 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Organizador Inteligente de Relatórios PDF</title>
-  <style>
-    :root{
-      --bg:#f4f7fb;
-      --card:#ffffff;
-      --text:#1f2937;
-      --muted:#6b7280;
-      --line:#e5e7eb;
-      --primary:#2563eb;
-      --primary-2:#0f4c81;
-      --success-bg:#ecfdf5;
-      --success-bd:#a7f3d0;
-      --success-tx:#065f46;
-      --error-bg:#fef2f2;
-      --error-bd:#fecaca;
-      --error-tx:#991b1b;
-      --warn-bg:#fff7ed;
-      --warn-bd:#fdba74;
-      --warn-tx:#9a3412;
-      --shadow:0 10px 30px rgba(15,23,42,.08);
-      --radius:18px;
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family:Arial, Helvetica, sans-serif;
-      background:var(--bg);
-      color:var(--text);
-    }
-    .container{
-      max-width:1380px;
-      margin:0 auto;
-      padding:24px;
-    }
-    .hero{
-      background:linear-gradient(135deg,var(--primary-2),var(--primary));
-      color:#fff;
-      border-radius:22px;
-      padding:30px;
-      box-shadow:0 14px 34px rgba(15,76,129,.22);
-      margin-bottom:24px;
-    }
-    .hero h1{
-      margin:0 0 10px;
-      font-size:32px;
-    }
-    .hero p{
-      margin:0;
-      font-size:16px;
-      line-height:1.5;
-      opacity:.96;
-      max-width:950px;
-    }
-    .pipeline{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:16px;
-      margin-top:22px;
-    }
-    .pipeline-step{
-      background:rgba(255,255,255,.14);
-      border:1px solid rgba(255,255,255,.18);
-      border-radius:16px;
-      padding:16px;
-      min-height:110px;
-    }
-    .pipeline-step strong{
-      display:block;
-      margin-bottom:8px;
-      font-size:15px;
-    }
-
-    .grid{
-      display:grid;
-      grid-template-columns:1.35fr .95fr;
-      gap:20px;
-    }
-    .card{
-      background:var(--card);
-      border-radius:var(--radius);
-      padding:22px;
-      box-shadow:var(--shadow);
-      margin-bottom:20px;
-    }
-    .card h2{
-      margin:0 0 16px;
-      font-size:22px;
-      color:var(--primary-2);
-    }
-
-    .dropzone{
-      border:2px dashed #93c5fd;
-      border-radius:16px;
-      padding:32px 20px;
-      text-align:center;
-      background:#f8fbff;
-      transition:.2s ease;
-      cursor:pointer;
-    }
-    .dropzone.dragover{
-      border-color:var(--primary);
-      background:#eef5ff;
-      transform:scale(1.01);
-    }
-    .dropzone p{margin:8px 0}
-    .dropzone .main-text{
-      font-size:19px;
-      font-weight:700;
-      color:#1d4ed8;
-    }
-    .dropzone .sub-text{
-      color:var(--muted);
-      font-size:14px;
-    }
-    .file-name{
-      margin-top:14px;
-      font-size:14px;
-      color:#111827;
-      font-weight:700;
-      word-break:break-word;
-    }
-    .actions{
-      display:flex;
-      gap:12px;
-      flex-wrap:wrap;
-      margin-top:18px;
-    }
-    button, .link-btn{
-      border:none;
-      border-radius:12px;
-      padding:12px 18px;
-      font-size:14px;
-      font-weight:700;
-      cursor:pointer;
-      transition:.2s ease;
-      text-decoration:none;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-    }
-    .btn-primary{
-      color:#fff;
-      background:linear-gradient(135deg,#2563eb,#1d4ed8);
-      box-shadow:0 10px 20px rgba(37,99,235,.25);
-    }
-    .btn-primary:hover{transform:translateY(-1px)}
-    .btn-secondary{
-      background:#e5eefc;
-      color:#1d4ed8;
-    }
-    .btn-secondary:hover{background:#dbe8ff}
-    .status-box{
-      margin-top:18px;
-      padding:14px 16px;
-      border-radius:12px;
-      background:#f8fafc;
-      border:1px solid var(--line);
-      font-size:14px;
-      line-height:1.55;
-      white-space:pre-line;
-      min-height:56px;
-    }
-    .status-success{
-      background:var(--success-bg);
-      border-color:var(--success-bd);
-      color:var(--success-tx);
-    }
-    .status-error{
-      background:var(--error-bg);
-      border-color:var(--error-bd);
-      color:var(--error-tx);
-    }
-    .status-warning{
-      background:var(--warn-bg);
-      border-color:var(--warn-bd);
-      color:var(--warn-tx);
-    }
-    .status-loading{
-      background:#eff6ff;
-      border-color:#bfdbfe;
-      color:#1d4ed8;
-    }
-
-    .metrics-grid{
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:12px;
-      margin-top:18px;
-    }
-    .metric-card{
-      background:#f8fafc;
-      border:1px solid var(--line);
-      border-radius:14px;
-      padding:12px;
-    }
-    .metric-label{
-      font-size:12px;
-      color:var(--muted);
-      margin-bottom:6px;
-    }
-    .metric-value{
-      font-size:18px;
-      font-weight:700;
-      color:#111827;
-      word-break:break-word;
-    }
-    .small-text{
-      font-size:12px;
-      color:var(--muted);
-      margin-top:10px;
-      line-height:1.5;
-    }
-
-    .history-list{
-      display:grid;
-      gap:12px;
-      max-height:920px;
-      overflow-y:auto;
-      padding-right:4px;
-    }
-    .history-item{
-      border:1px solid var(--line);
-      border-radius:14px;
-      padding:14px;
-      background:#fbfdff;
-      cursor:pointer;
-      transition:.15s ease;
-    }
-    .history-item:hover{
-      transform:translateY(-1px);
-      box-shadow:0 8px 22px rgba(15,23,42,.06);
-    }
-    .history-item.active{
-      border-color:var(--primary);
-      box-shadow:0 0 0 2px rgba(37,99,235,.10);
-    }
-    .history-item strong{
-      display:block;
-      color:#111827;
-      margin-bottom:6px;
-      word-break:break-word;
-    }
-    .history-meta{
-      font-size:13px;
-      color:var(--muted);
-      line-height:1.65;
-      margin-bottom:10px;
-    }
-    .badge{
-      display:inline-block;
-      padding:5px 10px;
-      border-radius:999px;
-      font-size:12px;
-      font-weight:700;
-      background:#dbeafe;
-      color:#1d4ed8;
-      margin-top:8px;
-      margin-right:6px;
-    }
-    .badge.success{background:#dcfce7;color:#166534}
-    .badge.warning{background:#fef3c7;color:#92400e}
-    .badge.error{background:#fee2e2;color:#991b1b}
-
-    .preview-grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:18px;
-      margin-top:20px;
-    }
-    .preview-panel{
-      background:#f8fafc;
-      border:1px solid var(--line);
-      border-radius:14px;
-      padding:12px;
-    }
-    .preview-panel h3{
-      margin:0 0 10px;
-      font-size:16px;
-      color:var(--primary-2);
-    }
-    .preview-frame{
-      width:100%;
-      height:520px;
-      border:1px solid #dbe4f0;
-      border-radius:10px;
-      background:#fff;
-    }
-    .empty{
-      color:var(--muted);
-      font-size:14px;
-    }
-    .foot-note{
-      margin-top:10px;
-      font-size:12px;
-      color:var(--muted);
-    }
-
-    @media (max-width:1200px){
-      .grid{grid-template-columns:1fr}
-      .preview-grid{grid-template-columns:1fr}
-      .pipeline{grid-template-columns:1fr}
-      .metrics-grid{grid-template-columns:repeat(2,1fr)}
-    }
-    @media (max-width:680px){
-      .container{padding:14px}
-      .hero{padding:22px}
-      .hero h1{font-size:26px}
-      .metrics-grid{grid-template-columns:1fr}
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Revisão Profissional</title>
+<style>
+body{font-family:Arial;background:#f4f6fb;margin:0;padding:20px}
+.card{background:white;padding:20px;border-radius:12px;margin-bottom:20px;box-shadow:0 4px 12px rgba(0,0,0,0.08)}
+button{padding:8px 12px;border:none;border-radius:8px;cursor:pointer}
+.approve{background:#22c55e;color:white}
+.reject{background:#ef4444;color:white}
+.pending{background:#f59e0b;color:white}
+</style>
 </head>
+
 <body>
-  <div class="container">
-    <section class="hero">
-      <h1>Organizador Inteligente de Relatórios PDF</h1>
-      <p>
-        Envie um PDF, processe pela API online, acompanhe o histórico de execuções e visualize o arquivo original,
-        o PDF gerado e as métricas do processamento em uma interface limpa, moderna e profissional.
-      </p>
 
-      <div class="pipeline">
-        <div class="pipeline-step">
-          <strong>1. Upload e processamento</strong>
-          O arquivo é enviado para a API hospedada no Render e recebe um identificador de processamento.
-        </div>
-        <div class="pipeline-step">
-          <strong>2. Banco online</strong>
-          O histórico é salvo no Neon e pode ser consultado a qualquer momento sem depender do seu PC.
-        </div>
-        <div class="pipeline-step">
-          <strong>3. Preview e download</strong>
-          Você visualiza o PDF original, o PDF gerado e pode baixar o resultado final do processamento.
-        </div>
-      </div>
-    </section>
+<div class="card">
+<h2>Filtros</h2>
+<input id="search" placeholder="Buscar arquivo">
+<select id="statusFilter">
+<option value="">Todos</option>
+<option value="aprovado">Aprovado</option>
+<option value="rejeitado">Rejeitado</option>
+<option value="pendente">Pendente</option>
+</select>
+<button onclick="load()">Filtrar</button>
+</div>
 
-    <div class="grid">
-      <div>
-        <section class="card">
-          <h2>Enviar relatório</h2>
+<div class="card">
+<h2>Histórico</h2>
+<div id="list"></div>
+</div>
 
-          <div id="dropzone" class="dropzone">
-            <p class="main-text">Clique aqui ou arraste um PDF</p>
-            <p class="sub-text">Aceita arquivos .pdf para envio à API publicada</p>
-            <input type="file" id="fileInput" accept=".pdf" hidden />
-            <div id="fileName" class="file-name"></div>
-            <div class="badge">API: Render + Neon</div>
-          </div>
+<div class="card" id="details" style="display:none">
+<h2>Detalhes</h2>
+<div id="info"></div>
+<button class="approve" onclick="review('aprovado')">Aprovar</button>
+<button class="reject" onclick="review('rejeitado')">Rejeitar</button>
+<button class="pending" onclick="review('pendente')">Voltar</button>
+</div>
 
-          <div class="actions">
-            <button class="btn-primary" id="btnProcessar">Processar relatório</button>
-            <button class="btn-secondary" id="btnLimparArquivo">Limpar seleção</button>
-            <button class="btn-secondary" id="btnAtualizarHistorico2">Atualizar histórico</button>
-            <a id="btnDownload" class="link-btn btn-secondary" href="#" target="_blank" style="display:none;">Baixar PDF gerado</a>
-          </div>
+<script>
+const API="https://jaboque.onrender.com"
+let current=null
 
-          <div id="statusBox" class="status-box">Nenhum arquivo enviado ainda.</div>
+async function load(){
+  let res=await fetch(API+"/history")
+  let data=await res.json()
 
-          <div class="metrics-grid">
-            <div class="metric-card">
-              <div class="metric-label">Job ID</div>
-              <div class="metric-value" id="metricJobId">-</div>
-            </div>
-            <div class="metric-card">
-              <div class="metric-label">Tipo detectado</div>
-              <div class="metric-value" id="metricTipo">-</div>
-            </div>
-            <div class="metric-card">
-              <div class="metric-label">Status</div>
-              <div class="metric-value" id="metricStatus">-</div>
-            </div>
-            <div class="metric-card">
-              <div class="metric-label">Parser</div>
-              <div class="metric-value" id="metricParser">-</div>
-            </div>
-            <div class="metric-card">
-              <div class="metric-label">Registros</div>
-              <div class="metric-value" id="metricRegistros">0</div>
-            </div>
-            <div class="metric-card">
-              <div class="metric-label">Total original</div>
-              <div class="metric-value" id="metricOriginal">0,00</div>
-            </div>
-            <div class="metric-card">
-              <div class="metric-label">Total gerado</div>
-              <div class="metric-value" id="metricGerado">0,00</div>
-            </div>
-            <div class="metric-card">
-              <div class="metric-label">Diferença</div>
-              <div class="metric-value" id="metricDiferenca">0,00</div>
-            </div>
-            <div class="metric-card">
-              <div class="metric-label">Divergência</div>
-              <div class="metric-value" id="metricDivergencia">Não</div>
-            </div>
-          </div>
+  let search=document.getElementById("search").value.toLowerCase()
+  let status=document.getElementById("statusFilter").value
 
-          <div class="small-text" id="statusDetails">
-            API base: <span id="apiBaseLabel"></span>
-          </div>
+  data=data.filter(x=>{
+    return (!search || x.nome.toLowerCase().includes(search))
+  })
 
-          <div class="preview-grid">
-            <div class="preview-panel">
-              <h3>Preview do PDF original</h3>
-              <iframe id="previewOriginal" class="preview-frame"></iframe>
-            </div>
-            <div class="preview-panel">
-              <h3>Preview do PDF gerado</h3>
-              <iframe id="previewFinal" class="preview-frame"></iframe>
-            </div>
-          </div>
-
-          <div class="foot-note">
-            Dica: você também pode clicar em um item do histórico para carregar novamente os previews e o download daquele processamento.
-          </div>
-        </section>
-      </div>
-
-      <aside>
-        <section class="card">
-          <h2>Histórico do servidor</h2>
-          <div class="actions" style="margin-top:0; margin-bottom:14px;">
-            <button class="btn-secondary" id="btnAtualizarHistorico">Atualizar</button>
-          </div>
-          <div id="historyList" class="history-list"></div>
-        </section>
-      </aside>
+  document.getElementById("list").innerHTML=data.map(x=>`
+    <div onclick="openJob('${x.job_id}')">
+      <b>${x.nome}</b> - ${x.status}
     </div>
-  </div>
+  `).join("")
+}
 
-  <script>
-    const API_BASE = "https://jaboque.onrender.com";
-    const API_URL = `${API_BASE}/upload`;
-    const HISTORY_URL = `${API_BASE}/history`;
+async function openJob(id){
+  let res=await fetch(API+"/history/"+id)
+  let d=await res.json()
+  current=id
 
-    let selectedFile = null;
-    let localPreviewUrl = "";
-    let selectedHistoryJobId = "";
+  document.getElementById("details").style.display="block"
+  document.getElementById("info").innerHTML=`
+    <p><b>Status:</b> ${d.status}</p>
+    <p><b>Parser:</b> ${d.parser_utilizado}</p>
+    <p><b>Registros:</b> ${d.qtd_registros}</p>
+    <p><b>Erros:</b> ${d.qtd_erros_parser}</p>
+    <p><b>Sucesso:</b> ${d.percentual_sucesso}%</p>
+    <p><b>Decisão:</b> ${d.decisao_final}</p>
+    <iframe src="${API+d.preview_original_url}" width="100%" height="200"></iframe>
+    <iframe src="${API+d.preview_gerado_url}" width="100%" height="200"></iframe>
+  `
+}
 
-    const dropzone = document.getElementById("dropzone");
-    const fileInput = document.getElementById("fileInput");
-    const fileName = document.getElementById("fileName");
-    const statusBox = document.getElementById("statusBox");
-    const historyList = document.getElementById("historyList");
-    const previewOriginal = document.getElementById("previewOriginal");
-    const previewFinal = document.getElementById("previewFinal");
-    const btnDownload = document.getElementById("btnDownload");
+async function review(status){
+  await fetch(API+"/review/"+current,{
+    method:"POST",
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({status})
+  })
+  load()
+}
+load()
+</script>
 
-    document.getElementById("apiBaseLabel").textContent = API_BASE;
-
-    function absoluteUrl(url) {
-      if (!url) return "";
-      if (url.startsWith("http://") || url.startsWith("https://")) return url;
-      return `${API_BASE}${url}`;
-    }
-
-    function setStatus(message, type = "") {
-      statusBox.className = "status-box";
-      if (type === "success") statusBox.classList.add("status-success");
-      if (type === "error") statusBox.classList.add("status-error");
-      if (type === "warning") statusBox.classList.add("status-warning");
-      if (type === "loading") statusBox.classList.add("status-loading");
-      statusBox.textContent = message;
-    }
-
-    function escapeHtml(text) {
-      return String(text ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-    }
-
-    function formatValue(v) {
-      if (v === null || v === undefined || v === "") return "0,00";
-      return String(v);
-    }
-
-    function statusBadgeClass(item) {
-      const status = String(item.status || "").toLowerCase();
-      if (status.includes("sucesso") || status === "ok") return item.divergencia_total ? "warning" : "success";
-      if (status.includes("diverg") || item.divergencia_total || status.includes("parcial")) return "warning";
-      if (status.includes("erro") || status.includes("inválido") || status.includes("invalido") || status.includes("vazio")) return "error";
-      return "";
-    }
-
-    function resetMetrics() {
-      document.getElementById("metricJobId").textContent = "-";
-      document.getElementById("metricTipo").textContent = "-";
-      document.getElementById("metricStatus").textContent = "-";
-      document.getElementById("metricParser").textContent = "-";
-      document.getElementById("metricRegistros").textContent = "0";
-      document.getElementById("metricOriginal").textContent = "0,00";
-      document.getElementById("metricGerado").textContent = "0,00";
-      document.getElementById("metricDiferenca").textContent = "0,00";
-      document.getElementById("metricDivergencia").textContent = "Não";
-      previewFinal.src = "";
-      btnDownload.style.display = "none";
-      btnDownload.href = "#";
-    }
-
-    function applyResultToUI(data, keepLocalPreview = false) {
-      document.getElementById("metricJobId").textContent = data.job_id || "-";
-      document.getElementById("metricTipo").textContent = data.tipo_detectado || "-";
-      document.getElementById("metricStatus").textContent = data.status || "-";
-      document.getElementById("metricParser").textContent = data.parser_utilizado || "-";
-      document.getElementById("metricRegistros").textContent = data.qtd_registros ?? 0;
-      document.getElementById("metricOriginal").textContent = formatValue(data.valor_total_original);
-      document.getElementById("metricGerado").textContent = formatValue(data.valor_total_gerado);
-      document.getElementById("metricDiferenca").textContent = formatValue(data.diferenca_total);
-      document.getElementById("metricDivergencia").textContent = data.divergencia_total ? "Sim" : "Não";
-
-      document.getElementById("statusDetails").textContent =
-        data.detalhes_status || `API base: ${API_BASE}`;
-
-      if (!keepLocalPreview && data.preview_original_url) {
-        previewOriginal.src = absoluteUrl(data.preview_original_url);
-      }
-
-      if (data.preview_gerado_url) {
-        previewFinal.src = absoluteUrl(data.preview_gerado_url);
-      } else {
-        previewFinal.src = "";
-      }
-
-      if (data.download_url) {
-        btnDownload.href = absoluteUrl(data.download_url);
-        btnDownload.style.display = "inline-flex";
-      } else {
-        btnDownload.href = "#";
-        btnDownload.style.display = "none";
-      }
-    }
-
-    function updateSelectedFile(file) {
-      selectedFile = file || null;
-      fileName.textContent = selectedFile ? `Arquivo selecionado: ${selectedFile.name}` : "";
-
-      if (localPreviewUrl) URL.revokeObjectURL(localPreviewUrl);
-      localPreviewUrl = "";
-      previewOriginal.src = "";
-
-      if (selectedFile) {
-        localPreviewUrl = URL.createObjectURL(selectedFile);
-        previewOriginal.src = localPreviewUrl;
-      }
-    }
-
-    function clearSelectedFile() {
-      selectedFile = null;
-      fileInput.value = "";
-      fileName.textContent = "";
-      if (localPreviewUrl) URL.revokeObjectURL(localPreviewUrl);
-      localPreviewUrl = "";
-      previewOriginal.src = "";
-      previewFinal.src = "";
-      selectedHistoryJobId = "";
-      resetMetrics();
-      setStatus("Nenhum arquivo enviado ainda.");
-    }
-
-    async function loadHistory() {
-      try {
-        const response = await fetch(HISTORY_URL);
-        if (!response.ok) throw new Error("Não foi possível carregar o histórico.");
-        const items = await response.json();
-
-        if (!items.length) {
-          historyList.innerHTML = `<div class="empty">Ainda não há histórico salvo no back-end.</div>`;
-          return;
-        }
-
-        historyList.innerHTML = items.map(item => `
-          <div class="history-item ${selectedHistoryJobId === item.job_id ? "active" : ""}" data-job-id="${escapeHtml(item.job_id)}">
-            <strong>${escapeHtml(item.nome_arquivo_original || "")}</strong>
-            <div class="badge ${statusBadgeClass(item)}">${escapeHtml(item.status || "-")}</div>
-            <div class="history-meta">
-              Job ID: ${escapeHtml(item.job_id || "-")}<br>
-              Tipo: ${escapeHtml(item.tipo_detectado || "-")}<br>
-              Data/Hora: ${escapeHtml(item.data_hora || "-")}<br>
-              Registros: ${escapeHtml(String(item.qtd_registros ?? 0))}<br>
-              Total original: ${escapeHtml(formatValue(item.valor_total_original || "-"))}<br>
-              Total gerado: ${escapeHtml(formatValue(item.valor_total_gerado || "-"))}<br>
-              Diferença: ${escapeHtml(formatValue(item.diferenca_total || "-"))}<br>
-              Divergência: ${item.divergencia_total ? "Sim" : "Não"}<br>
-              Parser: ${escapeHtml(item.parser_utilizado || "-")}
-            </div>
-            <div class="small-text">${escapeHtml(item.detalhes_status || "Sem observações.")}</div>
-          </div>
-        `).join("");
-
-        document.querySelectorAll(".history-item").forEach(el => {
-          el.addEventListener("click", () => {
-            const jobId = el.dataset.jobId;
-            const item = items.find(x => x.job_id === jobId);
-            if (!item) return;
-            selectedHistoryJobId = jobId;
-            applyResultToUI(item, false);
-            setStatus(`Histórico carregado com sucesso.\nJob: ${jobId}\nStatus: ${item.status || "-"}`, item.divergencia_total ? "warning" : "success");
-            loadHistory();
-          });
-        });
-      } catch (error) {
-        historyList.innerHTML = `<div class="empty">Erro ao carregar histórico: ${escapeHtml(error.message)}</div>`;
-      }
-    }
-
-    async function processFile() {
-      if (!selectedFile) {
-        setStatus("Selecione um PDF antes de processar.", "error");
-        return;
-      }
-
-      const formData = new FormData();
-      formData.append("file", selectedFile);
-
-      setStatus(
-        "Enviando arquivo para a API...\nAguarde enquanto o backend processa o PDF, gera o novo arquivo e grava o histórico no Neon.",
-        "loading"
-      );
-
-      resetMetrics();
-
-      try {
-        const response = await fetch(API_URL, {
-          method: "POST",
-          body: formData
-        });
-
-        const data = await response.json();
-
-        if (!response.ok || !data.ok) {
-          throw new Error(data.erro || "Erro ao processar o relatório.");
-        }
-
-        selectedHistoryJobId = data.job_id || "";
-        applyResultToUI(data, false);
-
-        const warning = Boolean(data.divergencia_total) || String(data.status || "").toLowerCase().includes("parcial");
-        setStatus(
-          `${data.mensagem || "Processamento concluído."}\nStatus: ${data.status || "-"}\nJob ID: ${data.job_id || "-"}\nTipo: ${data.tipo_detectado || "-"}\nTotal original: ${formatValue(data.valor_total_original)}\nTotal gerado: ${formatValue(data.valor_total_gerado)}\nDiferença: ${formatValue(data.diferenca_total)}`,
-          warning ? "warning" : "success"
-        );
-
-        await loadHistory();
-      } catch (error) {
-        setStatus(`Erro ao processar: ${error.message}`, "error");
-      }
-    }
-
-    dropzone.addEventListener("click", () => fileInput.click());
-    fileInput.addEventListener("change", (e) => updateSelectedFile(e.target.files[0] || null));
-
-    dropzone.addEventListener("dragover", (e) => {
-      e.preventDefault();
-      dropzone.classList.add("dragover");
-    });
-
-    dropzone.addEventListener("dragleave", () => {
-      dropzone.classList.remove("dragover");
-    });
-
-    dropzone.addEventListener("drop", (e) => {
-      e.preventDefault();
-      dropzone.classList.remove("dragover");
-      const file = e.dataTransfer.files[0];
-      if (file) updateSelectedFile(file);
-    });
-
-    document.getElementById("btnProcessar").addEventListener("click", processFile);
-    document.getElementById("btnLimparArquivo").addEventListener("click", clearSelectedFile);
-    document.getElementById("btnAtualizarHistorico").addEventListener("click", loadHistory);
-    document.getElementById("btnAtualizarHistorico2").addEventListener("click", loadHistory);
-
-    loadHistory();
-  </script>
 </body>
 </html>
