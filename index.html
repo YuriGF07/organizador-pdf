@@ -2,95 +2,676 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<title>Revisão Profissional</title>
-<style>
-body{font-family:Arial;background:#f4f6fb;margin:0;padding:20px}
-.card{background:white;padding:20px;border-radius:12px;margin-bottom:20px;box-shadow:0 4px 12px rgba(0,0,0,0.08)}
-button{padding:8px 12px;border:none;border-radius:8px;cursor:pointer}
-.approve{background:#22c55e;color:white}
-.reject{background:#ef4444;color:white}
-.pending{background:#f59e0b;color:white}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Organizador Inteligente de Relatórios PDF</title>
+  <style>
+    :root{
+      --bg:#f4f7fb;
+      --card:#ffffff;
+      --text:#1f2937;
+      --muted:#6b7280;
+      --line:#e5e7eb;
+      --primary:#2563eb;
+      --primary-2:#0f4c81;
+      --success:#16a34a;
+      --warning:#d97706;
+      --danger:#dc2626;
+      --shadow:0 10px 30px rgba(15,23,42,.08);
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
+    .container{max-width:1440px;margin:0 auto;padding:24px}
+    .hero{
+      background:linear-gradient(135deg,var(--primary-2),var(--primary));
+      color:#fff;border-radius:22px;padding:30px;margin-bottom:24px;
+      box-shadow:0 14px 34px rgba(15,76,129,.22)
+    }
+    .hero h1{margin:0 0 10px;font-size:32px}
+    .hero p{margin:0;max-width:980px;line-height:1.55}
+    .stats-grid,.metrics-grid,.filters-grid,.history-grid{
+      display:grid;gap:12px
+    }
+    .stats-grid{grid-template-columns:repeat(4,1fr);margin-top:20px}
+    .filters-grid{grid-template-columns:1.3fr 1fr 1fr auto;align-items:end}
+    .layout{display:grid;grid-template-columns:1.35fr .95fr;gap:20px}
+    .card{
+      background:var(--card);border-radius:var(--radius);padding:22px;
+      box-shadow:var(--shadow);margin-bottom:20px
+    }
+    .card h2{margin:0 0 16px;color:var(--primary-2);font-size:22px}
+    .dropzone{
+      border:2px dashed #93c5fd;border-radius:16px;padding:32px 20px;text-align:center;
+      background:#f8fbff;cursor:pointer;transition:.2s ease
+    }
+    .dropzone.dragover{border-color:var(--primary);background:#eef5ff;transform:scale(1.01)}
+    .dropzone .main-text{font-size:19px;font-weight:700;color:#1d4ed8}
+    .dropzone .sub-text{color:var(--muted);font-size:14px;margin-top:8px}
+    .file-name{margin-top:14px;font-size:14px;font-weight:700;word-break:break-word}
+    .actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px}
+    button,.link-btn,input,select,textarea{
+      font:inherit;border-radius:12px
+    }
+    button,.link-btn{
+      border:none;padding:12px 18px;font-weight:700;cursor:pointer;text-decoration:none;
+      display:inline-flex;align-items:center;justify-content:center
+    }
+    .btn-primary{background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff}
+    .btn-secondary{background:#e5eefc;color:#1d4ed8}
+    .btn-success{background:#dcfce7;color:#166534}
+    .btn-danger{background:#fee2e2;color:#991b1b}
+    .btn-warning{background:#fef3c7;color:#92400e}
+    input,select,textarea{
+      width:100%;padding:12px;border:1px solid #d1d5db;background:#fff
+    }
+    textarea{min-height:90px;resize:vertical}
+    .label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+    .status-box{
+      margin-top:18px;padding:14px 16px;border-radius:12px;border:1px solid var(--line);
+      font-size:14px;line-height:1.55;white-space:pre-line;min-height:56px;background:#f8fafc
+    }
+    .status-success{background:#ecfdf5;border-color:#a7f3d0;color:#065f46}
+    .status-error{background:#fef2f2;border-color:#fecaca;color:#991b1b}
+    .status-warning{background:#fff7ed;border-color:#fdba74;color:#9a3412}
+    .status-loading{background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8}
+    .stat-card,.metric-card{
+      background:#f8fafc;border:1px solid var(--line);border-radius:14px;padding:12px
+    }
+    .stat-label,.metric-label{font-size:12px;color:var(--muted);margin-bottom:6px}
+    .stat-value,.metric-value{font-size:20px;font-weight:700}
+    .metrics-grid{grid-template-columns:repeat(5,1fr);margin-top:18px}
+    .preview-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:20px}
+    .preview-panel{background:#f8fafc;border:1px solid var(--line);border-radius:14px;padding:12px}
+    .preview-panel h3{margin:0 0 10px;color:var(--primary-2);font-size:16px}
+    .preview-frame{width:100%;height:520px;border:1px solid #dbe4f0;border-radius:10px;background:#fff}
+    .history-list{display:grid;gap:12px;max-height:1100px;overflow-y:auto;padding-right:4px}
+    .history-item{
+      border:1px solid var(--line);border-radius:14px;padding:14px;background:#fbfdff;cursor:pointer;transition:.15s ease
+    }
+    .history-item:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(15,23,42,.06)}
+    .history-item.active{border-color:var(--primary);box-shadow:0 0 0 2px rgba(37,99,235,.10)}
+    .history-item strong{display:block;margin-bottom:6px;word-break:break-word}
+    .history-meta{font-size:13px;color:var(--muted);line-height:1.6;margin-top:8px}
+    .badge{
+      display:inline-block;padding:5px 10px;border-radius:999px;font-size:12px;font-weight:700;
+      margin-right:6px;margin-top:4px
+    }
+    .badge.blue{background:#dbeafe;color:#1d4ed8}
+    .badge.success{background:#dcfce7;color:#166534}
+    .badge.warning{background:#fef3c7;color:#92400e}
+    .badge.error{background:#fee2e2;color:#991b1b}
+    .small-text{font-size:12px;color:var(--muted);line-height:1.5}
+    .hidden{display:none!important}
+    .empty{color:var(--muted);font-size:14px}
+    .modal-backdrop{
+      position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;
+      align-items:center;justify-content:center;padding:20px;z-index:1000
+    }
+    .modal{
+      width:min(1100px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:20px;
+      box-shadow:0 24px 70px rgba(0,0,0,.25);padding:22px
+    }
+    .modal-header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}
+    .modal-header h3{margin:0;color:var(--primary-2);font-size:22px}
+    .close-btn{background:#eef2ff;color:#3730a3}
+    .detail-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .detail-block{background:#f8fafc;border:1px solid var(--line);border-radius:14px;padding:12px}
+    .detail-label{font-size:12px;color:var(--muted);margin-bottom:6px}
+    .detail-value{font-weight:700;word-break:break-word}
+    .detail-full{grid-column:1/-1}
+    @media (max-width:1200px){
+      .layout,.preview-grid{grid-template-columns:1fr}
+      .stats-grid,.metrics-grid,.detail-grid{grid-template-columns:repeat(2,1fr)}
+      .filters-grid{grid-template-columns:1fr 1fr}
+    }
+    @media (max-width:760px){
+      .container{padding:14px}
+      .hero{padding:22px}
+      .hero h1{font-size:26px}
+      .stats-grid,.metrics-grid,.detail-grid,.filters-grid{grid-template-columns:1fr}
+    }
+  </style>
 </head>
-
 <body>
+  <div class="container">
+    <section class="hero">
+      <h1>Organizador Inteligente de Relatórios PDF</h1>
+      <p>
+        Envie PDFs, acompanhe o diagnóstico técnico, filtre o histórico, visualize previews e faça revisão profissional
+        com aprovação, rejeição e observação por job.
+      </p>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-label">Total de jobs</div><div class="stat-value" id="statTotalJobs">0</div></div>
+        <div class="stat-card"><div class="stat-label">Pendentes</div><div class="stat-value" id="statPendentes">0</div></div>
+        <div class="stat-card"><div class="stat-label">Aprovados</div><div class="stat-value" id="statAprovados">0</div></div>
+        <div class="stat-card"><div class="stat-label">Rejeitados</div><div class="stat-value" id="statRejeitados">0</div></div>
+      </div>
+    </section>
 
-<div class="card">
-<h2>Filtros</h2>
-<input id="search" placeholder="Buscar arquivo">
-<select id="statusFilter">
-<option value="">Todos</option>
-<option value="aprovado">Aprovado</option>
-<option value="rejeitado">Rejeitado</option>
-<option value="pendente">Pendente</option>
-</select>
-<button onclick="load()">Filtrar</button>
-</div>
+    <div class="layout">
+      <div>
+        <section class="card">
+          <h2>Enviar relatório</h2>
+          <div id="dropzone" class="dropzone">
+            <div class="main-text">Clique aqui ou arraste um PDF</div>
+            <div class="sub-text">Envio real para a API publicada no Render</div>
+            <input type="file" id="fileInput" accept=".pdf" hidden />
+            <div id="fileName" class="file-name"></div>
+          </div>
 
-<div class="card">
-<h2>Histórico</h2>
-<div id="list"></div>
-</div>
+          <div class="actions">
+            <button class="btn-primary" id="btnProcessar">Processar relatório</button>
+            <button class="btn-secondary" id="btnLimparArquivo">Limpar seleção</button>
+            <button class="btn-secondary" id="btnAtualizarTudo">Atualizar dados</button>
+            <a id="btnDownload" class="link-btn btn-secondary hidden" href="#" target="_blank">Baixar PDF gerado</a>
+          </div>
 
-<div class="card" id="details" style="display:none">
-<h2>Detalhes</h2>
-<div id="info"></div>
-<button class="approve" onclick="review('aprovado')">Aprovar</button>
-<button class="reject" onclick="review('rejeitado')">Rejeitar</button>
-<button class="pending" onclick="review('pendente')">Voltar</button>
-</div>
+          <div id="statusBox" class="status-box">Nenhum arquivo enviado ainda.</div>
 
-<script>
-const API="https://jaboque.onrender.com"
-let current=null
+          <div class="metrics-grid">
+            <div class="metric-card"><div class="metric-label">Job ID</div><div class="metric-value" id="metricJobId">-</div></div>
+            <div class="metric-card"><div class="metric-label">Tipo</div><div class="metric-value" id="metricTipo">-</div></div>
+            <div class="metric-card"><div class="metric-label">Status</div><div class="metric-value" id="metricStatus">-</div></div>
+            <div class="metric-card"><div class="metric-label">Parser</div><div class="metric-value" id="metricParser">-</div></div>
+            <div class="metric-card"><div class="metric-label">Decisão</div><div class="metric-value" id="metricDecisao">-</div></div>
+            <div class="metric-card"><div class="metric-label">Registros</div><div class="metric-value" id="metricRegistros">0</div></div>
+            <div class="metric-card"><div class="metric-label">Erros parser</div><div class="metric-value" id="metricErros">0</div></div>
+            <div class="metric-card"><div class="metric-label">Sucesso %</div><div class="metric-value" id="metricSucesso">0</div></div>
+            <div class="metric-card"><div class="metric-label">Total original</div><div class="metric-value" id="metricOriginal">0,00</div></div>
+            <div class="metric-card"><div class="metric-label">Total gerado</div><div class="metric-value" id="metricGerado">0,00</div></div>
+          </div>
 
-async function load(){
-  let res=await fetch(API+"/history")
-  let data=await res.json()
+          <div class="small-text" id="statusDetails">API base: <span id="apiBaseLabel"></span></div>
 
-  let search=document.getElementById("search").value.toLowerCase()
-  let status=document.getElementById("statusFilter").value
+          <div class="preview-grid">
+            <div class="preview-panel">
+              <h3>Preview do PDF original</h3>
+              <iframe id="previewOriginal" class="preview-frame"></iframe>
+            </div>
+            <div class="preview-panel">
+              <h3>Preview do PDF gerado</h3>
+              <iframe id="previewFinal" class="preview-frame"></iframe>
+            </div>
+          </div>
+        </section>
+      </div>
 
-  data=data.filter(x=>{
-    return (!search || x.nome.toLowerCase().includes(search))
-  })
+      <aside>
+        <section class="card">
+          <h2>Histórico e revisão</h2>
 
-  document.getElementById("list").innerHTML=data.map(x=>`
-    <div onclick="openJob('${x.job_id}')">
-      <b>${x.nome}</b> - ${x.status}
+          <div class="filters-grid">
+            <div>
+              <label class="label" for="filterBusca">Buscar arquivo</label>
+              <input id="filterBusca" type="text" placeholder="Digite parte do nome do arquivo" />
+            </div>
+            <div>
+              <label class="label" for="filterStatus">Filtrar por decisão</label>
+              <select id="filterStatus">
+                <option value="">Todos</option>
+                <option value="aprovado">Aprovado</option>
+                <option value="aprovado com alerta">Aprovado com alerta</option>
+                <option value="precisa revisão">Precisa revisão</option>
+                <option value="reprovado">Reprovado</option>
+              </select>
+            </div>
+            <div>
+              <label class="label" for="filterRevisao">Filtrar por revisão</label>
+              <select id="filterRevisao">
+                <option value="">Todos</option>
+                <option value="pendente">Pendentes</option>
+                <option value="aprovado">Revisados aprovados</option>
+                <option value="rejeitado">Revisados rejeitados</option>
+              </select>
+            </div>
+            <div class="actions" style="margin-top:0">
+              <button class="btn-secondary" id="btnFiltrar">Filtrar</button>
+            </div>
+          </div>
+
+          <div style="margin-top:16px" id="historyList" class="history-list"></div>
+        </section>
+      </aside>
     </div>
-  `).join("")
-}
+  </div>
 
-async function openJob(id){
-  let res=await fetch(API+"/history/"+id)
-  let d=await res.json()
-  current=id
+  <div class="modal-backdrop" id="jobModalBackdrop">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Detalhes do job</h3>
+        <button class="close-btn" id="btnFecharModal">Fechar</button>
+      </div>
 
-  document.getElementById("details").style.display="block"
-  document.getElementById("info").innerHTML=`
-    <p><b>Status:</b> ${d.status}</p>
-    <p><b>Parser:</b> ${d.parser_utilizado}</p>
-    <p><b>Registros:</b> ${d.qtd_registros}</p>
-    <p><b>Erros:</b> ${d.qtd_erros_parser}</p>
-    <p><b>Sucesso:</b> ${d.percentual_sucesso}%</p>
-    <p><b>Decisão:</b> ${d.decisao_final}</p>
-    <iframe src="${API+d.preview_original_url}" width="100%" height="200"></iframe>
-    <iframe src="${API+d.preview_gerado_url}" width="100%" height="200"></iframe>
-  `
-}
+      <div class="detail-grid">
+        <div class="detail-block"><div class="detail-label">Job ID</div><div class="detail-value" id="detailJobId">-</div></div>
+        <div class="detail-block"><div class="detail-label">Arquivo</div><div class="detail-value" id="detailArquivo">-</div></div>
+        <div class="detail-block"><div class="detail-label">Status</div><div class="detail-value" id="detailStatus">-</div></div>
+        <div class="detail-block"><div class="detail-label">Decisão final</div><div class="detail-value" id="detailDecisao">-</div></div>
+        <div class="detail-block"><div class="detail-label">Parser</div><div class="detail-value" id="detailParser">-</div></div>
+        <div class="detail-block"><div class="detail-label">Registros</div><div class="detail-value" id="detailRegistros">0</div></div>
+        <div class="detail-block"><div class="detail-label">Qtd erros parser</div><div class="detail-value" id="detailQtdErros">0</div></div>
+        <div class="detail-block"><div class="detail-label">Sucesso %</div><div class="detail-value" id="detailPercentual">0</div></div>
+        <div class="detail-block"><div class="detail-label">Total original</div><div class="detail-value" id="detailOriginal">0,00</div></div>
+        <div class="detail-block"><div class="detail-label">Total gerado</div><div class="detail-value" id="detailGerado">0,00</div></div>
+        <div class="detail-block"><div class="detail-label">Diferença</div><div class="detail-value" id="detailDiferenca">0,00</div></div>
+        <div class="detail-block"><div class="detail-label">Needs review</div><div class="detail-value" id="detailNeedsReview">-</div></div>
+        <div class="detail-block detail-full"><div class="detail-label">Diagnóstico</div><div class="detail-value" id="detailDiagnostico">-</div></div>
+        <div class="detail-block detail-full"><div class="detail-label">Erros do parser</div><div class="detail-value small-text" id="detailErrosParser">Sem erros registrados.</div></div>
+      </div>
 
-async function review(status){
-  await fetch(API+"/review/"+current,{
-    method:"POST",
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({status})
-  })
-  load()
-}
-load()
-</script>
+      <div class="preview-grid" style="margin-top:18px">
+        <div class="preview-panel">
+          <h3>Preview original</h3>
+          <iframe id="modalPreviewOriginal" class="preview-frame"></iframe>
+        </div>
+        <div class="preview-panel">
+          <h3>Preview gerado</h3>
+          <iframe id="modalPreviewFinal" class="preview-frame"></iframe>
+        </div>
+      </div>
 
+      <div class="card" style="margin-top:18px;padding:16px">
+        <h2 style="font-size:18px;margin-bottom:12px">Revisão profissional</h2>
+        <div class="small-text" id="reviewMeta">Sem revisão registrada.</div>
+        <div style="margin-top:12px">
+          <label class="label" for="reviewObservation">Observação da revisão</label>
+          <textarea id="reviewObservation" placeholder="Escreva a justificativa ou comentário da revisão"></textarea>
+        </div>
+        <div class="actions">
+          <button class="btn-success" id="btnAprovar">Aprovar</button>
+          <button class="btn-danger" id="btnRejeitar">Rejeitar</button>
+          <button class="btn-warning" id="btnPendente">Voltar para pendente</button>
+          <a id="modalDownload" class="link-btn btn-secondary hidden" href="#" target="_blank">Baixar PDF gerado</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = "https://jaboque.onrender.com";
+    const API_URL = `${API_BASE}/upload`;
+    const HISTORY_URL = `${API_BASE}/history`;
+    const STATS_URL = `${API_BASE}/stats`;
+    const REVIEW_QUEUE_URL = `${API_BASE}/review-queue`;
+
+    let selectedFile = null;
+    let localPreviewUrl = "";
+    let selectedHistoryJobId = "";
+    let historyCache = [];
+    let currentDetail = null;
+
+    const dropzone = document.getElementById("dropzone");
+    const fileInput = document.getElementById("fileInput");
+    const fileName = document.getElementById("fileName");
+    const statusBox = document.getElementById("statusBox");
+    const historyList = document.getElementById("historyList");
+    const previewOriginal = document.getElementById("previewOriginal");
+    const previewFinal = document.getElementById("previewFinal");
+    const btnDownload = document.getElementById("btnDownload");
+
+    document.getElementById("apiBaseLabel").textContent = API_BASE;
+
+    function escapeHtml(text){
+      return String(text ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    function absoluteUrl(url){
+      if (!url) return "";
+      if (url.startsWith("http://") || url.startsWith("https://")) return url;
+      return `${API_BASE}${url}`;
+    }
+
+    function formatValue(v){
+      if (v === null || v === undefined || v === "") return "0,00";
+      return String(v);
+    }
+
+    function lower(v){ return String(v || "").toLowerCase(); }
+
+    function setStatus(message, type=""){
+      statusBox.className = "status-box";
+      if (type === "success") statusBox.classList.add("status-success");
+      if (type === "error") statusBox.classList.add("status-error");
+      if (type === "warning") statusBox.classList.add("status-warning");
+      if (type === "loading") statusBox.classList.add("status-loading");
+      statusBox.textContent = message;
+    }
+
+    function badgeClassForItem(item){
+      const decisao = lower(item.decisao_final);
+      const revisao = lower(item.revisao_status);
+      const status = lower(item.status);
+      if (revisao === "rejeitado" || decisao.includes("reprov")) return "error";
+      if (revisao === "aprovado" || decisao === "aprovado") return "success";
+      if (status.includes("diverg") || decisao.includes("alerta") || decisao.includes("revis")) return "warning";
+      return "blue";
+    }
+
+    function resetMetrics(){
+      const ids = {
+        metricJobId:"-",
+        metricTipo:"-",
+        metricStatus:"-",
+        metricParser:"-",
+        metricDecisao:"-",
+        metricRegistros:"0",
+        metricErros:"0",
+        metricSucesso:"0",
+        metricOriginal:"0,00",
+        metricGerado:"0,00"
+      };
+      Object.entries(ids).forEach(([id,val]) => document.getElementById(id).textContent = val);
+      previewFinal.src = "";
+      btnDownload.classList.add("hidden");
+      btnDownload.href = "#";
+      document.getElementById("statusDetails").innerHTML = `API base: <span>${escapeHtml(API_BASE)}</span>`;
+    }
+
+    function applyResultToMainUI(data, keepLocalPreview=false){
+      document.getElementById("metricJobId").textContent = data.job_id || "-";
+      document.getElementById("metricTipo").textContent = data.tipo_detectado || "-";
+      document.getElementById("metricStatus").textContent = data.status || "-";
+      document.getElementById("metricParser").textContent = data.parser_utilizado || "-";
+      document.getElementById("metricDecisao").textContent = data.decisao_final || data.revisao_status || "-";
+      document.getElementById("metricRegistros").textContent = data.qtd_registros ?? 0;
+      document.getElementById("metricErros").textContent = data.qtd_erros_parser ?? 0;
+      document.getElementById("metricSucesso").textContent = data.percentual_sucesso ?? 0;
+      document.getElementById("metricOriginal").textContent = formatValue(data.valor_total_original);
+      document.getElementById("metricGerado").textContent = formatValue(data.valor_total_gerado);
+
+      document.getElementById("statusDetails").textContent =
+        data.detalhes_status || "Sem observações no momento.";
+
+      if (!keepLocalPreview && data.preview_original_url) {
+        previewOriginal.src = absoluteUrl(data.preview_original_url);
+      }
+      previewFinal.src = data.preview_gerado_url ? absoluteUrl(data.preview_gerado_url) : "";
+
+      if (data.download_url) {
+        btnDownload.href = absoluteUrl(data.download_url);
+        btnDownload.classList.remove("hidden");
+      } else {
+        btnDownload.href = "#";
+        btnDownload.classList.add("hidden");
+      }
+    }
+
+    function updateSelectedFile(file){
+      selectedFile = file || null;
+      fileName.textContent = selectedFile ? `Arquivo selecionado: ${selectedFile.name}` : "";
+      if (localPreviewUrl) URL.revokeObjectURL(localPreviewUrl);
+      localPreviewUrl = "";
+      previewOriginal.src = "";
+      if (selectedFile) {
+        localPreviewUrl = URL.createObjectURL(selectedFile);
+        previewOriginal.src = localPreviewUrl;
+      }
+    }
+
+    function clearSelectedFile(){
+      selectedFile = null;
+      fileInput.value = "";
+      fileName.textContent = "";
+      if (localPreviewUrl) URL.revokeObjectURL(localPreviewUrl);
+      localPreviewUrl = "";
+      previewOriginal.src = "";
+      previewFinal.src = "";
+      selectedHistoryJobId = "";
+      resetMetrics();
+      setStatus("Nenhum arquivo enviado ainda.");
+    }
+
+    async function safeJson(response){
+      const text = await response.text();
+      try { return JSON.parse(text); } catch { return { raw: text }; }
+    }
+
+    async function loadStatsAndHistory(){
+      await Promise.all([loadStats(), loadHistory()]);
+    }
+
+    async function loadStats(){
+      try {
+        const response = await fetch(STATS_URL);
+        if (!response.ok) throw new Error("Falha ao carregar stats");
+        const data = await safeJson(response);
+        document.getElementById("statTotalJobs").textContent =
+          data.total_jobs ?? historyCache.length ?? 0;
+        document.getElementById("statPendentes").textContent =
+          data.pendentes ?? countByRevision("pendente");
+        document.getElementById("statAprovados").textContent =
+          data.aprovados ?? countByRevision("aprovado");
+        document.getElementById("statRejeitados").textContent =
+          data.rejeitados ?? countByRevision("rejeitado");
+      } catch {
+        document.getElementById("statTotalJobs").textContent = historyCache.length;
+        document.getElementById("statPendentes").textContent = countByRevision("pendente");
+        document.getElementById("statAprovados").textContent = countByRevision("aprovado");
+        document.getElementById("statRejeitados").textContent = countByRevision("rejeitado");
+      }
+    }
+
+    function countByRevision(value){
+      return historyCache.filter(x => lower(x.revisao_status) === value).length;
+    }
+
+    function applyHistoryFilters(items){
+      const busca = lower(document.getElementById("filterBusca").value).trim();
+      const statusFilter = lower(document.getElementById("filterStatus").value);
+      const revisaoFilter = lower(document.getElementById("filterRevisao").value);
+
+      return items.filter(item => {
+        const nome = lower(item.nome_arquivo_original || item.nome || "");
+        const decisao = lower(item.decisao_final);
+        const revisao = lower(item.revisao_status);
+
+        const okBusca = !busca || nome.includes(busca);
+        const okStatus = !statusFilter || decisao === statusFilter;
+        const okRevisao = !revisaoFilter || revisao === revisaoFilter;
+
+        return okBusca && okStatus && okRevisao;
+      });
+    }
+
+    async function loadHistory(){
+      try {
+        const response = await fetch(HISTORY_URL);
+        if (!response.ok) throw new Error("Não foi possível carregar o histórico.");
+        historyCache = await safeJson(response);
+        renderHistory();
+        await loadStats();
+      } catch (error) {
+        historyList.innerHTML = `<div class="empty">Erro ao carregar histórico: ${escapeHtml(error.message)}</div>`;
+      }
+    }
+
+    function renderHistory(){
+      const items = applyHistoryFilters(historyCache);
+
+      if (!items.length) {
+        historyList.innerHTML = `<div class="empty">Nenhum item encontrado com os filtros atuais.</div>`;
+        return;
+      }
+
+      historyList.innerHTML = items.map(item => `
+        <div class="history-item ${selectedHistoryJobId === item.job_id ? "active" : ""}" data-job-id="${escapeHtml(item.job_id)}">
+          <strong>${escapeHtml(item.nome_arquivo_original || item.nome || "Sem nome")}</strong>
+          <span class="badge ${badgeClassForItem(item)}">${escapeHtml(item.revisao_status || item.decisao_final || item.status || "-")}</span>
+          <span class="badge blue">${escapeHtml(item.tipo_detectado || "-")}</span>
+          <div class="history-meta">
+            Job ID: ${escapeHtml(item.job_id || "-")}<br>
+            Status: ${escapeHtml(item.status || "-")}<br>
+            Decisão: ${escapeHtml(item.decisao_final || "-")}<br>
+            Revisão: ${escapeHtml(item.revisao_status || "pendente")}<br>
+            Registros: ${escapeHtml(String(item.qtd_registros ?? 0))}<br>
+            Erros parser: ${escapeHtml(String(item.qtd_erros_parser ?? 0))}<br>
+            Sucesso: ${escapeHtml(String(item.percentual_sucesso ?? 0))}%<br>
+            Data/Hora: ${escapeHtml(item.data_hora || "-")}
+          </div>
+          <div class="small-text">${escapeHtml(item.detalhes_status || "Sem diagnóstico adicional.")}</div>
+        </div>
+      `).join("");
+
+      document.querySelectorAll(".history-item").forEach(el => {
+        el.addEventListener("click", () => {
+          const jobId = el.dataset.jobId;
+          openJobDetails(jobId);
+        });
+      });
+    }
+
+    async function processFile(){
+      if (!selectedFile) {
+        setStatus("Selecione um PDF antes de processar.", "error");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+
+      setStatus("Enviando arquivo para a API...\nAguarde o processamento completo.", "loading");
+      resetMetrics();
+
+      try {
+        const response = await fetch(API_URL, { method:"POST", body: formData });
+        const data = await safeJson(response);
+
+        if (!response.ok || data.ok === false) {
+          throw new Error(data.erro || data.detail || data.raw || "Erro ao processar o relatório.");
+        }
+
+        selectedHistoryJobId = data.job_id || "";
+        applyResultToMainUI(data, false);
+
+        const warning = Boolean(data.divergencia_total) || lower(data.decisao_final).includes("revis") || lower(data.status).includes("diverg");
+        setStatus(
+          `${data.mensagem || "Processamento concluído."}\nStatus: ${data.status || "-"}\nDecisão: ${data.decisao_final || "-"}\nJob ID: ${data.job_id || "-"}\nRegistros: ${data.qtd_registros ?? 0}\nErros parser: ${data.qtd_erros_parser ?? 0}\nSucesso: ${data.percentual_sucesso ?? 0}%`,
+          warning ? "warning" : "success"
+        );
+
+        await loadHistory();
+      } catch (error) {
+        setStatus(`Erro ao processar: ${error.message}`, "error");
+      }
+    }
+
+    async function fetchJobDetail(jobId){
+      const response = await fetch(`${HISTORY_URL}/${jobId}`);
+      const data = await safeJson(response);
+      if (!response.ok) throw new Error(data.detail || data.erro || "Erro ao carregar detalhes.");
+      return data;
+    }
+
+    async function openJobDetails(jobId){
+      try {
+        const data = await fetchJobDetail(jobId);
+        currentDetail = data;
+        selectedHistoryJobId = jobId;
+        renderHistory();
+        applyResultToMainUI(data, false);
+
+        document.getElementById("detailJobId").textContent = data.job_id || "-";
+        document.getElementById("detailArquivo").textContent = data.nome_arquivo_original || "-";
+        document.getElementById("detailStatus").textContent = data.status || "-";
+        document.getElementById("detailDecisao").textContent = data.decisao_final || "-";
+        document.getElementById("detailParser").textContent = data.parser_utilizado || "-";
+        document.getElementById("detailRegistros").textContent = data.qtd_registros ?? 0;
+        document.getElementById("detailQtdErros").textContent = data.qtd_erros_parser ?? 0;
+        document.getElementById("detailPercentual").textContent = `${data.percentual_sucesso ?? 0}%`;
+        document.getElementById("detailOriginal").textContent = formatValue(data.valor_total_original);
+        document.getElementById("detailGerado").textContent = formatValue(data.valor_total_gerado);
+        document.getElementById("detailDiferenca").textContent = formatValue(data.diferenca_total);
+        document.getElementById("detailNeedsReview").textContent = data.needs_review ? "Sim" : "Não";
+        document.getElementById("detailDiagnostico").textContent = data.detalhes_status || "Sem diagnóstico.";
+        document.getElementById("detailErrosParser").textContent = data.erros_parser || "Sem erros registrados.";
+
+        document.getElementById("modalPreviewOriginal").src = data.preview_original_url ? absoluteUrl(data.preview_original_url) : "";
+        document.getElementById("modalPreviewFinal").src = data.preview_gerado_url ? absoluteUrl(data.preview_gerado_url) : "";
+
+        const modalDownload = document.getElementById("modalDownload");
+        if (data.download_url) {
+          modalDownload.href = absoluteUrl(data.download_url);
+          modalDownload.classList.remove("hidden");
+        } else {
+          modalDownload.href = "#";
+          modalDownload.classList.add("hidden");
+        }
+
+        document.getElementById("reviewObservation").value = data.revisao_observacao || "";
+        document.getElementById("reviewMeta").textContent =
+          `Revisão: ${data.revisao_status || "pendente"} | Revisado por: ${data.revisado_por || "-"} | Em: ${data.revisado_em || "-"}`;
+
+        document.getElementById("jobModalBackdrop").style.display = "flex";
+      } catch (error) {
+        setStatus(`Erro ao carregar detalhes: ${error.message}`, "error");
+      }
+    }
+
+    async function submitReview(status){
+      if (!currentDetail?.job_id) return;
+
+      const body = {
+        status,
+        observacao: document.getElementById("reviewObservation").value || "",
+        revisado_por: "operador_web"
+      };
+
+      try {
+        const response = await fetch(`${API_BASE}/review/${currentDetail.job_id}`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body)
+        });
+        const data = await safeJson(response);
+        if (!response.ok) throw new Error(data.detail || data.erro || data.raw || "Erro ao salvar revisão.");
+
+        setStatus(`Revisão salva com sucesso.\nStatus da revisão: ${status}`, status === "rejeitado" ? "warning" : "success");
+        document.getElementById("jobModalBackdrop").style.display = "none";
+        await loadHistory();
+        if (selectedHistoryJobId) {
+          try { await openJobDetails(selectedHistoryJobId); } catch {}
+        }
+      } catch (error) {
+        setStatus(`Erro na revisão: ${error.message}`, "error");
+      }
+    }
+
+    dropzone.addEventListener("click", () => fileInput.click());
+    fileInput.addEventListener("change", e => updateSelectedFile(e.target.files[0] || null));
+    dropzone.addEventListener("dragover", e => { e.preventDefault(); dropzone.classList.add("dragover"); });
+    dropzone.addEventListener("dragleave", () => dropzone.classList.remove("dragover"));
+    dropzone.addEventListener("drop", e => {
+      e.preventDefault();
+      dropzone.classList.remove("dragover");
+      const file = e.dataTransfer.files[0];
+      if (file) updateSelectedFile(file);
+    });
+
+    document.getElementById("btnProcessar").addEventListener("click", processFile);
+    document.getElementById("btnLimparArquivo").addEventListener("click", clearSelectedFile);
+    document.getElementById("btnAtualizarTudo").addEventListener("click", loadStatsAndHistory);
+    document.getElementById("btnFiltrar").addEventListener("click", renderHistory);
+    document.getElementById("filterBusca").addEventListener("keydown", e => { if (e.key === "Enter") renderHistory(); });
+    document.getElementById("filterStatus").addEventListener("change", renderHistory);
+    document.getElementById("filterRevisao").addEventListener("change", renderHistory);
+    document.getElementById("btnFecharModal").addEventListener("click", () => document.getElementById("jobModalBackdrop").style.display = "none");
+    document.getElementById("btnAprovar").addEventListener("click", () => submitReview("aprovado"));
+    document.getElementById("btnRejeitar").addEventListener("click", () => submitReview("rejeitado"));
+    document.getElementById("btnPendente").addEventListener("click", () => submitReview("pendente"));
+
+    document.getElementById("jobModalBackdrop").addEventListener("click", (e) => {
+      if (e.target.id === "jobModalBackdrop") {
+        document.getElementById("jobModalBackdrop").style.display = "none";
+      }
+    });
+
+    loadStatsAndHistory();
+  </script>
 </body>
 </html>
