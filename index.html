@@ -6,473 +6,77 @@
   <title>Organizador Inteligente de Relatórios PDF</title>
   <style>
     :root{
-      --bg:#f4f7fb;
-      --card:#ffffff;
-      --text:#1f2937;
-      --muted:#6b7280;
-      --line:#e5e7eb;
-      --primary:#2563eb;
-      --primary-2:#0f4c81;
-      --success:#16a34a;
-      --warning:#d97706;
-      --danger:#dc2626;
-      --shadow:0 10px 30px rgba(15,23,42,.08);
-      --radius:18px;
+      --bg:#f4f7fb; --card:#ffffff; --text:#1f2937; --muted:#6b7280; --line:#e5e7eb;
+      --primary:#2563eb; --primary-2:#0f4c81; --success:#16a34a; --warning:#d97706; --danger:#dc2626;
+      --shadow:0 10px 30px rgba(15,23,42,.08); --radius:18px;
     }
-
     *{box-sizing:border-box}
-
-    body{
-      margin:0;
-      font-family:Arial,Helvetica,sans-serif;
-      background:var(--bg);
-      color:var(--text);
-    }
-
-    .container{
-      max-width:1440px;
-      margin:0 auto;
-      padding:24px;
-    }
-
-    .hero{
-      background:linear-gradient(135deg,var(--primary-2),var(--primary));
-      color:#fff;
-      border-radius:22px;
-      padding:30px;
-      margin-bottom:24px;
-      box-shadow:0 14px 34px rgba(15,76,129,.22);
-    }
-
-    .hero h1{
-      margin:0 0 10px;
-      font-size:32px;
-    }
-
-    .hero p{
-      margin:0;
-      max-width:980px;
-      line-height:1.55;
-    }
-
-    .stats-grid,
-    .metrics-grid,
-    .filters-grid{
-      display:grid;
-      gap:12px;
-    }
-
-    .stats-grid{
-      grid-template-columns:repeat(4,1fr);
-      margin-top:20px;
-    }
-
-    .filters-grid{
-      grid-template-columns:1.3fr 1fr 1fr auto;
-      align-items:end;
-    }
-
-    .layout{
-      display:grid;
-      grid-template-columns:1.35fr .95fr;
-      gap:20px;
-    }
-
-    .card{
-      background:var(--card);
-      border-radius:var(--radius);
-      padding:22px;
-      box-shadow:var(--shadow);
-      margin-bottom:20px;
-    }
-
-    .card h2{
-      margin:0 0 16px;
-      color:var(--primary-2);
-      font-size:22px;
-    }
-
-    .dropzone{
-      border:2px dashed #93c5fd;
-      border-radius:16px;
-      padding:32px 20px;
-      text-align:center;
-      background:#f8fbff;
-      cursor:pointer;
-      transition:.2s ease;
-    }
-
-    .dropzone.dragover{
-      border-color:var(--primary);
-      background:#eef5ff;
-      transform:scale(1.01);
-    }
-
-    .dropzone .main-text{
-      font-size:19px;
-      font-weight:700;
-      color:#1d4ed8;
-    }
-
-    .dropzone .sub-text{
-      color:var(--muted);
-      font-size:14px;
-      margin-top:8px;
-    }
-
-    .file-name{
-      margin-top:14px;
-      font-size:14px;
-      font-weight:700;
-      word-break:break-word;
-    }
-
-    .actions{
-      display:flex;
-      gap:12px;
-      flex-wrap:wrap;
-      margin-top:18px;
-    }
-
-    button,
-    .link-btn,
-    input,
-    select,
-    textarea{
-      font:inherit;
-      border-radius:12px;
-    }
-
-    button,
-    .link-btn{
-      border:none;
-      padding:12px 18px;
-      font-weight:700;
-      cursor:pointer;
-      text-decoration:none;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-    }
-
-    .btn-primary{
-      background:linear-gradient(135deg,#2563eb,#1d4ed8);
-      color:#fff;
-    }
-
-    .btn-secondary{
-      background:#e5eefc;
-      color:#1d4ed8;
-    }
-
-    .btn-success{
-      background:#dcfce7;
-      color:#166534;
-    }
-
-    .btn-danger{
-      background:#fee2e2;
-      color:#991b1b;
-    }
-
-    .btn-warning{
-      background:#fef3c7;
-      color:#92400e;
-    }
-
-    input,
-    select,
-    textarea{
-      width:100%;
-      padding:12px;
-      border:1px solid #d1d5db;
-      background:#fff;
-    }
-
-    textarea{
-      min-height:90px;
-      resize:vertical;
-    }
-
-    .label{
-      display:block;
-      font-size:12px;
-      color:var(--muted);
-      margin-bottom:6px;
-    }
-
-    .status-box{
-      margin-top:18px;
-      padding:14px 16px;
-      border-radius:12px;
-      border:1px solid var(--line);
-      font-size:14px;
-      line-height:1.55;
-      white-space:pre-line;
-      min-height:56px;
-      background:#f8fafc;
-    }
-
-    .status-success{
-      background:#ecfdf5;
-      border-color:#a7f3d0;
-      color:#065f46;
-    }
-
-    .status-error{
-      background:#fef2f2;
-      border-color:#fecaca;
-      color:#991b1b;
-    }
-
-    .status-warning{
-      background:#fff7ed;
-      border-color:#fdba74;
-      color:#9a3412;
-    }
-
-    .status-loading{
-      background:#eff6ff;
-      border-color:#bfdbfe;
-      color:#1d4ed8;
-    }
-
-    .stat-card,
-    .metric-card{
-      background:#f8fafc;
-      border:1px solid var(--line);
-      border-radius:14px;
-      padding:12px;
-    }
-
-    .stat-label,
-    .metric-label{
-      font-size:12px;
-      color:var(--muted);
-      margin-bottom:6px;
-    }
-
-    .stat-value,
-    .metric-value{
-      font-size:20px;
-      font-weight:700;
-    }
-
-    .metrics-grid{
-      grid-template-columns:repeat(5,1fr);
-      margin-top:18px;
-    }
-
-    .preview-grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:18px;
-      margin-top:20px;
-    }
-
-    .preview-panel{
-      background:#f8fafc;
-      border:1px solid var(--line);
-      border-radius:14px;
-      padding:12px;
-    }
-
-    .preview-panel h3{
-      margin:0 0 10px;
-      color:var(--primary-2);
-      font-size:16px;
-    }
-
-    .preview-frame{
-      width:100%;
-      height:520px;
-      border:1px solid #dbe4f0;
-      border-radius:10px;
-      background:#fff;
-    }
-
-    .history-list{
-      display:grid;
-      gap:12px;
-      max-height:1100px;
-      overflow-y:auto;
-      padding-right:4px;
-    }
-
-    .history-item{
-      border:1px solid var(--line);
-      border-radius:14px;
-      padding:14px;
-      background:#fbfdff;
-      cursor:pointer;
-      transition:.15s ease;
-    }
-
-    .history-item:hover{
-      transform:translateY(-1px);
-      box-shadow:0 8px 22px rgba(15,23,42,.06);
-    }
-
-    .history-item.active{
-      border-color:var(--primary);
-      box-shadow:0 0 0 2px rgba(37,99,235,.10);
-    }
-
-    .history-item strong{
-      display:block;
-      margin-bottom:6px;
-      word-break:break-word;
-    }
-
-    .history-meta{
-      font-size:13px;
-      color:var(--muted);
-      line-height:1.6;
-      margin-top:8px;
-    }
-
-    .badge{
-      display:inline-block;
-      padding:5px 10px;
-      border-radius:999px;
-      font-size:12px;
-      font-weight:700;
-      margin-right:6px;
-      margin-top:4px;
-    }
-
-    .badge.blue{
-      background:#dbeafe;
-      color:#1d4ed8;
-    }
-
-    .badge.success{
-      background:#dcfce7;
-      color:#166534;
-    }
-
-    .badge.warning{
-      background:#fef3c7;
-      color:#92400e;
-    }
-
-    .badge.error{
-      background:#fee2e2;
-      color:#991b1b;
-    }
-
-    .small-text{
-      font-size:12px;
-      color:var(--muted);
-      line-height:1.5;
-    }
-
-    .hidden{
-      display:none !important;
-    }
-
-    .empty{
-      color:var(--muted);
-      font-size:14px;
-    }
-
-    .modal-backdrop{
-      position:fixed;
-      inset:0;
-      background:rgba(15,23,42,.55);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      padding:20px;
-      z-index:1000;
-    }
-
-    .modal{
-      width:min(1100px,100%);
-      max-height:90vh;
-      overflow:auto;
-      background:#fff;
-      border-radius:20px;
-      box-shadow:0 24px 70px rgba(0,0,0,.25);
-      padding:22px;
-    }
-
-    .modal-header{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:12px;
-      margin-bottom:16px;
-    }
-
-    .modal-header h3{
-      margin:0;
-      color:var(--primary-2);
-      font-size:22px;
-    }
-
-    .close-btn{
-      background:#eef2ff;
-      color:#3730a3;
-    }
-
-    .detail-grid{
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:12px;
-    }
-
-    .detail-block{
-      background:#f8fafc;
-      border:1px solid var(--line);
-      border-radius:14px;
-      padding:12px;
-    }
-
-    .detail-label{
-      font-size:12px;
-      color:var(--muted);
-      margin-bottom:6px;
-    }
-
-    .detail-value{
-      font-weight:700;
-      word-break:break-word;
-    }
-
-    .detail-full{
-      grid-column:1/-1;
-    }
-
-    @media (max-width:1200px){
-      .layout,
-      .preview-grid{
-        grid-template-columns:1fr;
-      }
-
-      .stats-grid,
-      .metrics-grid,
-      .detail-grid{
-        grid-template-columns:repeat(2,1fr);
-      }
-
-      .filters-grid{
-        grid-template-columns:1fr 1fr;
-      }
-    }
-
-    @media (max-width:760px){
-      .container{padding:14px}
-      .hero{padding:22px}
-      .hero h1{font-size:26px}
-
-      .stats-grid,
-      .metrics-grid,
-      .detail-grid,
-      .filters-grid{
-        grid-template-columns:1fr;
-      }
-    }
+    body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
+    .container{max-width:1440px;margin:0 auto;padding:24px}
+    .hero{background:linear-gradient(135deg,var(--primary-2),var(--primary));color:#fff;border-radius:22px;padding:30px;margin-bottom:24px;box-shadow:0 14px 34px rgba(15,76,129,.22)}
+    .hero h1{margin:0 0 10px;font-size:32px}
+    .hero p{margin:0;max-width:980px;line-height:1.55}
+    .stats-grid,.metrics-grid,.filters-grid{display:grid;gap:12px}
+    .stats-grid{grid-template-columns:repeat(4,1fr);margin-top:20px}
+    .filters-grid{grid-template-columns:1.3fr 1fr 1fr auto;align-items:end}
+    .layout{display:grid;grid-template-columns:1.35fr .95fr;gap:20px}
+    .card{background:var(--card);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);margin-bottom:20px}
+    .card h2{margin:0 0 16px;color:var(--primary-2);font-size:22px}
+    .dropzone{border:2px dashed #93c5fd;border-radius:16px;padding:32px 20px;text-align:center;background:#f8fbff;cursor:pointer;transition:.2s ease}
+    .dropzone.dragover{border-color:var(--primary);background:#eef5ff;transform:scale(1.01)}
+    .dropzone .main-text{font-size:19px;font-weight:700;color:#1d4ed8}
+    .dropzone .sub-text{color:var(--muted);font-size:14px;margin-top:8px}
+    .file-name{margin-top:14px;font-size:14px;font-weight:700;word-break:break-word}
+    .actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px}
+    button,.link-btn,input,select,textarea{font:inherit;border-radius:12px}
+    button,.link-btn{border:none;padding:12px 18px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+    .btn-primary{background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff}
+    .btn-secondary{background:#e5eefc;color:#1d4ed8}
+    .btn-success{background:#dcfce7;color:#166534}
+    .btn-danger{background:#fee2e2;color:#991b1b}
+    .btn-warning{background:#fef3c7;color:#92400e}
+    input,select,textarea{width:100%;padding:12px;border:1px solid #d1d5db;background:#fff}
+    textarea{min-height:90px;resize:vertical}
+    .label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+    .status-box{margin-top:18px;padding:14px 16px;border-radius:12px;border:1px solid var(--line);font-size:14px;line-height:1.55;white-space:pre-line;min-height:56px;background:#f8fafc}
+    .status-success{background:#ecfdf5;border-color:#a7f3d0;color:#065f46}
+    .status-error{background:#fef2f2;border-color:#fecaca;color:#991b1b}
+    .status-warning{background:#fff7ed;border-color:#fdba74;color:#9a3412}
+    .status-loading{background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8}
+    .stat-card,.metric-card{background:#f8fafc;border:1px solid var(--line);border-radius:14px;padding:12px}
+    .stat-label,.metric-label{font-size:12px;color:var(--muted);margin-bottom:6px}
+    .stat-value,.metric-value{font-size:20px;font-weight:700}
+    .metrics-grid{grid-template-columns:repeat(5,1fr);margin-top:18px}
+    .preview-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:20px}
+    .preview-panel{background:#f8fafc;border:1px solid var(--line);border-radius:14px;padding:12px}
+    .preview-panel h3{margin:0 0 10px;color:var(--primary-2);font-size:16px}
+    .preview-frame{width:100%;height:520px;border:1px solid #dbe4f0;border-radius:10px;background:#fff}
+    .history-list{display:grid;gap:12px;max-height:1100px;overflow-y:auto;padding-right:4px}
+    .history-item{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fbfdff;cursor:pointer;transition:.15s ease}
+    .history-item:hover{transform:translateY(-1px);box-shadow:0 8px 22px rgba(15,23,42,.06)}
+    .history-item.active{border-color:var(--primary);box-shadow:0 0 0 2px rgba(37,99,235,.10)}
+    .history-item strong{display:block;margin-bottom:6px;word-break:break-word}
+    .history-meta{font-size:13px;color:var(--muted);line-height:1.6;margin-top:8px}
+    .badge{display:inline-block;padding:5px 10px;border-radius:999px;font-size:12px;font-weight:700;margin-right:6px;margin-top:4px}
+    .badge.blue{background:#dbeafe;color:#1d4ed8}
+    .badge.success{background:#dcfce7;color:#166534}
+    .badge.warning{background:#fef3c7;color:#92400e}
+    .badge.error{background:#fee2e2;color:#991b1b}
+    .small-text{font-size:12px;color:var(--muted);line-height:1.5}
+    .hidden{display:none!important}
+    .empty{color:var(--muted);font-size:14px}
+    .modal-backdrop{position:fixed;inset:0;background:rgba(15,23,42,.55);display:none;align-items:center;justify-content:center;padding:20px;z-index:1000}
+    .modal{width:min(1100px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:20px;box-shadow:0 24px 70px rgba(0,0,0,.25);padding:22px}
+    .modal-header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}
+    .modal-header h3{margin:0;color:var(--primary-2);font-size:22px}
+    .close-btn{background:#eef2ff;color:#3730a3}
+    .detail-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .detail-block{background:#f8fafc;border:1px solid var(--line);border-radius:14px;padding:12px}
+    .detail-label{font-size:12px;color:var(--muted);margin-bottom:6px}
+    .detail-value{font-weight:700;word-break:break-word}
+    .detail-full{grid-column:1/-1}
+    @media (max-width:1200px){.layout,.preview-grid{grid-template-columns:1fr}.stats-grid,.metrics-grid,.detail-grid{grid-template-columns:repeat(2,1fr)}.filters-grid{grid-template-columns:1fr 1fr}}
+    @media (max-width:760px){.container{padding:14px}.hero{padding:22px}.hero h1{font-size:26px}.stats-grid,.metrics-grid,.detail-grid,.filters-grid{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
@@ -480,24 +84,11 @@
     <section class="hero">
       <h1>Organizador Inteligente de Relatórios PDF</h1>
       <p>Envie PDFs, acompanhe o diagnóstico técnico, filtre o histórico, visualize previews e faça revisão profissional com aprovação, rejeição e observação por job.</p>
-
       <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-label">Total de jobs</div>
-          <div class="stat-value" id="statTotalJobs">0</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Precisa revisão</div>
-          <div class="stat-value" id="statPendentes">0</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Aprovados auto</div>
-          <div class="stat-value" id="statAprovados">0</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Reprovados</div>
-          <div class="stat-value" id="statRejeitados">0</div>
-        </div>
+        <div class="stat-card"><div class="stat-label">Total de jobs</div><div class="stat-value" id="statTotalJobs">0</div></div>
+        <div class="stat-card"><div class="stat-label">Pendentes</div><div class="stat-value" id="statPendentes">0</div></div>
+        <div class="stat-card"><div class="stat-label">Aprovados</div><div class="stat-value" id="statAprovados">0</div></div>
+        <div class="stat-card"><div class="stat-label">Rejeitados</div><div class="stat-value" id="statRejeitados">0</div></div>
       </div>
     </section>
 
@@ -505,19 +96,18 @@
       <div>
         <section class="card">
           <h2>Enviar relatório</h2>
-
           <div id="dropzone" class="dropzone">
             <div class="main-text">Clique aqui ou arraste um PDF</div>
             <div class="sub-text">Envio real para a API publicada no Render</div>
-            <input type="file" id="fileInput" accept=".pdf,application/pdf" hidden />
+            <input type="file" id="fileInput" accept=".pdf" hidden />
             <div id="fileName" class="file-name"></div>
           </div>
 
           <div class="actions">
-            <button class="btn-primary" id="btnProcessar" type="button">Processar relatório</button>
-            <button class="btn-secondary" id="btnLimparArquivo" type="button">Limpar seleção</button>
-            <button class="btn-secondary" id="btnAtualizarTudo" type="button">Atualizar dados</button>
-            <a id="btnDownload" class="link-btn btn-secondary hidden" href="#" target="_blank" rel="noopener noreferrer">Baixar PDF gerado</a>
+            <button class="btn-primary" id="btnProcessar">Processar relatório</button>
+            <button class="btn-secondary" id="btnLimparArquivo">Limpar seleção</button>
+            <button class="btn-secondary" id="btnAtualizarTudo">Atualizar dados</button>
+            <a id="btnDownload" class="link-btn btn-secondary hidden" href="#" target="_blank">Baixar PDF gerado</a>
           </div>
 
           <div id="statusBox" class="status-box">Nenhum arquivo enviado ainda.</div>
@@ -553,13 +143,11 @@
       <aside>
         <section class="card">
           <h2>Histórico e revisão</h2>
-
           <div class="filters-grid">
             <div>
               <label class="label" for="filterBusca">Buscar arquivo</label>
               <input id="filterBusca" type="text" placeholder="Digite parte do nome do arquivo" />
             </div>
-
             <div>
               <label class="label" for="filterStatus">Filtrar por decisão</label>
               <select id="filterStatus">
@@ -568,9 +156,10 @@
                 <option value="aprovado com alerta">Aprovado com alerta</option>
                 <option value="precisa revisão">Precisa revisão</option>
                 <option value="reprovado">Reprovado</option>
+                <option value="aprovado manualmente">Aprovado manualmente</option>
+                <option value="rejeitado manualmente">Rejeitado manualmente</option>
               </select>
             </div>
-
             <div>
               <label class="label" for="filterRevisao">Filtrar por revisão</label>
               <select id="filterRevisao">
@@ -580,13 +169,18 @@
                 <option value="rejeitado">Revisados rejeitados</option>
               </select>
             </div>
-
             <div class="actions" style="margin-top:0">
-              <button class="btn-secondary" id="btnFiltrar" type="button">Filtrar</button>
+              <button class="btn-secondary" id="btnFiltrar">Filtrar</button>
             </div>
           </div>
 
           <div style="margin-top:16px" id="historyList" class="history-list"></div>
+
+          <div class="actions" style="justify-content:space-between;align-items:center;margin-top:16px">
+            <button class="btn-secondary" id="btnPrevPage">Página anterior</button>
+            <div class="small-text" id="historyPaginationInfo">Página 1 de 1</div>
+            <button class="btn-secondary" id="btnNextPage">Próxima página</button>
+          </div>
         </section>
       </aside>
     </div>
@@ -596,7 +190,7 @@
     <div class="modal">
       <div class="modal-header">
         <h3>Detalhes do job</h3>
-        <button class="close-btn" id="btnFecharModal" type="button">Fechar</button>
+        <button class="close-btn" id="btnFecharModal">Fechar</button>
       </div>
 
       <div class="detail-grid">
@@ -630,17 +224,15 @@
       <div class="card" style="margin-top:18px;padding:16px">
         <h2 style="font-size:18px;margin-bottom:12px">Revisão profissional</h2>
         <div class="small-text" id="reviewMeta">Sem revisão registrada.</div>
-
         <div style="margin-top:12px">
           <label class="label" for="reviewObservation">Observação da revisão</label>
           <textarea id="reviewObservation" placeholder="Escreva a justificativa ou comentário da revisão"></textarea>
         </div>
-
         <div class="actions">
-          <button class="btn-success" id="btnAprovar" type="button">Aprovar</button>
-          <button class="btn-danger" id="btnRejeitar" type="button">Rejeitar</button>
-          <button class="btn-warning" id="btnPendente" type="button">Voltar para pendente</button>
-          <a id="modalDownload" class="link-btn btn-secondary hidden" href="#" target="_blank" rel="noopener noreferrer">Baixar PDF gerado</a>
+          <button class="btn-success" id="btnAprovar">Aprovar</button>
+          <button class="btn-danger" id="btnRejeitar">Rejeitar</button>
+          <button class="btn-warning" id="btnPendente">Voltar para pendente</button>
+          <a id="modalDownload" class="link-btn btn-secondary hidden" href="#" target="_blank">Baixar PDF gerado</a>
         </div>
       </div>
     </div>
@@ -657,6 +249,9 @@
     let selectedHistoryJobId = "";
     let historyCache = [];
     let currentDetail = null;
+    let currentHistoryPage = 1;
+    let currentHistoryLimit = 10;
+    let historyMeta = { page: 1, limit: 10, total: 0, total_pages: 1, has_prev: false, has_next: false };
 
     const dropzone = document.getElementById("dropzone");
     const fileInput = document.getElementById("fileInput");
@@ -666,17 +261,11 @@
     const previewOriginal = document.getElementById("previewOriginal");
     const previewFinal = document.getElementById("previewFinal");
     const btnDownload = document.getElementById("btnDownload");
-    const btnProcessar = document.getElementById("btnProcessar");
 
     document.getElementById("apiBaseLabel").textContent = API_BASE;
 
     function escapeHtml(text){
-      return String(text ?? "")
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
+      return String(text ?? "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
     }
 
     function absoluteUrl(url){
@@ -690,19 +279,17 @@
       return String(v);
     }
 
-    function lower(v){
-      return String(v || "").toLowerCase();
-    }
+    function lower(v){ return String(v || "").toLowerCase(); }
 
     function backendMessage(data){
-      if (typeof data === "string") return data;
-      if (data?.detail && typeof data.detail === "string") return data.detail;
-      if (data?.erro && typeof data.erro === "string") return data.erro;
-      if (data?.message && typeof data.message === "string") return data.message;
-      if (data?.detail) return JSON.stringify(data.detail);
-      if (data?.erro) return JSON.stringify(data.erro);
-      if (data?.raw) return String(data.raw);
-      return JSON.stringify(data);
+      return typeof data === "string" ? data :
+        (data?.detail && typeof data.detail === "string") ? data.detail :
+        (data?.erro && typeof data.erro === "string") ? data.erro :
+        (data?.message && typeof data.message === "string") ? data.message :
+        data?.detail ? JSON.stringify(data.detail) :
+        data?.erro ? JSON.stringify(data.erro) :
+        data?.raw ? String(data.raw) :
+        JSON.stringify(data);
     }
 
     function setStatus(message, type=""){
@@ -714,18 +301,12 @@
       statusBox.textContent = message;
     }
 
-    function setProcessingState(isProcessing){
-      btnProcessar.disabled = isProcessing;
-      btnProcessar.textContent = isProcessing ? "Processando..." : "Processar relatório";
-    }
-
     function badgeClassForItem(item){
       const decisao = lower(item.decisao_final);
       const revisao = lower(item.revisao_status);
       const status = lower(item.status);
-
       if (revisao === "rejeitado" || decisao.includes("reprov")) return "error";
-      if (revisao === "aprovado" || decisao.includes("aprovado automaticamente")) return "success";
+      if (revisao === "aprovado" || decisao === "aprovado") return "success";
       if (status.includes("diverg") || decisao.includes("alerta") || decisao.includes("revis")) return "warning";
       return "blue";
     }
@@ -743,11 +324,7 @@
         metricOriginal:"0,00",
         metricGerado:"0,00"
       };
-
-      Object.entries(ids).forEach(([id,val]) => {
-        document.getElementById(id).textContent = val;
-      });
-
+      Object.entries(ids).forEach(([id,val]) => document.getElementById(id).textContent = val);
       previewFinal.src = "";
       btnDownload.classList.add("hidden");
       btnDownload.href = "#";
@@ -767,10 +344,7 @@
       document.getElementById("metricGerado").textContent = formatValue(data.valor_total_gerado);
       document.getElementById("statusDetails").textContent = data.detalhes_status || "Sem observações no momento.";
 
-      if (!keepLocalPreview && data.preview_original_url) {
-        previewOriginal.src = absoluteUrl(data.preview_original_url);
-      }
-
+      if (!keepLocalPreview && data.preview_original_url) previewOriginal.src = absoluteUrl(data.preview_original_url);
       previewFinal.src = data.preview_gerado_url ? absoluteUrl(data.preview_gerado_url) : "";
 
       if (data.download_url) {
@@ -785,18 +359,12 @@
     function updateSelectedFile(file){
       selectedFile = file || null;
       fileName.textContent = selectedFile ? `Arquivo selecionado: ${selectedFile.name}` : "";
-
-      if (localPreviewUrl) {
-        URL.revokeObjectURL(localPreviewUrl);
-      }
-
+      if (localPreviewUrl) URL.revokeObjectURL(localPreviewUrl);
       localPreviewUrl = "";
       previewOriginal.src = "";
-
       if (selectedFile) {
         localPreviewUrl = URL.createObjectURL(selectedFile);
         previewOriginal.src = localPreviewUrl;
-        setStatus(`Arquivo selecionado com sucesso.\nNome: ${selectedFile.name}`, "success");
       }
     }
 
@@ -804,11 +372,7 @@
       selectedFile = null;
       fileInput.value = "";
       fileName.textContent = "";
-
-      if (localPreviewUrl) {
-        URL.revokeObjectURL(localPreviewUrl);
-      }
-
+      if (localPreviewUrl) URL.revokeObjectURL(localPreviewUrl);
       localPreviewUrl = "";
       previewOriginal.src = "";
       previewFinal.src = "";
@@ -819,15 +383,7 @@
 
     async function safeJson(response){
       const text = await response.text();
-      try {
-        return JSON.parse(text);
-      } catch {
-        return { raw: text };
-      }
-    }
-
-    function countByRevision(value){
-      return historyCache.filter(x => lower(x.revisao_status) === value).length;
+      try { return JSON.parse(text); } catch { return { raw: text }; }
     }
 
     async function loadStatsAndHistory(){
@@ -837,51 +393,83 @@
     async function loadStats(){
       try {
         const response = await fetch(STATS_URL);
+        if (!response.ok) throw new Error("Falha ao carregar stats");
         const data = await safeJson(response);
-
-        if (!response.ok) {
-          throw new Error(backendMessage(data));
-        }
-
-        document.getElementById("statTotalJobs").textContent = data.total_jobs ?? 0;
+        document.getElementById("statTotalJobs").textContent = data.total_jobs ?? historyMeta.total ?? 0;
         document.getElementById("statPendentes").textContent = data.precisa_revisao ?? 0;
         document.getElementById("statAprovados").textContent = data.aprovados_automaticamente ?? 0;
         document.getElementById("statRejeitados").textContent = data.reprovados ?? 0;
-      } catch (error) {
-        document.getElementById("statTotalJobs").textContent = historyCache.length;
-        document.getElementById("statPendentes").textContent = countByRevision("pendente");
-        document.getElementById("statAprovados").textContent = countByRevision("aprovado");
-        document.getElementById("statRejeitados").textContent = countByRevision("rejeitado");
-        console.error("Erro ao carregar stats:", error);
+      } catch {
+        document.getElementById("statTotalJobs").textContent = historyMeta.total ?? historyCache.length;
+        document.getElementById("statPendentes").textContent = 0;
+        document.getElementById("statAprovados").textContent = 0;
+        document.getElementById("statRejeitados").textContent = 0;
       }
     }
 
-    function applyHistoryFilters(items){
-      const busca = lower(document.getElementById("filterBusca").value).trim();
-      const statusFilter = lower(document.getElementById("filterStatus").value);
-      const revisaoFilter = lower(document.getElementById("filterRevisao").value);
+    function getHistoryFilters(){
+      return {
+        busca: document.getElementById("filterBusca").value.trim(),
+        decisao_final: document.getElementById("filterStatus").value.trim(),
+        revisao_status: document.getElementById("filterRevisao").value.trim(),
+      };
+    }
 
-      return items.filter(item => {
-        const nome = lower(item.nome_arquivo_original || item.nome || "");
-        const decisao = lower(item.decisao_final);
-        const revisao = lower(item.revisao_status);
+    function updateHistoryPaginationUI(){
+      const info = document.getElementById("historyPaginationInfo");
+      const btnPrev = document.getElementById("btnPrevPage");
+      const btnNext = document.getElementById("btnNextPage");
+      info.textContent = `Página ${historyMeta.page} de ${historyMeta.total_pages} • ${historyMeta.total} registro(s)`;
+      btnPrev.disabled = !historyMeta.has_prev;
+      btnNext.disabled = !historyMeta.has_next;
+    }
 
-        return (!busca || nome.includes(busca))
-          && (!statusFilter || decisao === statusFilter)
-          && (!revisaoFilter || revisao === revisaoFilter);
-      });
+    async function loadHistory(page = 1){
+      try {
+        currentHistoryPage = page;
+        const filters = getHistoryFilters();
+        const params = new URLSearchParams({
+          page: String(page),
+          limit: String(currentHistoryLimit),
+          busca: filters.busca,
+          decisao_final: filters.decisao_final,
+          revisao_status: filters.revisao_status,
+        });
+
+        const response = await fetch(`${HISTORY_URL}?${params.toString()}`);
+        const data = await safeJson(response);
+        if (!response.ok) throw new Error(backendMessage(data) || "Não foi possível carregar o histórico.");
+
+        historyCache = Array.isArray(data.items) ? data.items : [];
+        historyMeta = {
+          page: data.page ?? 1,
+          limit: data.limit ?? currentHistoryLimit,
+          total: data.total ?? 0,
+          total_pages: data.total_pages ?? 1,
+          has_prev: Boolean(data.has_prev),
+          has_next: Boolean(data.has_next),
+        };
+
+        renderHistory();
+        updateHistoryPaginationUI();
+        await loadStats();
+      } catch (error) {
+        historyCache = [];
+        historyMeta = { page: 1, limit: currentHistoryLimit, total: 0, total_pages: 1, has_prev: false, has_next: false };
+        historyList.innerHTML = `<div class="empty">Erro ao carregar histórico: ${escapeHtml(error.message)}</div>`;
+        updateHistoryPaginationUI();
+      }
     }
 
     function renderHistory(){
-      const filtered = applyHistoryFilters(historyCache);
-
-      if (!filtered.length) {
-        historyList.innerHTML = `<div class="empty">Nenhum job encontrado com os filtros atuais.</div>`;
+      const items = historyCache;
+      if (!items.length) {
+        historyList.innerHTML = `<div class="empty">Nenhum item encontrado com os filtros atuais.</div>`;
         return;
       }
 
-      historyList.innerHTML = filtered.map(item => `
-        <div class="history-item ${item.job_id === selectedHistoryJobId ? "active" : ""}" data-job-id="${escapeHtml(item.job_id)}">
+      historyList.innerHTML = items.map(item => `
+        <div class="history-item ${selectedHistoryJobId === item.job_id ? "active" : ""}" data-job-id="${escapeHtml(item.job_id)}">
           <strong>${escapeHtml(item.nome_arquivo_original || item.nome || "Sem nome")}</strong>
           <span class="badge ${badgeClassForItem(item)}">${escapeHtml(item.revisao_status || item.decisao_final || item.status || "-")}</span>
           <span class="badge blue">${escapeHtml(item.tipo_detectado || "-")}</span>
@@ -896,31 +484,11 @@
             Data/Hora: ${escapeHtml(item.data_hora || "-")}
           </div>
           <div class="small-text">${escapeHtml(item.detalhes_status || "Sem diagnóstico adicional.")}</div>
-        </div>
-      `).join("");
+        </div>`).join("");
 
       document.querySelectorAll(".history-item").forEach(el => {
         el.addEventListener("click", () => openJobDetails(el.dataset.jobId));
       });
-    }
-
-    async function loadHistory(){
-      try {
-        const response = await fetch(HISTORY_URL);
-        const data = await safeJson(response);
-
-        if (!response.ok) {
-          throw new Error(backendMessage(data));
-        }
-
-        historyCache = Array.isArray(data) ? data : [];
-        renderHistory();
-        await loadStats();
-      } catch (error) {
-        historyCache = [];
-        renderHistory();
-        console.error("Erro ao carregar histórico:", error);
-      }
     }
 
     async function processFile(){
@@ -928,63 +496,35 @@
         setStatus("Selecione um PDF antes de processar.", "error");
         return;
       }
-
       const formData = new FormData();
       formData.append("file", selectedFile);
-
       setStatus("Enviando arquivo para a API...\nAguarde o processamento completo.", "loading");
       resetMetrics();
-      setProcessingState(true);
 
       try {
-        const response = await fetch(API_URL, {
-          method: "POST",
-          body: formData
-        });
-
+        const response = await fetch(API_URL, { method:"POST", body: formData });
         const data = await safeJson(response);
-
-        if (!response.ok || data.ok === false) {
-          throw new Error(backendMessage(data));
-        }
+        if (!response.ok || data.ok === false) throw new Error(backendMessage(data));
 
         selectedHistoryJobId = data.job_id || "";
         applyResultToMainUI(data, false);
 
-        const warning =
-          Boolean(data.divergencia_total) ||
-          lower(data.decisao_final).includes("revis") ||
-          lower(data.status).includes("diverg") ||
-          lower(data.status).includes("parcial");
-
+        const warning = Boolean(data.divergencia_total) || lower(data.decisao_final).includes("revis") || lower(data.status).includes("diverg");
         setStatus(
-          `${data.mensagem || "Processamento concluído."}
-Status: ${data.status || "-"}
-Decisão: ${data.decisao_final || "-"}
-Job ID: ${data.job_id || "-"}
-Registros: ${data.qtd_registros ?? 0}
-Erros parser: ${data.qtd_erros_parser ?? 0}
-Sucesso: ${data.percentual_sucesso ?? 0}%`,
+          `${data.mensagem || "Processamento concluído."}\nStatus: ${data.status || "-"}\nDecisão: ${data.decisao_final || "-"}\nJob ID: ${data.job_id || "-"}\nRegistros: ${data.qtd_registros ?? 0}\nErros parser: ${data.qtd_erros_parser ?? 0}\nSucesso: ${data.percentual_sucesso ?? 0}%`,
           warning ? "warning" : "success"
         );
-
-        await loadHistory();
+        await loadHistory(currentHistoryPage);
       } catch (error) {
         setStatus(`Erro ao processar: ${String(error.message || error)}`, "error");
         console.error("Erro completo no processamento:", error);
-      } finally {
-        setProcessingState(false);
       }
     }
 
     async function fetchJobDetail(jobId){
       const response = await fetch(`${HISTORY_URL}/${jobId}`);
       const data = await safeJson(response);
-
-      if (!response.ok) {
-        throw new Error(backendMessage(data));
-      }
-
+      if (!response.ok) throw new Error(backendMessage(data));
       return data;
     }
 
@@ -1040,7 +580,9 @@ Sucesso: ${data.percentual_sucesso ?? 0}%`,
       const observacao = document.getElementById("reviewObservation").value || "";
 
       const body = {
+        status,
         revisao_status: status,
+        observacao,
         revisao_observacao: observacao,
         revisado_por: "operador_web"
       };
@@ -1051,20 +593,15 @@ Sucesso: ${data.percentual_sucesso ?? 0}%`,
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body)
         });
-
         const data = await safeJson(response);
 
         if (!response.ok) {
-          throw new Error(backendMessage(data));
+          throw new Error(backendMessage(data) || "Erro ao salvar revisão.");
         }
 
         setStatus(`Revisão salva com sucesso.\nStatus da revisão: ${status}`, status === "rejeitado" ? "warning" : "success");
         document.getElementById("jobModalBackdrop").style.display = "none";
-        await loadHistory();
-
-        if (currentDetail?.job_id) {
-          await openJobDetails(currentDetail.job_id);
-        }
+        await loadHistory(currentHistoryPage);
       } catch (error) {
         setStatus(`Erro na revisão: ${String(error.message || error)}`, "error");
         console.error("Erro completo na revisão:", error);
@@ -1072,20 +609,9 @@ Sucesso: ${data.percentual_sucesso ?? 0}%`,
     }
 
     dropzone.addEventListener("click", () => fileInput.click());
-
-    fileInput.addEventListener("change", e => {
-      updateSelectedFile(e.target.files[0] || null);
-    });
-
-    dropzone.addEventListener("dragover", e => {
-      e.preventDefault();
-      dropzone.classList.add("dragover");
-    });
-
-    dropzone.addEventListener("dragleave", () => {
-      dropzone.classList.remove("dragover");
-    });
-
+    fileInput.addEventListener("change", e => updateSelectedFile(e.target.files[0] || null));
+    dropzone.addEventListener("dragover", e => { e.preventDefault(); dropzone.classList.add("dragover"); });
+    dropzone.addEventListener("dragleave", () => dropzone.classList.remove("dragover"));
     dropzone.addEventListener("drop", e => {
       e.preventDefault();
       dropzone.classList.remove("dragover");
@@ -1095,28 +621,19 @@ Sucesso: ${data.percentual_sucesso ?? 0}%`,
 
     document.getElementById("btnProcessar").addEventListener("click", processFile);
     document.getElementById("btnLimparArquivo").addEventListener("click", clearSelectedFile);
-    document.getElementById("btnAtualizarTudo").addEventListener("click", loadStatsAndHistory);
-    document.getElementById("btnFiltrar").addEventListener("click", renderHistory);
-
-    document.getElementById("filterBusca").addEventListener("keydown", e => {
-      if (e.key === "Enter") renderHistory();
-    });
-
-    document.getElementById("filterStatus").addEventListener("change", renderHistory);
-    document.getElementById("filterRevisao").addEventListener("change", renderHistory);
-
-    document.getElementById("btnFecharModal").addEventListener("click", () => {
-      document.getElementById("jobModalBackdrop").style.display = "none";
-    });
-
+    document.getElementById("btnAtualizarTudo").addEventListener("click", () => loadStatsAndHistory());
+    document.getElementById("btnFiltrar").addEventListener("click", () => loadHistory(1));
+    document.getElementById("filterBusca").addEventListener("keydown", e => { if (e.key === "Enter") loadHistory(1); });
+    document.getElementById("filterStatus").addEventListener("change", () => loadHistory(1));
+    document.getElementById("filterRevisao").addEventListener("change", () => loadHistory(1));
+    document.getElementById("btnPrevPage").addEventListener("click", () => { if (historyMeta.has_prev) loadHistory(historyMeta.page - 1); });
+    document.getElementById("btnNextPage").addEventListener("click", () => { if (historyMeta.has_next) loadHistory(historyMeta.page + 1); });
+    document.getElementById("btnFecharModal").addEventListener("click", () => document.getElementById("jobModalBackdrop").style.display = "none");
     document.getElementById("btnAprovar").addEventListener("click", () => submitReview("aprovado"));
     document.getElementById("btnRejeitar").addEventListener("click", () => submitReview("rejeitado"));
     document.getElementById("btnPendente").addEventListener("click", () => submitReview("pendente"));
-
     document.getElementById("jobModalBackdrop").addEventListener("click", e => {
-      if (e.target.id === "jobModalBackdrop") {
-        document.getElementById("jobModalBackdrop").style.display = "none";
-      }
+      if (e.target.id === "jobModalBackdrop") document.getElementById("jobModalBackdrop").style.display = "none";
     });
 
     loadStatsAndHistory();
