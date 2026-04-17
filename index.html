@@ -171,6 +171,8 @@
             </div>
             <div class="actions" style="margin-top:0">
               <button class="btn-secondary" id="btnFiltrar">Filtrar</button>
+              <button class="btn-warning" id="btnSomentePendentes">Somente pendentes</button>
+              <button class="btn-primary" id="btnAbrirProximoPendente">Abrir próximo pendente</button>
             </div>
           </div>
 
@@ -232,6 +234,7 @@
           <button class="btn-success" id="btnAprovar">Aprovar</button>
           <button class="btn-danger" id="btnRejeitar">Rejeitar</button>
           <button class="btn-warning" id="btnPendente">Voltar para pendente</button>
+          <button class="btn-primary" id="btnProximoPendente">Próximo pendente</button>
           <a id="modalDownload" class="link-btn btn-secondary hidden" href="#" target="_blank">Baixar PDF gerado</a>
         </div>
       </div>
@@ -491,6 +494,41 @@
       });
     }
 
+    async function openNextPendingFromQueue(options = {}){
+      const busca = options.busca ?? document.getElementById("filterBusca").value.trim();
+      const currentJobId = options.currentJobId ?? (currentDetail?.job_id || selectedHistoryJobId || "");
+
+      try {
+        const params = new URLSearchParams({
+          current_job_id: currentJobId,
+          busca
+        });
+        const response = await fetch(`${API_BASE}/history/next-pending?${params.toString()}`);
+        const data = await safeJson(response);
+        if (!response.ok) throw new Error(backendMessage(data));
+
+        if (!data.found || !data.item?.job_id) {
+          document.getElementById("jobModalBackdrop").style.display = "none";
+          await loadHistory(1);
+          setStatus("Nenhum job pendente encontrado na fila.", "success");
+          return false;
+        }
+
+        const filtroRevisao = document.getElementById("filterRevisao");
+        if (!filtroRevisao.value) {
+          filtroRevisao.value = "pendente";
+        }
+
+        await loadHistory(1);
+        await openJobDetails(data.item.job_id);
+        setStatus(`Abrindo próximo pendente: ${data.item.nome_arquivo_original || data.item.job_id}`, "loading");
+        return true;
+      } catch (error) {
+        setStatus(`Erro ao buscar próximo pendente: ${String(error.message || error)}`, "error");
+        return false;
+      }
+    }
+
     async function processFile(){
       if (!selectedFile) {
         setStatus("Selecione um PDF antes de processar.", "error");
@@ -623,6 +661,11 @@
     document.getElementById("btnLimparArquivo").addEventListener("click", clearSelectedFile);
     document.getElementById("btnAtualizarTudo").addEventListener("click", () => loadStatsAndHistory());
     document.getElementById("btnFiltrar").addEventListener("click", () => loadHistory(1));
+    document.getElementById("btnSomentePendentes").addEventListener("click", async () => {
+      document.getElementById("filterRevisao").value = "pendente";
+      await loadHistory(1);
+    });
+    document.getElementById("btnAbrirProximoPendente").addEventListener("click", () => openNextPendingFromQueue());
     document.getElementById("filterBusca").addEventListener("keydown", e => { if (e.key === "Enter") loadHistory(1); });
     document.getElementById("filterStatus").addEventListener("change", () => loadHistory(1));
     document.getElementById("filterRevisao").addEventListener("change", () => loadHistory(1));
@@ -632,6 +675,7 @@
     document.getElementById("btnAprovar").addEventListener("click", () => submitReview("aprovado"));
     document.getElementById("btnRejeitar").addEventListener("click", () => submitReview("rejeitado"));
     document.getElementById("btnPendente").addEventListener("click", () => submitReview("pendente"));
+    document.getElementById("btnProximoPendente").addEventListener("click", () => openNextPendingFromQueue());
     document.getElementById("jobModalBackdrop").addEventListener("click", e => {
       if (e.target.id === "jobModalBackdrop") document.getElementById("jobModalBackdrop").style.display = "none";
     });
