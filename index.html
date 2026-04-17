@@ -290,12 +290,10 @@
       border-radius:10px;
       background:#fff;
     }
-
     .empty{
       color:var(--muted);
       font-size:14px;
     }
-
     .foot-note{
       margin-top:10px;
       font-size:12px;
@@ -321,8 +319,8 @@
     <section class="hero">
       <h1>Organizador Inteligente de Relatórios PDF</h1>
       <p>
-        Envie um PDF, processe pela API online, acompanhe o histórico de execuções e visualize as métricas
-        do processamento em uma interface limpa, moderna e pronta para crescer.
+        Envie um PDF, processe pela API online, acompanhe o histórico de execuções e visualize o arquivo original,
+        o PDF gerado e as métricas do processamento em uma interface limpa, moderna e profissional.
       </p>
 
       <div class="pipeline">
@@ -335,8 +333,8 @@
           O histórico é salvo no Neon e pode ser consultado a qualquer momento sem depender do seu PC.
         </div>
         <div class="pipeline-step">
-          <strong>3. Painel central</strong>
-          Você acompanha o status, métricas e jobs processados em uma tela única e organizada.
+          <strong>3. Preview e download</strong>
+          Você visualiza o PDF original, o PDF gerado e pode baixar o resultado final do processamento.
         </div>
       </div>
     </section>
@@ -358,6 +356,7 @@
             <button class="btn-primary" id="btnProcessar">Processar relatório</button>
             <button class="btn-secondary" id="btnLimparArquivo">Limpar seleção</button>
             <button class="btn-secondary" id="btnAtualizarHistorico2">Atualizar histórico</button>
+            <a id="btnDownload" class="link-btn btn-secondary" href="#" target="_blank" style="display:none;">Baixar PDF gerado</a>
           </div>
 
           <div id="statusBox" class="status-box">Nenhum arquivo enviado ainda.</div>
@@ -368,16 +367,20 @@
               <div class="metric-value" id="metricJobId">-</div>
             </div>
             <div class="metric-card">
+              <div class="metric-label">Tipo detectado</div>
+              <div class="metric-value" id="metricTipo">-</div>
+            </div>
+            <div class="metric-card">
               <div class="metric-label">Status</div>
               <div class="metric-value" id="metricStatus">-</div>
             </div>
             <div class="metric-card">
-              <div class="metric-label">Registros</div>
-              <div class="metric-value" id="metricRegistros">0</div>
-            </div>
-            <div class="metric-card">
               <div class="metric-label">Parser</div>
               <div class="metric-value" id="metricParser">-</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">Registros</div>
+              <div class="metric-value" id="metricRegistros">0</div>
             </div>
             <div class="metric-card">
               <div class="metric-label">Total original</div>
@@ -403,17 +406,17 @@
 
           <div class="preview-grid">
             <div class="preview-panel">
-              <h3>Preview do arquivo selecionado</h3>
+              <h3>Preview do PDF original</h3>
               <iframe id="previewOriginal" class="preview-frame"></iframe>
             </div>
             <div class="preview-panel">
-              <h3>Resultado / resposta da API</h3>
+              <h3>Preview do PDF gerado</h3>
               <iframe id="previewFinal" class="preview-frame"></iframe>
             </div>
           </div>
 
           <div class="foot-note">
-            Observação: enquanto o backend simplificado não gera PDF final real, o painel da direita mostra uma visualização da resposta JSON.
+            Dica: você também pode clicar em um item do histórico para carregar novamente os previews e o download daquele processamento.
           </div>
         </section>
       </div>
@@ -436,7 +439,7 @@
     const HISTORY_URL = `${API_BASE}/history`;
 
     let selectedFile = null;
-    let originalPreviewUrl = "";
+    let localPreviewUrl = "";
     let selectedHistoryJobId = "";
 
     const dropzone = document.getElementById("dropzone");
@@ -446,8 +449,15 @@
     const historyList = document.getElementById("historyList");
     const previewOriginal = document.getElementById("previewOriginal");
     const previewFinal = document.getElementById("previewFinal");
+    const btnDownload = document.getElementById("btnDownload");
 
     document.getElementById("apiBaseLabel").textContent = API_BASE;
+
+    function absoluteUrl(url) {
+      if (!url) return "";
+      if (url.startsWith("http://") || url.startsWith("https://")) return url;
+      return `${API_BASE}${url}`;
+    }
 
     function setStatus(message, type = "") {
       statusBox.className = "status-box";
@@ -474,54 +484,71 @@
 
     function statusBadgeClass(item) {
       const status = String(item.status || "").toLowerCase();
-      if (status.includes("ok") && !item.divergencia_total) return "success";
+      if (status.includes("sucesso") || status === "ok") return item.divergencia_total ? "warning" : "success";
       if (status.includes("diverg") || item.divergencia_total || status.includes("parcial")) return "warning";
-      if (status.includes("erro") || status.includes("inválido") || status.includes("vazio")) return "error";
+      if (status.includes("erro") || status.includes("inválido") || status.includes("invalido") || status.includes("vazio")) return "error";
       return "";
     }
 
     function resetMetrics() {
       document.getElementById("metricJobId").textContent = "-";
+      document.getElementById("metricTipo").textContent = "-";
       document.getElementById("metricStatus").textContent = "-";
-      document.getElementById("metricRegistros").textContent = "0";
       document.getElementById("metricParser").textContent = "-";
+      document.getElementById("metricRegistros").textContent = "0";
       document.getElementById("metricOriginal").textContent = "0,00";
       document.getElementById("metricGerado").textContent = "0,00";
       document.getElementById("metricDiferenca").textContent = "0,00";
       document.getElementById("metricDivergencia").textContent = "Não";
-      previewFinal.srcdoc = "";
+      previewFinal.src = "";
+      btnDownload.style.display = "none";
+      btnDownload.href = "#";
     }
 
-    function applyResultToUI(data) {
+    function applyResultToUI(data, keepLocalPreview = false) {
       document.getElementById("metricJobId").textContent = data.job_id || "-";
+      document.getElementById("metricTipo").textContent = data.tipo_detectado || "-";
       document.getElementById("metricStatus").textContent = data.status || "-";
-      document.getElementById("metricRegistros").textContent = data.qtd_registros ?? 0;
       document.getElementById("metricParser").textContent = data.parser_utilizado || "-";
+      document.getElementById("metricRegistros").textContent = data.qtd_registros ?? 0;
       document.getElementById("metricOriginal").textContent = formatValue(data.valor_total_original);
       document.getElementById("metricGerado").textContent = formatValue(data.valor_total_gerado);
       document.getElementById("metricDiferenca").textContent = formatValue(data.diferenca_total);
       document.getElementById("metricDivergencia").textContent = data.divergencia_total ? "Sim" : "Não";
 
-      previewFinal.srcdoc = `
-        <html>
-        <body style="font-family:Arial;padding:16px;background:#fff;color:#111827">
-          <h3 style="margin-top:0;color:#0f4c81">Resposta da API</h3>
-          <pre style="white-space:pre-wrap;word-break:break-word;font-size:13px;line-height:1.5">${escapeHtml(JSON.stringify(data, null, 2))}</pre>
-        </body>
-        </html>
-      `;
+      document.getElementById("statusDetails").textContent =
+        data.detalhes_status || `API base: ${API_BASE}`;
+
+      if (!keepLocalPreview && data.preview_original_url) {
+        previewOriginal.src = absoluteUrl(data.preview_original_url);
+      }
+
+      if (data.preview_gerado_url) {
+        previewFinal.src = absoluteUrl(data.preview_gerado_url);
+      } else {
+        previewFinal.src = "";
+      }
+
+      if (data.download_url) {
+        btnDownload.href = absoluteUrl(data.download_url);
+        btnDownload.style.display = "inline-flex";
+      } else {
+        btnDownload.href = "#";
+        btnDownload.style.display = "none";
+      }
     }
 
     function updateSelectedFile(file) {
       selectedFile = file || null;
       fileName.textContent = selectedFile ? `Arquivo selecionado: ${selectedFile.name}` : "";
 
-      if (originalPreviewUrl) URL.revokeObjectURL(originalPreviewUrl);
+      if (localPreviewUrl) URL.revokeObjectURL(localPreviewUrl);
+      localPreviewUrl = "";
       previewOriginal.src = "";
 
       if (selectedFile) {
-        originalPreviewUrl = URL.createObjectURL(selectedFile);
-        previewOriginal.src = originalPreviewUrl;
+        localPreviewUrl = URL.createObjectURL(selectedFile);
+        previewOriginal.src = localPreviewUrl;
       }
     }
 
@@ -529,9 +556,10 @@
       selectedFile = null;
       fileInput.value = "";
       fileName.textContent = "";
+      if (localPreviewUrl) URL.revokeObjectURL(localPreviewUrl);
+      localPreviewUrl = "";
       previewOriginal.src = "";
-      if (originalPreviewUrl) URL.revokeObjectURL(originalPreviewUrl);
-      originalPreviewUrl = "";
+      previewFinal.src = "";
       selectedHistoryJobId = "";
       resetMetrics();
       setStatus("Nenhum arquivo enviado ainda.");
@@ -550,10 +578,11 @@
 
         historyList.innerHTML = items.map(item => `
           <div class="history-item ${selectedHistoryJobId === item.job_id ? "active" : ""}" data-job-id="${escapeHtml(item.job_id)}">
-            <strong>${escapeHtml(item.nome_arquivo_original || item.nome || "")}</strong>
+            <strong>${escapeHtml(item.nome_arquivo_original || "")}</strong>
             <div class="badge ${statusBadgeClass(item)}">${escapeHtml(item.status || "-")}</div>
             <div class="history-meta">
               Job ID: ${escapeHtml(item.job_id || "-")}<br>
+              Tipo: ${escapeHtml(item.tipo_detectado || "-")}<br>
               Data/Hora: ${escapeHtml(item.data_hora || "-")}<br>
               Registros: ${escapeHtml(String(item.qtd_registros ?? 0))}<br>
               Total original: ${escapeHtml(formatValue(item.valor_total_original || "-"))}<br>
@@ -562,6 +591,7 @@
               Divergência: ${item.divergencia_total ? "Sim" : "Não"}<br>
               Parser: ${escapeHtml(item.parser_utilizado || "-")}
             </div>
+            <div class="small-text">${escapeHtml(item.detalhes_status || "Sem observações.")}</div>
           </div>
         `).join("");
 
@@ -571,8 +601,8 @@
             const item = items.find(x => x.job_id === jobId);
             if (!item) return;
             selectedHistoryJobId = jobId;
-            applyResultToUI(item);
-            setStatus(`Histórico carregado com sucesso.\nJob: ${jobId}\nStatus: ${item.status || "-"}`, "success");
+            applyResultToUI(item, false);
+            setStatus(`Histórico carregado com sucesso.\nJob: ${jobId}\nStatus: ${item.status || "-"}`, item.divergencia_total ? "warning" : "success");
             loadHistory();
           });
         });
@@ -591,7 +621,7 @@
       formData.append("file", selectedFile);
 
       setStatus(
-        "Enviando arquivo para a API...\nAguarde enquanto o backend processa o upload e grava o histórico no Neon.",
+        "Enviando arquivo para a API...\nAguarde enquanto o backend processa o PDF, gera o novo arquivo e grava o histórico no Neon.",
         "loading"
       );
 
@@ -610,12 +640,12 @@
         }
 
         selectedHistoryJobId = data.job_id || "";
-        applyResultToUI(data);
+        applyResultToUI(data, false);
 
-        const hasWarning = Boolean(data.divergencia_total) || String(data.status || "").toLowerCase().includes("parcial");
+        const warning = Boolean(data.divergencia_total) || String(data.status || "").toLowerCase().includes("parcial");
         setStatus(
-          `${data.mensagem || "Processamento concluído."}\nStatus: ${data.status || "-"}\nJob ID: ${data.job_id || "-"}\nTotal original: ${formatValue(data.valor_total_original)}\nTotal gerado: ${formatValue(data.valor_total_gerado)}\nDiferença: ${formatValue(data.diferenca_total)}`,
-          hasWarning ? "warning" : "success"
+          `${data.mensagem || "Processamento concluído."}\nStatus: ${data.status || "-"}\nJob ID: ${data.job_id || "-"}\nTipo: ${data.tipo_detectado || "-"}\nTotal original: ${formatValue(data.valor_total_original)}\nTotal gerado: ${formatValue(data.valor_total_gerado)}\nDiferença: ${formatValue(data.diferenca_total)}`,
+          warning ? "warning" : "success"
         );
 
         await loadHistory();
