@@ -3,109 +3,187 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Organizador de Relatórios PDF</title>
+  <title>Organizador Inteligente de Relatórios PDF</title>
   <style>
     :root{
       --bg:#f4f7fb;
       --card:#ffffff;
-      --text:#1f2937;
+      --text:#162033;
       --muted:#6b7280;
-      --line:#e5e7eb;
+      --line:#e6eaf2;
       --primary:#2563eb;
-      --primary-dark:#1d4ed8;
-      --success:#16a34a;
-      --warning:#d97706;
-      --danger:#dc2626;
-      --shadow:0 10px 30px rgba(15,23,42,.08);
-      --radius:18px;
+      --primary-2:#1d4ed8;
+      --primary-soft:#e8f0ff;
+      --success:#15803d;
+      --success-bg:#dcfce7;
+      --warning:#a16207;
+      --warning-bg:#fef3c7;
+      --danger:#b91c1c;
+      --danger-bg:#fee2e2;
+      --info:#1d4ed8;
+      --info-bg:#dbeafe;
+      --shadow:0 10px 35px rgba(15,23,42,.08);
+      --radius:20px;
     }
 
     *{box-sizing:border-box}
 
-    body{
+    html,body{
       margin:0;
+      padding:0;
       font-family:Arial,Helvetica,sans-serif;
       background:var(--bg);
       color:var(--text);
     }
 
+    body{
+      min-height:100vh;
+    }
+
     .container{
-      max-width:1280px;
+      max-width:1380px;
       margin:0 auto;
-      padding:24px;
+      padding:22px;
     }
 
     .hero{
-      background:linear-gradient(135deg,#0f4c81,#2563eb);
+      background:linear-gradient(135deg,#0f4c81,#2563eb 60%,#38bdf8);
       color:#fff;
-      border-radius:22px;
-      padding:28px;
-      margin-bottom:24px;
-      box-shadow:0 14px 34px rgba(15,76,129,.22);
+      border-radius:26px;
+      padding:30px;
+      box-shadow:0 20px 40px rgba(15,76,129,.22);
+      margin-bottom:22px;
+    }
+
+    .hero-top{
+      display:flex;
+      justify-content:space-between;
+      gap:18px;
+      align-items:flex-start;
+      flex-wrap:wrap;
     }
 
     .hero h1{
       margin:0 0 10px;
       font-size:30px;
+      line-height:1.15;
     }
 
     .hero p{
       margin:0;
       max-width:900px;
-      line-height:1.55;
+      line-height:1.6;
       opacity:.96;
     }
 
-    .layout{
+    .hero-mini-grid{
       display:grid;
-      grid-template-columns:1.25fr .95fr;
-      gap:20px;
+      grid-template-columns:repeat(3,minmax(120px,1fr));
+      gap:12px;
+      min-width:340px;
+    }
+
+    .hero-stat{
+      background:rgba(255,255,255,.14);
+      border:1px solid rgba(255,255,255,.18);
+      border-radius:18px;
+      padding:14px;
+      backdrop-filter: blur(10px);
+    }
+
+    .hero-stat-label{
+      font-size:12px;
+      opacity:.9;
+      margin-bottom:6px;
+    }
+
+    .hero-stat-value{
+      font-size:22px;
+      font-weight:700;
+    }
+
+    .main-grid{
+      display:grid;
+      grid-template-columns:1.35fr .92fr;
+      gap:22px;
+      align-items:start;
     }
 
     .card{
       background:var(--card);
       border-radius:var(--radius);
-      padding:22px;
       box-shadow:var(--shadow);
-      margin-bottom:20px;
+      padding:22px;
+      margin-bottom:22px;
     }
 
     .card h2{
       margin:0 0 16px;
-      color:#0f4c81;
       font-size:22px;
+      color:#103b77;
+    }
+
+    .section-head{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:center;
+      margin-bottom:14px;
+      flex-wrap:wrap;
+    }
+
+    .section-head p{
+      margin:0;
+      color:var(--muted);
+      font-size:14px;
     }
 
     .dropzone{
-      border:2px dashed #93c5fd;
-      border-radius:16px;
+      border:2px dashed #97baf8;
+      background:linear-gradient(180deg,#f8fbff,#f3f8ff);
+      border-radius:18px;
       padding:30px 18px;
       text-align:center;
-      background:#f8fbff;
       cursor:pointer;
       transition:.2s ease;
     }
 
     .dropzone:hover{
+      transform:translateY(-1px);
       background:#eef5ff;
     }
 
     .dropzone.dragover{
       border-color:var(--primary);
-      background:#eef5ff;
+      background:#edf4ff;
       transform:scale(1.01);
     }
 
-    .dropzone .main-text{
-      font-size:19px;
+    .dropzone-icon{
+      width:58px;
+      height:58px;
+      margin:0 auto 12px;
+      border-radius:16px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:#dbeafe;
+      color:var(--primary-2);
+      font-size:30px;
       font-weight:700;
-      color:var(--primary-dark);
+    }
+
+    .dropzone .main-text{
+      font-size:20px;
+      font-weight:700;
+      color:#133f8d;
+      margin-bottom:8px;
     }
 
     .dropzone .sub-text{
       color:var(--muted);
       font-size:14px;
-      margin-top:8px;
+      line-height:1.5;
     }
 
     .file-name{
@@ -113,30 +191,31 @@
       font-size:14px;
       font-weight:700;
       word-break:break-word;
+      color:#163672;
     }
 
     .actions{
       display:flex;
-      gap:12px;
       flex-wrap:wrap;
-      margin-top:18px;
+      gap:12px;
+      margin-top:16px;
     }
 
     button,.link-btn,input{
       font:inherit;
-      border-radius:12px;
+      border-radius:14px;
     }
 
     button,.link-btn{
       border:none;
-      padding:12px 18px;
+      padding:12px 16px;
       font-weight:700;
       cursor:pointer;
       text-decoration:none;
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      transition:.15s ease;
+      transition:.16s ease;
     }
 
     button:hover,.link-btn:hover{
@@ -144,34 +223,86 @@
     }
 
     button:disabled{
-      opacity:.6;
+      opacity:.55;
       cursor:not-allowed;
       transform:none;
     }
 
-    .btn-primary{background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff}
-    .btn-secondary{background:#e5eefc;color:#1d4ed8}
-    .btn-success{background:#dcfce7;color:#166534}
-    .btn-danger{background:#fee2e2;color:#991b1b}
-
-    .status-box{
-      margin-top:18px;
-      padding:14px 16px;
-      border-radius:12px;
-      border:1px solid var(--line);
-      font-size:14px;
-      line-height:1.55;
-      white-space:pre-line;
-      min-height:56px;
-      background:#f8fafc;
+    .btn-primary{
+      background:linear-gradient(135deg,#2563eb,#1d4ed8);
+      color:#fff;
+      box-shadow:0 10px 24px rgba(37,99,235,.22);
     }
 
-    .status-success{background:#ecfdf5;border-color:#a7f3d0;color:#065f46}
-    .status-error{background:#fef2f2;border-color:#fecaca;color:#991b1b}
-    .status-warning{background:#fff7ed;border-color:#fdba74;color:#9a3412}
-    .status-loading{background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8}
+    .btn-secondary{
+      background:#eef4ff;
+      color:#1d4ed8;
+    }
 
-    .simple-metrics{
+    .btn-success{
+      background:#dcfce7;
+      color:#166534;
+    }
+
+    .btn-danger{
+      background:#fee2e2;
+      color:#991b1b;
+    }
+
+    .status-panel{
+      margin-top:18px;
+      border:1px solid var(--line);
+      border-radius:18px;
+      overflow:hidden;
+      background:#fbfcff;
+    }
+
+    .status-header{
+      padding:14px 16px;
+      border-bottom:1px solid var(--line);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      background:#fff;
+    }
+
+    .status-label{
+      font-size:12px;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.04em;
+      font-weight:700;
+    }
+
+    .status-message{
+      padding:16px;
+      font-size:14px;
+      line-height:1.6;
+      white-space:pre-line;
+      color:#24324a;
+      min-height:82px;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:7px 12px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:700;
+      white-space:nowrap;
+    }
+
+    .badge-ok{background:var(--success-bg);color:var(--success)}
+    .badge-warning{background:var(--warning-bg);color:var(--warning)}
+    .badge-error{background:var(--danger-bg);color:var(--danger)}
+    .badge-info{background:var(--info-bg);color:var(--info)}
+    .badge-muted{background:#eef2f7;color:#475569}
+
+    .metrics-grid{
       display:grid;
       grid-template-columns:repeat(4,1fr);
       gap:12px;
@@ -179,57 +310,135 @@
     }
 
     .metric{
-      background:#f8fafc;
       border:1px solid var(--line);
-      border-radius:14px;
-      padding:12px;
+      border-radius:18px;
+      padding:14px;
+      background:#fbfdff;
     }
 
     .metric-label{
       font-size:12px;
       color:var(--muted);
-      margin-bottom:6px;
+      margin-bottom:8px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:.03em;
     }
 
     .metric-value{
       font-size:18px;
       font-weight:700;
+      line-height:1.35;
       word-break:break-word;
+      color:#10284f;
+    }
+
+    .metric-sub{
+      margin-top:8px;
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.45;
+    }
+
+    .metric.highlight .metric-value{
+      color:#1d4ed8;
+      font-size:24px;
     }
 
     .preview-grid{
       display:grid;
       grid-template-columns:1fr 1fr;
-      gap:18px;
+      gap:16px;
       margin-top:20px;
     }
 
     .preview-panel{
-      background:#f8fafc;
       border:1px solid var(--line);
-      border-radius:14px;
-      padding:12px;
+      border-radius:18px;
+      background:#fbfdff;
+      overflow:hidden;
+    }
+
+    .preview-panel-head{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:center;
+      padding:14px 16px;
+      border-bottom:1px solid var(--line);
+      background:#fff;
     }
 
     .preview-panel h3{
-      margin:0 0 10px;
-      color:#0f4c81;
+      margin:0;
       font-size:16px;
+      color:#123d78;
     }
 
     .preview-frame{
       width:100%;
-      height:460px;
-      border:1px solid #dbe4f0;
-      border-radius:10px;
+      height:470px;
+      border:0;
       background:#fff;
+    }
+
+    .diagnostic-box{
+      margin-top:18px;
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:#fbfdff;
+      overflow:hidden;
+    }
+
+    .diagnostic-box summary{
+      list-style:none;
+      cursor:pointer;
+      padding:16px;
+      font-weight:700;
+      color:#123d78;
+      border-bottom:1px solid transparent;
+      user-select:none;
+    }
+
+    .diagnostic-box[open] summary{
+      border-bottom-color:var(--line);
+      background:#fff;
+    }
+
+    .diagnostic-content{
+      padding:16px;
+      display:grid;
+      gap:14px;
+    }
+
+    .diag-item{
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:14px;
+      background:#fff;
+    }
+
+    .diag-label{
+      font-size:12px;
+      color:var(--muted);
+      font-weight:700;
+      margin-bottom:8px;
+      text-transform:uppercase;
+      letter-spacing:.03em;
+    }
+
+    .diag-value{
+      font-size:14px;
+      line-height:1.6;
+      white-space:pre-wrap;
+      word-break:break-word;
     }
 
     .history-toolbar{
       display:flex;
       gap:12px;
-      flex-wrap:wrap;
       align-items:end;
+      flex-wrap:wrap;
       margin-bottom:16px;
     }
 
@@ -246,11 +455,18 @@
       font-weight:700;
     }
 
-    .history-search input{
+    input{
       width:100%;
-      padding:12px;
-      border:1px solid #d1d5db;
+      padding:12px 14px;
+      border:1px solid #d2d9e6;
       background:#fff;
+      color:var(--text);
+      outline:none;
+    }
+
+    input:focus{
+      border-color:#7aa6ff;
+      box-shadow:0 0 0 3px rgba(37,99,235,.08);
     }
 
     .history-list{
@@ -260,67 +476,53 @@
 
     .history-item{
       border:1px solid var(--line);
-      border-radius:14px;
-      padding:14px;
       background:#fbfdff;
+      border-radius:18px;
+      padding:16px;
       cursor:pointer;
-      transition:.15s ease;
+      transition:.16s ease;
     }
 
     .history-item:hover{
       transform:translateY(-1px);
-      box-shadow:0 8px 22px rgba(15,23,42,.06);
+      box-shadow:0 10px 24px rgba(15,23,42,.06);
     }
 
     .history-item.active{
-      border-color:var(--primary);
-      box-shadow:0 0 0 2px rgba(37,99,235,.10);
+      border-color:#8eb3ff;
+      background:#f5f9ff;
+      box-shadow:0 0 0 3px rgba(37,99,235,.08);
     }
 
-    .history-item strong{
-      display:block;
-      margin-bottom:6px;
-      word-break:break-word;
+    .history-title{
       font-size:15px;
+      font-weight:700;
+      margin:0 0 8px;
+      color:#10284f;
+      word-break:break-word;
+    }
+
+    .history-badges{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-bottom:10px;
     }
 
     .history-meta{
       font-size:13px;
       color:var(--muted);
       line-height:1.6;
-      margin-top:8px;
-    }
-
-    .badge{
-      display:inline-block;
-      padding:5px 10px;
-      border-radius:999px;
-      font-size:12px;
-      font-weight:700;
-      margin-right:6px;
-      margin-top:4px;
-    }
-
-    .badge.success{background:#dcfce7;color:#166534}
-    .badge.warning{background:#fef3c7;color:#92400e}
-    .badge.error{background:#fee2e2;color:#991b1b}
-    .badge.blue{background:#dbeafe;color:#1d4ed8}
-    .badge.gray{background:#e5e7eb;color:#374151}
-
-    .empty{
-      color:var(--muted);
-      font-size:14px;
-      padding:8px 0;
     }
 
     .pagination-bar{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
       margin-top:16px;
       padding-top:14px;
       border-top:1px solid var(--line);
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:center;
       flex-wrap:wrap;
     }
 
@@ -336,111 +538,164 @@
       line-height:1.5;
     }
 
-    .hidden{display:none!important}
+    .empty{
+      color:var(--muted);
+      font-size:14px;
+      padding:12px 4px;
+    }
+
+    .hidden{display:none !important}
 
     .modal-backdrop{
       position:fixed;
       inset:0;
-      background:rgba(15,23,42,.55);
+      background:rgba(15,23,42,.58);
       display:none;
       align-items:center;
       justify-content:center;
-      padding:20px;
-      z-index:1000;
+      padding:18px;
+      z-index:1200;
     }
 
     .modal{
-      width:min(1100px,100%);
+      width:min(1180px,100%);
       max-height:92vh;
       overflow:auto;
       background:#fff;
-      border-radius:20px;
-      box-shadow:0 24px 70px rgba(0,0,0,.25);
+      border-radius:24px;
+      box-shadow:0 30px 80px rgba(0,0,0,.28);
       padding:22px;
     }
 
     .modal-header{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:12px;
-      margin-bottom:16px;
       position:sticky;
       top:0;
+      z-index:12;
       background:#fff;
-      z-index:10;
-      padding-bottom:12px;
+      padding-bottom:14px;
       border-bottom:1px solid var(--line);
+      margin-bottom:16px;
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:center;
+      flex-wrap:wrap;
     }
 
     .modal-header h3{
       margin:0;
-      color:#0f4c81;
-      font-size:22px;
-    }
-
-    .close-btn{
-      background:#eef2ff;
-      color:#3730a3;
+      color:#103b77;
+      font-size:24px;
     }
 
     .detail-grid{
       display:grid;
-      grid-template-columns:repeat(3,1fr);
+      grid-template-columns:repeat(4,1fr);
       gap:12px;
     }
 
     .detail-block{
-      background:#f8fafc;
       border:1px solid var(--line);
-      border-radius:14px;
-      padding:12px;
+      border-radius:18px;
+      padding:14px;
+      background:#fbfdff;
+    }
+
+    .detail-block.full{
+      grid-column:1/-1;
     }
 
     .detail-label{
       font-size:12px;
       color:var(--muted);
-      margin-bottom:6px;
+      margin-bottom:8px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:.03em;
     }
 
     .detail-value{
+      font-size:15px;
       font-weight:700;
+      color:#13294b;
       word-break:break-word;
+      line-height:1.45;
     }
 
-    .detail-full{
-      grid-column:1/-1;
+    .detail-value.soft{
+      font-weight:400;
+      white-space:pre-wrap;
     }
 
-    @media (max-width:1100px){
-      .layout,.preview-grid{grid-template-columns:1fr}
-      .simple-metrics,.detail-grid{grid-template-columns:repeat(2,1fr)}
+    .footer-note{
+      margin-top:8px;
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.5;
     }
 
-    @media (max-width:720px){
+    @media (max-width:1150px){
+      .main-grid,.preview-grid{grid-template-columns:1fr}
+      .metrics-grid{grid-template-columns:repeat(2,1fr)}
+      .detail-grid{grid-template-columns:repeat(2,1fr)}
+      .hero-mini-grid{grid-template-columns:repeat(3,1fr); min-width:unset; width:100%}
+    }
+
+    @media (max-width:760px){
       .container{padding:14px}
       .hero{padding:22px}
       .hero h1{font-size:26px}
-      .simple-metrics,.detail-grid{grid-template-columns:1fr}
+      .metrics-grid,.detail-grid,.hero-mini-grid{grid-template-columns:1fr}
       .preview-frame{height:340px}
+      .modal{padding:16px}
     }
   </style>
 </head>
 <body>
   <div class="container">
     <section class="hero">
-      <h1>Organizador de Relatórios PDF</h1>
-      <p>Envie o PDF, acompanhe o resultado do processamento, compare o original com o arquivo gerado e consulte um histórico simples dos relatórios processados.</p>
+      <div class="hero-top">
+        <div>
+          <h1>Organizador Inteligente de Relatórios PDF</h1>
+          <p>
+            Envie o PDF, acompanhe o processamento, compare o original com o arquivo gerado,
+            veja a confiança do total extraído e consulte o histórico com diagnóstico detalhado.
+          </p>
+        </div>
+
+        <div class="hero-mini-grid">
+          <div class="hero-stat">
+            <div class="hero-stat-label">Ambiente</div>
+            <div class="hero-stat-value">DEV</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-label">Formato</div>
+            <div class="hero-stat-value">PDF</div>
+          </div>
+          <div class="hero-stat">
+            <div class="hero-stat-label">Histórico</div>
+            <div class="hero-stat-value" id="heroHistoryCount">0</div>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <div class="layout">
-      <div>
+    <div class="main-grid">
+      <main>
         <section class="card">
-          <h2>Enviar relatório</h2>
+          <div class="section-head">
+            <div>
+              <h2>Enviar relatório</h2>
+              <p>Faça upload do PDF e acompanhe o resultado com visualização lado a lado.</p>
+            </div>
+          </div>
 
           <div id="dropzone" class="dropzone">
-            <div class="main-text">Clique aqui ou arraste um PDF</div>
-            <div class="sub-text">Envio direto para a API publicada no Render</div>
+            <div class="dropzone-icon">PDF</div>
+            <div class="main-text">Clique aqui ou arraste um arquivo PDF</div>
+            <div class="sub-text">
+              O arquivo será enviado diretamente para a sua API FastAPI no Render.
+            </div>
             <input type="file" id="fileInput" accept=".pdf,application/pdf" hidden />
             <div id="fileName" class="file-name"></div>
           </div>
@@ -452,43 +707,87 @@
             <a id="btnDownload" class="link-btn btn-secondary hidden" href="#" target="_blank" rel="noopener noreferrer">Baixar PDF gerado</a>
           </div>
 
-          <div id="statusBox" class="status-box">Nenhum arquivo enviado ainda.</div>
+          <div class="status-panel">
+            <div class="status-header">
+              <div>
+                <div class="status-label">Situação atual</div>
+              </div>
+              <span id="statusBadge" class="badge badge-muted">Aguardando</span>
+            </div>
+            <div id="statusBox" class="status-message">Nenhum arquivo enviado ainda.</div>
+          </div>
 
-          <div class="simple-metrics">
+          <div class="metrics-grid">
             <div class="metric">
               <div class="metric-label">Arquivo</div>
               <div class="metric-value" id="metricArquivo">-</div>
             </div>
+
             <div class="metric">
-              <div class="metric-label">Tipo</div>
+              <div class="metric-label">Tipo detectado</div>
               <div class="metric-value" id="metricTipo">-</div>
+              <div class="metric-sub" id="metricPontuacao">Pontuação: -</div>
             </div>
+
             <div class="metric">
-              <div class="metric-label">Status</div>
-              <div class="metric-value" id="metricStatus">-</div>
+              <div class="metric-label">Total original</div>
+              <div class="metric-value" id="metricTotalOriginal">0,00</div>
+              <div class="metric-sub" id="metricConfidence">Confiança: -</div>
             </div>
-            <div class="metric">
-              <div class="metric-label">Registros</div>
-              <div class="metric-value" id="metricRegistros">0</div>
+
+            <div class="metric highlight">
+              <div class="metric-label">Total gerado</div>
+              <div class="metric-value" id="metricTotalGerado">0,00</div>
+              <div class="metric-sub" id="metricDiferenca">Diferença: -</div>
             </div>
           </div>
 
           <div class="preview-grid">
             <div class="preview-panel">
-              <h3>Preview do PDF original</h3>
+              <div class="preview-panel-head">
+                <h3>Preview do PDF original</h3>
+                <span class="badge badge-muted">Original</span>
+              </div>
               <iframe id="previewOriginal" class="preview-frame"></iframe>
             </div>
+
             <div class="preview-panel">
-              <h3>Preview do PDF gerado</h3>
+              <div class="preview-panel-head">
+                <h3>Preview do PDF gerado</h3>
+                <span class="badge badge-info">Gerado</span>
+              </div>
               <iframe id="previewFinal" class="preview-frame"></iframe>
             </div>
           </div>
+
+          <details class="diagnostic-box">
+            <summary>🔍 Ver diagnóstico técnico</summary>
+            <div class="diagnostic-content">
+              <div class="diag-item">
+                <div class="diag-label">Motivo da detecção</div>
+                <div class="diag-value" id="diagMotivoDetectado">-</div>
+              </div>
+              <div class="diag-item">
+                <div class="diag-label">Motivo do total original</div>
+                <div class="diag-value" id="diagMotivoTotal">-</div>
+              </div>
+              <div class="diag-item">
+                <div class="diag-label">Detalhes gerais</div>
+                <div class="diag-value" id="diagDetalhesStatus">-</div>
+              </div>
+            </div>
+          </details>
         </section>
-      </div>
+      </main>
 
       <aside>
         <section class="card">
-          <h2>Histórico simples</h2>
+          <div class="section-head">
+            <div>
+              <h2>Histórico</h2>
+              <p>Pesquise relatórios processados e abra o detalhe completo.</p>
+            </div>
+          </div>
 
           <div class="history-toolbar">
             <div class="history-search">
@@ -516,7 +815,9 @@
     <div class="modal">
       <div class="modal-header">
         <h3>Detalhes do relatório</h3>
-        <button class="close-btn" id="btnFecharModal" type="button">Fechar</button>
+        <div class="actions" style="margin-top:0">
+          <button class="btn-secondary" id="btnFecharModal" type="button">Fechar</button>
+        </div>
       </div>
 
       <div class="detail-grid">
@@ -524,41 +825,92 @@
           <div class="detail-label">Arquivo</div>
           <div class="detail-value" id="detailArquivo">-</div>
         </div>
+
         <div class="detail-block">
-          <div class="detail-label">Data/Hora</div>
-          <div class="detail-value" id="detailDataHora">-</div>
+          <div class="detail-label">Tipo</div>
+          <div class="detail-value" id="detailTipo">-</div>
         </div>
+
         <div class="detail-block">
           <div class="detail-label">Status</div>
           <div class="detail-value" id="detailStatus">-</div>
         </div>
 
         <div class="detail-block">
-          <div class="detail-label">Tipo</div>
-          <div class="detail-value" id="detailTipo">-</div>
-        </div>
-        <div class="detail-block">
           <div class="detail-label">Registros</div>
           <div class="detail-value" id="detailRegistros">0</div>
         </div>
+
         <div class="detail-block">
-          <div class="detail-label">Decisão</div>
+          <div class="detail-label">Data/Hora</div>
+          <div class="detail-value" id="detailDataHora">-</div>
+        </div>
+
+        <div class="detail-block">
+          <div class="detail-label">Parser</div>
+          <div class="detail-value" id="detailParser">-</div>
+        </div>
+
+        <div class="detail-block">
+          <div class="detail-label">Total original</div>
+          <div class="detail-value" id="detailTotalOriginal">0,00</div>
+        </div>
+
+        <div class="detail-block">
+          <div class="detail-label">Total gerado</div>
+          <div class="detail-value" id="detailTotalGerado">0,00</div>
+        </div>
+
+        <div class="detail-block">
+          <div class="detail-label">Diferença</div>
+          <div class="detail-value" id="detailDiferenca">-</div>
+        </div>
+
+        <div class="detail-block">
+          <div class="detail-label">Confiança do total</div>
+          <div class="detail-value" id="detailConfidence">-</div>
+        </div>
+
+        <div class="detail-block">
+          <div class="detail-label">Decisão final</div>
           <div class="detail-value" id="detailDecisao">-</div>
         </div>
 
-        <div class="detail-block detail-full">
-          <div class="detail-label">Observação</div>
-          <div class="detail-value" id="detailDiagnostico">Sem observações.</div>
+        <div class="detail-block">
+          <div class="detail-label">Revisão</div>
+          <div class="detail-value" id="detailRevisaoStatus">-</div>
+        </div>
+
+        <div class="detail-block full">
+          <div class="detail-label">Motivo da detecção</div>
+          <div class="detail-value soft" id="detailMotivoDetectado">-</div>
+        </div>
+
+        <div class="detail-block full">
+          <div class="detail-label">Motivo do total original</div>
+          <div class="detail-value soft" id="detailMotivoTotal">-</div>
+        </div>
+
+        <div class="detail-block full">
+          <div class="detail-label">Detalhes técnicos</div>
+          <div class="detail-value soft" id="detailDiagnostico">-</div>
         </div>
       </div>
 
       <div class="preview-grid" style="margin-top:18px">
         <div class="preview-panel">
-          <h3>Preview original</h3>
+          <div class="preview-panel-head">
+            <h3>Preview original</h3>
+            <span class="badge badge-muted">Original</span>
+          </div>
           <iframe id="modalPreviewOriginal" class="preview-frame"></iframe>
         </div>
+
         <div class="preview-panel">
-          <h3>Preview gerado</h3>
+          <div class="preview-panel-head">
+            <h3>Preview gerado</h3>
+            <span class="badge badge-info">Gerado</span>
+          </div>
           <iframe id="modalPreviewFinal" class="preview-frame"></iframe>
         </div>
       </div>
@@ -568,11 +920,17 @@
         <button class="btn-danger" id="btnRejeitar" type="button">Rejeitar</button>
         <a id="modalDownload" class="link-btn btn-secondary hidden" href="#" target="_blank" rel="noopener noreferrer">Baixar PDF gerado</a>
       </div>
+
+      <div class="footer-note">
+        Ajuste a constante <strong>API_BASE</strong> no script se você quiser alternar entre DEV e produção.
+      </div>
     </div>
   </div>
 
   <script>
-    const API_BASE = "https://jaboque.onrender.com";
+    // Ajuste aqui para DEV ou PROD
+    const API_BASE = "https://meu-projeto-dev.onrender.com";
+
     const API_URL = `${API_BASE}/upload`;
     const HISTORY_URL = `${API_BASE}/history`;
 
@@ -610,62 +968,112 @@
       if (data?.detail && typeof data.detail === "string") return data.detail;
       if (data?.erro && typeof data.erro === "string") return data.erro;
       if (data?.message && typeof data.message === "string") return data.message;
-      if (data?.detail) return JSON.stringify(data.detail);
-      if (data?.erro) return JSON.stringify(data.erro);
+      if (data?.detail) return JSON.stringify(data.detail, null, 2);
+      if (data?.erro) return JSON.stringify(data.erro, null, 2);
       if (data?.raw) return String(data.raw);
-      return JSON.stringify(data);
+      return JSON.stringify(data, null, 2);
     }
 
-    function setStatus(message, type=""){
-      statusBox.className = "status-box";
-      if (type === "success") statusBox.classList.add("status-success");
-      if (type === "error") statusBox.classList.add("status-error");
-      if (type === "warning") statusBox.classList.add("status-warning");
-      if (type === "loading") statusBox.classList.add("status-loading");
-      statusBox.textContent = message;
+    function setStatus(message){
+      statusBox.textContent = message || "-";
+    }
+
+    function setStatusBadge(status){
+      const badge = document.getElementById("statusBadge");
+      const value = lower(status);
+
+      if (!value || value === "-" || value.includes("aguard")) {
+        badge.className = "badge badge-muted";
+        badge.textContent = "Aguardando";
+        return;
+      }
+
+      if (value === "ok" || value.includes("sucesso")) {
+        badge.className = "badge badge-ok";
+        badge.textContent = "OK";
+        return;
+      }
+
+      if (value.includes("sem total")) {
+        badge.className = "badge badge-warning";
+        badge.textContent = "Sem total no original";
+        return;
+      }
+
+      if (value.includes("diverg")) {
+        badge.className = "badge badge-error";
+        badge.textContent = "Diferença de total";
+        return;
+      }
+
+      if (value.includes("parcial")) {
+        badge.className = "badge badge-warning";
+        badge.textContent = "Parser parcial";
+        return;
+      }
+
+      badge.className = "badge badge-info";
+      badge.textContent = status;
     }
 
     function setProcessingState(isProcessing){
       btnProcessar.disabled = isProcessing;
       btnProcessar.textContent = isProcessing ? "Processando..." : "Processar relatório";
+      if (isProcessing) {
+        setStatusBadge("processando");
+        setStatus("Processando PDF e aguardando resposta da API...");
+      }
     }
 
-    function setMetric(id, value){
+    function setText(id, value){
       document.getElementById(id).textContent = value ?? "-";
     }
 
+    function formatConfidence(confidence){
+      const c = lower(confidence);
+      if (!c) return "-";
+      if (c === "alta") return "Alta";
+      if (c === "media") return "Média";
+      if (c === "baixa") return "Baixa";
+      if (c === "inexistente") return "Inexistente";
+      return confidence;
+    }
+
+    function formatPontuacao(item){
+      const scores = item?.pontuacoes_detectadas;
+      if (!scores) return "Pontuação: -";
+
+      try {
+        const parsed = typeof scores === "string" ? JSON.parse(scores) : scores;
+        const entries = Object.entries(parsed || {});
+        if (!entries.length) return "Pontuação: -";
+        const best = entries.sort((a,b) => (b[1]||0) - (a[1]||0))[0];
+        return `Pontuação: ${best[0]} = ${best[1]}`;
+      } catch {
+        return "Pontuação: -";
+      }
+    }
+
+    function updateHeroHistoryCount(total){
+      document.getElementById("heroHistoryCount").textContent = String(total ?? 0);
+    }
+
     function resetMainView(){
-      setMetric("metricArquivo", "-");
-      setMetric("metricTipo", "-");
-      setMetric("metricStatus", "-");
-      setMetric("metricRegistros", "0");
+      setText("metricArquivo", "-");
+      setText("metricTipo", "-");
+      setText("metricPontuacao", "Pontuação: -");
+      setText("metricTotalOriginal", "0,00");
+      setText("metricConfidence", "Confiança: -");
+      setText("metricTotalGerado", "0,00");
+      setText("metricDiferenca", "Diferença: -");
+      setText("diagMotivoDetectado", "-");
+      setText("diagMotivoTotal", "-");
+      setText("diagDetalhesStatus", "-");
       previewOriginal.src = "";
       previewFinal.src = "";
       btnDownload.classList.add("hidden");
       btnDownload.href = "#";
-    }
-
-    function applyMainResult(data, keepLocalPreview=false){
-      setMetric("metricArquivo", data.nome_arquivo_original || selectedFile?.name || "-");
-      setMetric("metricTipo", data.tipo_detectado || "-");
-      setMetric("metricStatus", data.status || "-");
-      setMetric("metricRegistros", data.qtd_registros ?? 0);
-
-      if (!keepLocalPreview && data.preview_original_url) {
-        previewOriginal.src = absoluteUrl(data.preview_original_url);
-      } else if (keepLocalPreview && localPreviewUrl) {
-        previewOriginal.src = localPreviewUrl;
-      }
-
-      previewFinal.src = data.preview_gerado_url ? absoluteUrl(data.preview_gerado_url) : "";
-
-      if (data.download_url) {
-        btnDownload.href = absoluteUrl(data.download_url);
-        btnDownload.classList.remove("hidden");
-      } else {
-        btnDownload.classList.add("hidden");
-        btnDownload.href = "#";
-      }
+      setStatusBadge("aguardando");
     }
 
     function updateSelectedFile(file){
@@ -679,8 +1087,9 @@
       if (selectedFile) {
         localPreviewUrl = URL.createObjectURL(selectedFile);
         previewOriginal.src = localPreviewUrl;
-        setMetric("metricArquivo", selectedFile.name);
-        setStatus(`Arquivo selecionado com sucesso.\nNome: ${selectedFile.name}`, "success");
+        setText("metricArquivo", selectedFile.name);
+        setStatus("Arquivo selecionado com sucesso. Clique em “Processar relatório” para enviar.");
+        setStatusBadge("arquivo selecionado");
       }
     }
 
@@ -703,20 +1112,32 @@
       }
     }
 
-    function getStatusBadge(item){
-      const decisao = lower(item.decisao_final);
+    function getHistoryStatusBadge(item){
       const status = lower(item.status);
+      const decisao = lower(item.decisao_final);
 
-      if (decisao.includes("reprov") || decisao.includes("rejeitado")) {
-        return '<span class="badge error">Reprovado</span>';
+      if (status.includes("diverg")) {
+        return `<span class="badge badge-error">Diferença</span>`;
       }
-      if (decisao.includes("aprovado")) {
-        return '<span class="badge success">Aprovado</span>';
+      if (status.includes("sem total")) {
+        return `<span class="badge badge-warning">Sem total</span>`;
       }
-      if (status.includes("diverg") || decisao.includes("revis")) {
-        return '<span class="badge warning">Atenção</span>';
+      if (decisao.includes("reprov") || decisao.includes("rejeit")) {
+        return `<span class="badge badge-error">Reprovado</span>`;
       }
-      return '<span class="badge blue">Processado</span>';
+      if (decisao.includes("aprov")) {
+        return `<span class="badge badge-ok">Aprovado</span>`;
+      }
+      return `<span class="badge badge-info">Processado</span>`;
+    }
+
+    function getConfidenceBadge(confidence){
+      const c = lower(confidence);
+      if (c === "alta") return `<span class="badge badge-ok">Confiança alta</span>`;
+      if (c === "media") return `<span class="badge badge-warning">Confiança média</span>`;
+      if (c === "baixa") return `<span class="badge badge-warning">Confiança baixa</span>`;
+      if (c === "inexistente") return `<span class="badge badge-muted">Sem total</span>`;
+      return `<span class="badge badge-muted">-</span>`;
     }
 
     function buildHistoryUrl(page = 1){
@@ -730,15 +1151,55 @@
       return `${HISTORY_URL}?${params.toString()}`;
     }
 
+    function applyMainResult(data, keepLocalPreview=false){
+      setText("metricArquivo", data.nome_arquivo_original || selectedFile?.name || "-");
+      setText("metricTipo", data.tipo_detectado || "-");
+      setText("metricPontuacao", formatPontuacao(data));
+      setText("metricTotalOriginal", data.valor_total_original || "0,00");
+      setText("metricConfidence", `Confiança: ${formatConfidence(data.total_original_confidence)}`);
+      setText("metricTotalGerado", data.valor_total_gerado || "0,00");
+
+      if (lower(data.total_original_confidence) === "alta") {
+        setText("metricDiferenca", `Diferença: ${data.diferenca_total || "0,00"}`);
+      } else {
+        setText("metricDiferenca", "Diferença: não comparada");
+      }
+
+      setText("diagMotivoDetectado", data.motivo_detectado || "-");
+      setText("diagMotivoTotal", data.total_original_motivo || "-");
+      setText("diagDetalhesStatus", data.detalhes_status || "-");
+
+      setStatus(data.mensagem || data.status || "-");
+      setStatusBadge(data.status || data.mensagem || "-");
+
+      if (!keepLocalPreview && data.preview_original_url) {
+        previewOriginal.src = absoluteUrl(data.preview_original_url);
+      } else if (keepLocalPreview && localPreviewUrl) {
+        previewOriginal.src = localPreviewUrl;
+      }
+
+      previewFinal.src = data.preview_gerado_url ? absoluteUrl(data.preview_gerado_url) : "";
+
+      if (data.download_url) {
+        btnDownload.href = absoluteUrl(data.download_url);
+        btnDownload.classList.remove("hidden");
+      } else {
+        btnDownload.classList.add("hidden");
+        btnDownload.href = "#";
+      }
+    }
+
     function renderHistory(){
       if (!currentItems.length) {
         historyList.innerHTML = `<div class="empty">Nenhum relatório encontrado.</div>`;
       } else {
         historyList.innerHTML = currentItems.map(item => `
           <div class="history-item ${item.job_id === selectedReportId ? "active" : ""}" data-report-id="${item.job_id}">
-            <strong>${item.nome_arquivo_original || "Sem nome"}</strong>
-            ${getStatusBadge(item)}
-            <span class="badge gray">${item.tipo_detectado || "-"}</span>
+            <div class="history-title">${item.nome_arquivo_original || "Sem nome"}</div>
+            <div class="history-badges">
+              ${getHistoryStatusBadge(item)}
+              <span class="badge badge-muted">${item.tipo_detectado || "-"}</span>
+            </div>
             <div class="history-meta">
               Data/Hora: ${item.data_hora || "-"}<br>
               Status: ${item.status || "-"}
@@ -766,29 +1227,103 @@
         currentItems = Array.isArray(data.items) ? data.items : Array.isArray(data) ? data : [];
         currentPage = Number(data.page || page || 1);
         totalPages = Number(data.total_pages || 1);
+
+        updateHeroHistoryCount(Number(data.total || currentItems.length || 0));
         renderHistory();
       } catch (error) {
-        currentItems = [];
-        currentPage = 1;
-        totalPages = 1;
+        historyList.innerHTML = `<div class="empty">Erro ao carregar histórico: ${error.message}</div>`;
+      }
+    }
+
+    async function openReportDetails(reportId){
+      try {
+        const response = await fetch(`${HISTORY_URL}/${reportId}`);
+        const data = await safeJson(response);
+
+        if (!response.ok) throw new Error(backendMessage(data));
+
+        currentDetail = data;
+        selectedReportId = reportId;
         renderHistory();
-        console.error("Erro ao carregar histórico:", error);
+        fillDetailModal(data);
+        document.getElementById("reportModalBackdrop").style.display = "flex";
+      } catch (error) {
+        alert(`Erro ao abrir detalhes: ${error.message}`);
+      }
+    }
+
+    function fillDetailModal(data){
+      setText("detailArquivo", data.nome_arquivo_original || "-");
+      setText("detailTipo", data.tipo_detectado || "-");
+      setText("detailStatus", data.status || "-");
+      setText("detailRegistros", data.qtd_registros ?? 0);
+      setText("detailDataHora", data.data_hora || "-");
+      setText("detailParser", data.parser_utilizado || "-");
+      setText("detailTotalOriginal", data.valor_total_original || "0,00");
+      setText("detailTotalGerado", data.valor_total_gerado || "0,00");
+      setText("detailDiferenca", lower(data.total_original_confidence) === "alta" ? (data.diferenca_total || "0,00") : "Não comparada");
+      setText("detailConfidence", formatConfidence(data.total_original_confidence || "inexistente"));
+      setText("detailDecisao", data.decisao_final || "-");
+      setText("detailRevisaoStatus", data.revisao_status || "-");
+      setText("detailMotivoDetectado", data.motivo_detectado || "-");
+      setText("detailMotivoTotal", data.total_original_motivo || "-");
+      setText("detailDiagnostico", data.detalhes_status || "-");
+
+      document.getElementById("modalPreviewOriginal").src = data.preview_original_url ? absoluteUrl(data.preview_original_url) : "";
+      document.getElementById("modalPreviewFinal").src = data.preview_gerado_url ? absoluteUrl(data.preview_gerado_url) : "";
+
+      const modalDownload = document.getElementById("modalDownload");
+      if (data.download_url) {
+        modalDownload.href = absoluteUrl(data.download_url);
+        modalDownload.classList.remove("hidden");
+      } else {
+        modalDownload.href = "#";
+        modalDownload.classList.add("hidden");
+      }
+
+      const btnAprovar = document.getElementById("btnAprovar");
+      const btnRejeitar = document.getElementById("btnRejeitar");
+
+      btnAprovar.onclick = () => submitReview(data.job_id, "aprovado");
+      btnRejeitar.onclick = () => submitReview(data.job_id, "rejeitado");
+    }
+
+    async function submitReview(jobId, action){
+      try {
+        const url = `${API_BASE}/review/${jobId}`;
+        const payload = {
+          decisao: action,
+          observacao: ""
+        };
+
+        const response = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await safeJson(response);
+        if (!response.ok) throw new Error(backendMessage(data));
+
+        await loadHistory(currentPage);
+        if (selectedReportId) await openReportDetails(selectedReportId);
+      } catch (error) {
+        alert(`Erro na revisão: ${error.message}`);
       }
     }
 
     async function processFile(){
       if (!selectedFile) {
-        setStatus("Selecione um PDF antes de processar.", "error");
+        alert("Selecione um arquivo PDF antes de processar.");
         return;
       }
 
-      const formData = new FormData();
-      formData.append("file", selectedFile);
-
-      setStatus("Enviando arquivo para a API...\nAguarde o processamento completo.", "loading");
-      setProcessingState(true);
-
       try {
+        setProcessingState(true);
+
+        const formData = new FormData();
+        formData.append("file", selectedFile);
+
         const response = await fetch(API_URL, {
           method: "POST",
           body: formData
@@ -796,116 +1331,26 @@
 
         const data = await safeJson(response);
 
-        if (!response.ok || data.ok === false) {
-          throw new Error(backendMessage(data));
-        }
+        if (!response.ok) throw new Error(backendMessage(data));
 
-        selectedReportId = data.job_id || "";
         applyMainResult(data, true);
-
-        const warning =
-          lower(data.decisao_final).includes("revis") ||
-          lower(data.status).includes("parcial");
-
-        setStatus(
-          `${data.mensagem || "Processamento concluído."}
-Status: ${data.status || "-"}
-Registros: ${data.qtd_registros ?? 0}`,
-          warning ? "warning" : "success"
-        );
-
-        currentPage = 1;
-        await loadHistory(currentPage);
+        await loadHistory(1);
       } catch (error) {
-        setStatus(`Erro ao processar: ${String(error.message || error)}`, "error");
-        console.error("Erro completo no processamento:", error);
+        setStatusBadge("erro");
+        setStatus(`Erro ao processar o relatório.\n${error.message}`);
       } finally {
         setProcessingState(false);
       }
     }
 
-    async function fetchReportDetail(reportId){
-      const response = await fetch(`${HISTORY_URL}/${reportId}`);
-      const data = await safeJson(response);
-
-      if (!response.ok) {
-        throw new Error(backendMessage(data));
-      }
-      return data;
-    }
-
-    async function openReportDetails(reportId){
-      try {
-        const data = await fetchReportDetail(reportId);
-        currentDetail = data;
-        selectedReportId = reportId;
-        renderHistory();
-
-        document.getElementById("detailArquivo").textContent = data.nome_arquivo_original || "-";
-        document.getElementById("detailDataHora").textContent = data.data_hora || "-";
-        document.getElementById("detailStatus").textContent = data.status || "-";
-        document.getElementById("detailTipo").textContent = data.tipo_detectado || "-";
-        document.getElementById("detailRegistros").textContent = data.qtd_registros ?? 0;
-        document.getElementById("detailDecisao").textContent = data.decisao_final || "-";
-        document.getElementById("detailDiagnostico").textContent = data.detalhes_status || "Sem observações.";
-
-        document.getElementById("modalPreviewOriginal").src = data.preview_original_url ? absoluteUrl(data.preview_original_url) : "";
-        document.getElementById("modalPreviewFinal").src = data.preview_gerado_url ? absoluteUrl(data.preview_gerado_url) : "";
-
-        const modalDownload = document.getElementById("modalDownload");
-        if (data.download_url) {
-          modalDownload.href = absoluteUrl(data.download_url);
-          modalDownload.classList.remove("hidden");
-        } else {
-          modalDownload.href = "#";
-          modalDownload.classList.add("hidden");
-        }
-
-        document.getElementById("reportModalBackdrop").style.display = "flex";
-      } catch (error) {
-        setStatus(`Erro ao carregar detalhes: ${String(error.message || error)}`, "error");
-        console.error("Erro completo ao carregar detalhes:", error);
-      }
-    }
-
-    async function submitReview(status){
-      if (!currentDetail?.job_id) return;
-
-      const body = {
-        revisao_status: status,
-        revisao_observacao: "",
-        revisado_por: "operador_web"
-      };
-
-      try {
-        const response = await fetch(`${API_BASE}/review/${currentDetail.job_id}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body)
-        });
-
-        const data = await safeJson(response);
-
-        if (!response.ok) {
-          throw new Error(backendMessage(data));
-        }
-
-        setStatus(`Revisão atualizada com sucesso.`, status === "rejeitado" ? "warning" : "success");
-        document.getElementById("reportModalBackdrop").style.display = "none";
-        await loadHistory(currentPage);
-      } catch (error) {
-        setStatus(`Erro na revisão: ${String(error.message || error)}`, "error");
-        console.error("Erro completo na revisão:", error);
-      }
-    }
-
     dropzone.addEventListener("click", () => fileInput.click());
 
-    fileInput.addEventListener("change", e => {
-      updateSelectedFile(e.target.files[0] || null);
+    fileInput.addEventListener("change", (e) => {
+      const file = e.target.files?.[0];
+      if (file) updateSelectedFile(file);
     });
 
-    dropzone.addEventListener("dragover", e => {
+    dropzone.addEventListener("dragover", (e) => {
       e.preventDefault();
       dropzone.classList.add("dragover");
     });
@@ -914,55 +1359,40 @@ Registros: ${data.qtd_registros ?? 0}`,
       dropzone.classList.remove("dragover");
     });
 
-    dropzone.addEventListener("drop", e => {
+    dropzone.addEventListener("drop", (e) => {
       e.preventDefault();
       dropzone.classList.remove("dragover");
-      const file = e.dataTransfer.files[0];
-      if (file) updateSelectedFile(file);
+
+      const file = e.dataTransfer.files?.[0];
+      if (file) {
+        fileInput.files = e.dataTransfer.files;
+        updateSelectedFile(file);
+      }
     });
 
     document.getElementById("btnProcessar").addEventListener("click", processFile);
     document.getElementById("btnLimparArquivo").addEventListener("click", clearSelectedFile);
     document.getElementById("btnAtualizar").addEventListener("click", () => loadHistory(currentPage));
-    document.getElementById("btnBuscar").addEventListener("click", () => {
-      currentPage = 1;
-      loadHistory(currentPage);
-    });
+    document.getElementById("btnBuscar").addEventListener("click", () => loadHistory(1));
+    document.getElementById("btnPrevPage").addEventListener("click", () => currentPage > 1 && loadHistory(currentPage - 1));
+    document.getElementById("btnNextPage").addEventListener("click", () => currentPage < totalPages && loadHistory(currentPage + 1));
 
-    document.getElementById("filterBusca").addEventListener("keydown", e => {
-      if (e.key === "Enter") {
-        currentPage = 1;
-        loadHistory(currentPage);
-      }
-    });
-
-    document.getElementById("btnPrevPage").addEventListener("click", () => {
-      if (currentPage > 1) {
-        currentPage -= 1;
-        loadHistory(currentPage);
-      }
-    });
-
-    document.getElementById("btnNextPage").addEventListener("click", () => {
-      if (currentPage < totalPages) {
-        currentPage += 1;
-        loadHistory(currentPage);
-      }
+    document.getElementById("filterBusca").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") loadHistory(1);
     });
 
     document.getElementById("btnFecharModal").addEventListener("click", () => {
       document.getElementById("reportModalBackdrop").style.display = "none";
     });
 
-    document.getElementById("btnAprovar").addEventListener("click", () => submitReview("aprovado"));
-    document.getElementById("btnRejeitar").addEventListener("click", () => submitReview("rejeitado"));
-
-    document.getElementById("reportModalBackdrop").addEventListener("click", e => {
+    document.getElementById("reportModalBackdrop").addEventListener("click", (e) => {
       if (e.target.id === "reportModalBackdrop") {
         document.getElementById("reportModalBackdrop").style.display = "none";
       }
     });
 
+    resetMainView();
+    setStatus("Nenhum arquivo enviado ainda.");
     loadHistory();
   </script>
 </body>
