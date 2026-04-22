@@ -713,6 +713,34 @@
       background:#fff5f5;
     }
 
+  
+    .history-item-top{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:flex-start;
+    }
+
+    .history-item-actions{
+      display:flex;
+      gap:8px;
+      flex-shrink:0;
+    }
+
+    .btn-mini-danger{
+      background:#fff5f5;
+      color:#b91c1c;
+      border:1px solid #fecaca;
+      padding:8px 10px;
+      border-radius:10px;
+      font-size:12px;
+      font-weight:700;
+    }
+
+    .btn-mini-danger:hover{
+      background:#fee2e2;
+    }
+
   </style>
 </head>
 <body>
@@ -862,7 +890,7 @@
             </div>
             <div class="toolbar-inline">
               <button class="btn-primary" id="btnToggleHistory" type="button">Abrir histórico</button>
-              <button class="btn-outline-danger" id="btnDeleteRecent" type="button">Apagar relatórios recentes</button>
+              <button class="btn-outline-danger" id="btnDeleteAll" type="button">Apagar todos</button>
             </div>
           </div>
 
@@ -1283,34 +1311,45 @@
       }
     }
 
-    async function deleteRecentReports(){
-      const confirmed = window.confirm("Tem certeza que deseja apagar os relatórios recentes exibidos no histórico atual?");
+    async function deleteOneReport(jobId, fileName = "este relatório"){
+      try {
+        const response = await fetch(`${API_BASE}/history/${jobId}`, { method: "DELETE" });
+        const data = await safeJson(response);
+
+        if (!response.ok) {
+          throw new Error(backendMessage(data));
+        }
+
+        if (selectedReportId === jobId) {
+          selectedReportId = "";
+          document.getElementById("reportModalBackdrop").style.display = "none";
+        }
+
+        await loadHistory(currentPage);
+      } catch (error) {
+        alert(`Não foi possível apagar ${fileName}.\n${error.message}`);
+      }
+    }
+
+    async function deleteAllReports(){
+      const confirmed = window.confirm("Tem certeza que deseja apagar TODOS os relatórios?");
       if (!confirmed) return;
 
-      const itemsToDelete = currentItems.slice(0, 10);
-      if (!itemsToDelete.length) {
-        alert("Não há relatórios recentes carregados para apagar.");
-        return;
-      }
+      try {
+        const response = await fetch(`${API_BASE}/history`, { method: "DELETE" });
+        const data = await safeJson(response);
 
-      const failed = [];
-      for (const item of itemsToDelete) {
-        try {
-          const response = await fetch(`${API_BASE}/history/${item.job_id}`, { method: "DELETE" });
-          if (!response.ok) {
-            failed.push(item.nome_arquivo_original || item.job_id);
-          }
-        } catch {
-          failed.push(item.nome_arquivo_original || item.job_id);
+        if (!response.ok) {
+          throw new Error(backendMessage(data));
         }
-      }
 
-      await loadHistory(1);
-
-      if (failed.length) {
-        alert(`Alguns relatórios não puderam ser apagados:\n- ${failed.join("\n- ")}`);
-      } else {
-        alert("Relatórios recentes apagados com sucesso.");
+        selectedReportId = "";
+        document.getElementById("reportModalBackdrop").style.display = "none";
+        currentItems = [];
+        await loadHistory(1);
+        alert("Todos os relatórios foram apagados com sucesso.");
+      } catch (error) {
+        alert(`Não foi possível apagar todos os relatórios.\n${error.message}`);
       }
     }
 
@@ -1320,10 +1359,17 @@
       } else {
         historyList.innerHTML = currentItems.map(item => `
           <div class="history-item ${item.job_id === selectedReportId ? "active" : ""}" data-report-id="${item.job_id}">
-            <div class="history-title">${item.nome_arquivo_original || "Sem nome"}</div>
-            <div class="history-badges">
-              ${getHistoryStatusBadge(item)}
-              <span class="badge badge-muted">${item.tipo_detectado || "-"}</span>
+            <div class="history-item-top">
+              <div style="min-width:0;flex:1">
+                <div class="history-title">${item.nome_arquivo_original || "Sem nome"}</div>
+                <div class="history-badges">
+                  ${getHistoryStatusBadge(item)}
+                  <span class="badge badge-muted">${item.tipo_detectado || "-"}</span>
+                </div>
+              </div>
+              <div class="history-item-actions">
+                <button class="btn-mini-danger btn-delete-one" type="button" data-job-id="${item.job_id}" data-file-name="${(item.nome_arquivo_original || "Sem nome").replace(/"/g, '&quot;')}">Apagar</button>
+              </div>
             </div>
             <div class="history-meta">
               Data/Hora: ${item.data_hora || "-"}<br>
@@ -1334,7 +1380,21 @@
       }
 
       document.querySelectorAll(".history-item").forEach(el => {
-        el.addEventListener("click", () => openReportDetails(el.dataset.reportId));
+        el.addEventListener("click", (e) => {
+          if (e.target.closest(".btn-delete-one")) return;
+          openReportDetails(el.dataset.reportId);
+        });
+      });
+
+      document.querySelectorAll(".btn-delete-one").forEach(btn => {
+        btn.addEventListener("click", async (e) => {
+          e.stopPropagation();
+          const jobId = btn.dataset.jobId;
+          const fileName = btn.dataset.fileName || "este relatório";
+          const confirmed = window.confirm(`Tem certeza que deseja apagar ${fileName}?`);
+          if (!confirmed) return;
+          await deleteOneReport(jobId, fileName);
+        });
       });
 
       document.getElementById("paginationInfo").textContent = `Página ${currentPage} de ${totalPages}`;
@@ -1608,10 +1668,9 @@
     document.getElementById("btnLimparArquivo").addEventListener("click", clearSelectedFile);
     document.getElementById("btnAtualizar").addEventListener("click", () => { toggleHistoryPanel(true); loadHistory(currentPage); });
     document.getElementById("btnToggleHistory").addEventListener("click", () => toggleHistoryPanel());
-    document.getElementById("btnDeleteRecent").addEventListener("click", async () => {
+    document.getElementById("btnDeleteAll").addEventListener("click", async () => {
       toggleHistoryPanel(true);
-      if (!currentItems.length) await loadHistory(1);
-      await deleteRecentReports();
+      await deleteAllReports();
     });
     document.getElementById("btnBuscar").addEventListener("click", () => { toggleHistoryPanel(true); loadHistory(1); });
     document.getElementById("btnPrevPage").addEventListener("click", () => { if (currentPage > 1) { toggleHistoryPanel(true); loadHistory(currentPage - 1); } });
