@@ -649,6 +649,48 @@
       .preview-frame{height:340px}
       .modal{padding:16px}
     }
+  
+    .feedback-box{
+      margin-top:18px;
+      border-radius:18px;
+      padding:16px;
+      border:1px solid var(--line);
+    }
+
+    .feedback-error{
+      background:#fff5f5;
+      border-color:#fecaca;
+    }
+
+    .feedback-title{
+      font-size:16px;
+      font-weight:700;
+      color:#991b1b;
+      margin-bottom:8px;
+    }
+
+    .feedback-message{
+      font-size:14px;
+      color:#7f1d1d;
+      line-height:1.6;
+    }
+
+    .feedback-box details{
+      margin-top:12px;
+    }
+
+    .feedback-box pre{
+      white-space:pre-wrap;
+      word-break:break-word;
+      font-size:12px;
+      background:#fff;
+      border:1px solid #f1d5d5;
+      padding:12px;
+      border-radius:12px;
+      color:#5b1a1a;
+    }
+
+
   </style>
 </head>
 <body>
@@ -715,6 +757,15 @@
               <span id="statusBadge" class="badge badge-muted">Aguardando</span>
             </div>
             <div id="statusBox" class="status-message">Nenhum arquivo enviado ainda.</div>
+          </div>
+
+          <div id="errorBox" class="feedback-box feedback-error hidden">
+            <div class="feedback-title">Erro ao processar o relatório</div>
+            <div class="feedback-message" id="errorMessage"></div>
+            <details>
+              <summary>Ver detalhe técnico</summary>
+              <pre id="errorTechnical"></pre>
+            </details>
           </div>
 
           <div class="metrics-grid">
@@ -1094,6 +1145,7 @@
     }
 
     function clearSelectedFile(){
+      hideErrorFeedback();
       selectedFile = null;
       fileInput.value = "";
       fileName.textContent = "";
@@ -1312,6 +1364,106 @@
       }
     }
 
+
+    function hideErrorFeedback(){
+      const box = document.getElementById("errorBox");
+      const message = document.getElementById("errorMessage");
+      const technical = document.getElementById("errorTechnical");
+      box.classList.add("hidden");
+      message.textContent = "";
+      technical.textContent = "";
+    }
+
+    function humanizeError(data, responseStatus = 0){
+      const raw =
+        data?.detail ||
+        data?.erro ||
+        data?.message ||
+        data?.raw ||
+        "";
+
+      const text = String(typeof raw === "object" ? JSON.stringify(raw) : raw).toLowerCase();
+
+      if (responseStatus === 413) {
+        return {
+          title: "Arquivo muito grande",
+          message: "O PDF enviado é grande demais para ser processado.",
+          technical: raw
+        };
+      }
+
+      if (responseStatus === 500) {
+        return {
+          title: "Erro interno no servidor",
+          message: "O servidor encontrou um erro ao processar o relatório.",
+          technical: raw
+        };
+      }
+
+      if (text.includes("pdf inválido") || text.includes("pdf invalido") || text.includes("corrompido")) {
+        return {
+          title: "PDF inválido",
+          message: "O arquivo enviado não é um PDF válido ou está corrompido.",
+          technical: raw
+        };
+      }
+
+      if (text.includes("escaneado") || text.includes("sem texto") || text.includes("arquivo vazio")) {
+        return {
+          title: "PDF sem texto legível",
+          message: "Não foi possível extrair texto do PDF. Esse arquivo pode estar escaneado como imagem.",
+          technical: raw
+        };
+      }
+
+      if (text.includes("layout desconhecido")) {
+        return {
+          title: "Layout não reconhecido",
+          message: "Esse modelo de relatório ainda não foi reconhecido automaticamente pelo sistema.",
+          technical: raw
+        };
+      }
+
+      if (text.includes("nenhum registro encontrado")) {
+        return {
+          title: "Nenhum registro encontrado",
+          message: "Nenhum registro válido foi encontrado no PDF enviado.",
+          technical: raw
+        };
+      }
+
+      if (text.includes("networkerror") || text.includes("failed to fetch")) {
+        return {
+          title: "Falha de conexão",
+          message: "Não foi possível se conectar com a API. Verifique se o backend está online.",
+          technical: raw
+        };
+      }
+
+      return {
+        title: "Erro ao processar",
+        message: "Ocorreu um erro durante o processamento do relatório.",
+        technical: raw
+      };
+    }
+
+    function showErrorFeedback(errorInfo){
+      const box = document.getElementById("errorBox");
+      const title = document.querySelector("#errorBox .feedback-title");
+      const message = document.getElementById("errorMessage");
+      const technical = document.getElementById("errorTechnical");
+
+      box.classList.remove("hidden");
+      title.textContent = errorInfo.title || "Erro ao processar o relatório";
+      message.textContent = errorInfo.message || "Ocorreu um erro durante o processamento.";
+      technical.textContent = typeof errorInfo.technical === "string"
+        ? errorInfo.technical
+        : JSON.stringify(errorInfo.technical, null, 2);
+
+      setStatusBadge("erro");
+      setStatus(`${title.textContent}\n${message.textContent}`);
+    }
+
     async function processFile(){
       if (!selectedFile) {
         alert("Selecione um arquivo PDF antes de processar.");
@@ -1319,6 +1471,7 @@
       }
 
       try {
+        hideErrorFeedback();
         setProcessingState(true);
 
         const formData = new FormData();
@@ -1331,13 +1484,21 @@
 
         const data = await safeJson(response);
 
-        if (!response.ok) throw new Error(backendMessage(data));
+        if (!response.ok) {
+          const errorInfo = humanizeError(data, response.status);
+          showErrorFeedback(errorInfo);
+          throw new Error(errorInfo.message);
+        }
 
+        hideErrorFeedback();
         applyMainResult(data, true);
         await loadHistory(1);
       } catch (error) {
-        setStatusBadge("erro");
-        setStatus(`Erro ao processar o relatório.\n${error.message}`);
+        const errorBox = document.getElementById("errorBox");
+        if (errorBox.classList.contains("hidden")) {
+          const errorInfo = humanizeError({ raw: error.message }, 0);
+          showErrorFeedback(errorInfo);
+        }
       } finally {
         setProcessingState(false);
       }
