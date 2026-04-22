@@ -713,7 +713,7 @@
       if (decisao.includes("aprovado")) {
         return '<span class="badge success">Aprovado</span>';
       }
-      if (status.includes("diverg") || decisao.includes("revis")) {
+      if (status.includes("diferença possível") || decisao.includes("revis")) {
         return '<span class="badge warning">Atenção</span>';
       }
       return '<span class="badge blue">Processado</span>';
@@ -804,9 +804,9 @@
         applyMainResult(data, true);
 
         const warning =
-          Boolean(data.divergencia_total) ||
+          Boolean(data.diferença possívelencia_total) ||
           lower(data.decisao_final).includes("revis") ||
-          lower(data.status).includes("diverg") ||
+          lower(data.status).includes("diferença possível") ||
           lower(data.status).includes("parcial");
 
         setStatus(
