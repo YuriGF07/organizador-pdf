@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Central de Revisão de Relatórios PDF</title>
+  <title>Organizador de Relatórios PDF</title>
   <style>
     :root{
       --bg:#f4f7fb;
@@ -12,16 +12,16 @@
       --muted:#6b7280;
       --line:#e5e7eb;
       --primary:#2563eb;
-      --primary-2:#0f4c81;
+      --primary-dark:#1d4ed8;
       --success:#16a34a;
       --warning:#d97706;
       --danger:#dc2626;
-      --info:#0ea5e9;
       --shadow:0 10px 30px rgba(15,23,42,.08);
       --radius:18px;
     }
 
     *{box-sizing:border-box}
+
     body{
       margin:0;
       font-family:Arial,Helvetica,sans-serif;
@@ -30,61 +30,35 @@
     }
 
     .container{
-      max-width:1440px;
+      max-width:1280px;
       margin:0 auto;
       padding:24px;
     }
 
     .hero{
-      background:linear-gradient(135deg,var(--primary-2),var(--primary));
+      background:linear-gradient(135deg,#0f4c81,#2563eb);
       color:#fff;
       border-radius:22px;
-      padding:30px;
+      padding:28px;
       margin-bottom:24px;
       box-shadow:0 14px 34px rgba(15,76,129,.22);
     }
 
     .hero h1{
       margin:0 0 10px;
-      font-size:32px;
+      font-size:30px;
     }
 
     .hero p{
       margin:0;
-      max-width:980px;
+      max-width:900px;
       line-height:1.55;
       opacity:.96;
     }
 
-    .stats-grid{
-      display:grid;
-      grid-template-columns:repeat(5,1fr);
-      gap:12px;
-      margin-top:20px;
-    }
-
-    .stat-card,.metric-card,.detail-block{
-      background:#f8fafc;
-      border:1px solid var(--line);
-      border-radius:14px;
-      padding:12px;
-    }
-
-    .stat-label,.metric-label,.detail-label{
-      font-size:12px;
-      color:var(--muted);
-      margin-bottom:6px;
-    }
-
-    .stat-value,.metric-value,.detail-value{
-      font-size:20px;
-      font-weight:700;
-      word-break:break-word;
-    }
-
     .layout{
       display:grid;
-      grid-template-columns:1.35fr .95fr;
+      grid-template-columns:1.25fr .95fr;
       gap:20px;
     }
 
@@ -98,14 +72,14 @@
 
     .card h2{
       margin:0 0 16px;
-      color:var(--primary-2);
+      color:#0f4c81;
       font-size:22px;
     }
 
     .dropzone{
       border:2px dashed #93c5fd;
       border-radius:16px;
-      padding:32px 20px;
+      padding:30px 18px;
       text-align:center;
       background:#f8fbff;
       cursor:pointer;
@@ -113,7 +87,7 @@
     }
 
     .dropzone:hover{
-      background:#f3f8ff;
+      background:#eef5ff;
     }
 
     .dropzone.dragover{
@@ -125,7 +99,7 @@
     .dropzone .main-text{
       font-size:19px;
       font-weight:700;
-      color:#1d4ed8;
+      color:var(--primary-dark);
     }
 
     .dropzone .sub-text{
@@ -148,7 +122,7 @@
       margin-top:18px;
     }
 
-    button,.link-btn,input,select,textarea{
+    button,.link-btn,input{
       font:inherit;
       border-radius:12px;
     }
@@ -179,34 +153,6 @@
     .btn-secondary{background:#e5eefc;color:#1d4ed8}
     .btn-success{background:#dcfce7;color:#166534}
     .btn-danger{background:#fee2e2;color:#991b1b}
-    .btn-warning{background:#fef3c7;color:#92400e}
-    .btn-info{background:#e0f2fe;color:#075985}
-
-    input,select,textarea{
-      width:100%;
-      padding:12px;
-      border:1px solid #d1d5db;
-      background:#fff;
-      outline:none;
-    }
-
-    input:focus,select:focus,textarea:focus{
-      border-color:#93c5fd;
-      box-shadow:0 0 0 3px rgba(147,197,253,.25);
-    }
-
-    textarea{
-      min-height:90px;
-      resize:vertical;
-    }
-
-    .label{
-      display:block;
-      font-size:12px;
-      color:var(--muted);
-      margin-bottom:6px;
-      font-weight:700;
-    }
 
     .status-box{
       margin-top:18px;
@@ -225,11 +171,30 @@
     .status-warning{background:#fff7ed;border-color:#fdba74;color:#9a3412}
     .status-loading{background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8}
 
-    .metrics-grid{
+    .simple-metrics{
       display:grid;
-      grid-template-columns:repeat(5,1fr);
+      grid-template-columns:repeat(4,1fr);
       gap:12px;
       margin-top:18px;
+    }
+
+    .metric{
+      background:#f8fafc;
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:12px;
+    }
+
+    .metric-label{
+      font-size:12px;
+      color:var(--muted);
+      margin-bottom:6px;
+    }
+
+    .metric-value{
+      font-size:18px;
+      font-weight:700;
+      word-break:break-word;
     }
 
     .preview-grid{
@@ -248,90 +213,49 @@
 
     .preview-panel h3{
       margin:0 0 10px;
-      color:var(--primary-2);
+      color:#0f4c81;
       font-size:16px;
     }
 
     .preview-frame{
       width:100%;
-      height:520px;
+      height:460px;
       border:1px solid #dbe4f0;
       border-radius:10px;
       background:#fff;
     }
 
-    .toolbar{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:14px;
-      flex-wrap:wrap;
-      margin-bottom:14px;
-    }
-
-    .queue-summary{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-
-    .pill{
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      padding:8px 12px;
-      border-radius:999px;
-      font-size:13px;
-      font-weight:700;
-      background:#eef2ff;
-      color:#3730a3;
-    }
-
-    .filters-container{
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-end;
-      gap:16px;
-      flex-wrap:wrap;
-      margin-bottom:16px;
-      padding:16px;
-      border:1px solid var(--line);
-      border-radius:16px;
-      background:#f8fafc;
-    }
-
-    .filters-left{
+    .history-toolbar{
       display:flex;
       gap:12px;
       flex-wrap:wrap;
+      align-items:end;
+      margin-bottom:16px;
+    }
+
+    .history-search{
       flex:1;
-      min-width:280px;
+      min-width:220px;
     }
 
-    .filter-group{
-      display:flex;
-      flex-direction:column;
-      min-width:180px;
-      flex:1;
+    .history-search label{
+      display:block;
+      font-size:12px;
+      color:var(--muted);
+      margin-bottom:6px;
+      font-weight:700;
     }
 
-    .filters-right{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      align-items:flex-end;
-    }
-
-    .filters-right button{
-      min-height:44px;
+    .history-search input{
+      width:100%;
+      padding:12px;
+      border:1px solid #d1d5db;
+      background:#fff;
     }
 
     .history-list{
       display:grid;
       gap:12px;
-      max-height:1100px;
-      overflow-y:auto;
-      padding-right:4px;
     }
 
     .history-item{
@@ -351,13 +275,6 @@
     .history-item.active{
       border-color:var(--primary);
       box-shadow:0 0 0 2px rgba(37,99,235,.10);
-    }
-
-    .history-title-row{
-      display:flex;
-      justify-content:space-between;
-      gap:10px;
-      align-items:flex-start;
     }
 
     .history-item strong{
@@ -384,26 +301,17 @@
       margin-top:4px;
     }
 
-    .badge.blue{background:#dbeafe;color:#1d4ed8}
     .badge.success{background:#dcfce7;color:#166534}
     .badge.warning{background:#fef3c7;color:#92400e}
     .badge.error{background:#fee2e2;color:#991b1b}
+    .badge.blue{background:#dbeafe;color:#1d4ed8}
     .badge.gray{background:#e5e7eb;color:#374151}
 
-    .small-text{
-      font-size:12px;
+    .empty{
       color:var(--muted);
-      line-height:1.5;
+      font-size:14px;
+      padding:8px 0;
     }
-
-    .helper-line{
-      margin-top:10px;
-      color:var(--muted);
-      font-size:12px;
-    }
-
-    .hidden{display:none!important}
-    .empty{color:var(--muted);font-size:14px;padding:8px 0}
 
     .pagination-bar{
       display:flex;
@@ -422,6 +330,14 @@
       flex-wrap:wrap;
     }
 
+    .small-text{
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.5;
+    }
+
+    .hidden{display:none!important}
+
     .modal-backdrop{
       position:fixed;
       inset:0;
@@ -434,7 +350,7 @@
     }
 
     .modal{
-      width:min(1180px,100%);
+      width:min(1100px,100%);
       max-height:92vh;
       overflow:auto;
       background:#fff;
@@ -459,7 +375,7 @@
 
     .modal-header h3{
       margin:0;
-      color:var(--primary-2);
+      color:#0f4c81;
       font-size:22px;
     }
 
@@ -470,70 +386,51 @@
 
     .detail-grid{
       display:grid;
-      grid-template-columns:repeat(4,1fr);
+      grid-template-columns:repeat(3,1fr);
       gap:12px;
     }
 
-    .detail-full{grid-column:1/-1}
-
-    .critical-box{
-      margin-top:16px;
-      padding:14px 16px;
-      border-radius:14px;
+    .detail-block{
+      background:#f8fafc;
       border:1px solid var(--line);
-      background:#fff;
+      border-radius:14px;
+      padding:12px;
     }
 
-    .critical-box.critical{
-      background:#fef2f2;
-      border-color:#fecaca;
-      color:#991b1b;
+    .detail-label{
+      font-size:12px;
+      color:var(--muted);
+      margin-bottom:6px;
     }
 
-    .critical-box.warning{
-      background:#fff7ed;
-      border-color:#fdba74;
-      color:#9a3412;
+    .detail-value{
+      font-weight:700;
+      word-break:break-word;
     }
 
-    .critical-box.good{
-      background:#ecfdf5;
-      border-color:#a7f3d0;
-      color:#065f46;
+    .detail-full{
+      grid-column:1/-1;
     }
 
-    @media (max-width:1200px){
+    @media (max-width:1100px){
       .layout,.preview-grid{grid-template-columns:1fr}
-      .stats-grid,.metrics-grid,.detail-grid{grid-template-columns:repeat(2,1fr)}
+      .simple-metrics,.detail-grid{grid-template-columns:repeat(2,1fr)}
     }
 
-    @media (max-width:760px){
+    @media (max-width:720px){
       .container{padding:14px}
       .hero{padding:22px}
       .hero h1{font-size:26px}
-      .stats-grid,.metrics-grid,.detail-grid{grid-template-columns:1fr}
-      .filters-container{padding:14px}
-      .filters-left,.filters-right{width:100%}
-      .filter-group{min-width:100%}
-      .filters-right button{width:100%}
-      .preview-frame{height:380px}
-      .pagination-bar{align-items:flex-start}
+      .simple-metrics,.detail-grid{grid-template-columns:1fr}
+      .preview-frame{height:340px}
     }
   </style>
 </head>
 <body>
   <div class="container">
     <section class="hero">
-      <h1>Central de Revisão de Relatórios PDF</h1>
-      <p>Envie PDFs, acompanhe o diagnóstico técnico, filtre o histórico, visualize os previews lado a lado e faça revisão profissional com fila de pendências, aprovação, rejeição e abertura automática do próximo relatório pendente.</p>
-
-      <div class="stats-grid">
-        <div class="stat-card"><div class="stat-label">Total de relatórios</div><div class="stat-value" id="statTotalRelatorios">0</div></div>
-        <div class="stat-card"><div class="stat-label">Pendentes de revisão</div><div class="stat-value" id="statPendentes">0</div></div>
-        <div class="stat-card"><div class="stat-label">Aprovados automáticos</div><div class="stat-value" id="statAprovadosAuto">0</div></div>
-        <div class="stat-card"><div class="stat-label">Aprovados com alerta</div><div class="stat-value" id="statAprovadosAlerta">0</div></div>
-        <div class="stat-card"><div class="stat-label">Reprovados</div><div class="stat-value" id="statReprovados">0</div></div>
-      </div>
+      <h1>Organizador de Relatórios PDF</h1>
+      <p>Envie o PDF, acompanhe o resultado do processamento, compare o original com o arquivo gerado e consulte um histórico simples dos relatórios processados.</p>
     </section>
 
     <div class="layout">
@@ -543,7 +440,7 @@
 
           <div id="dropzone" class="dropzone">
             <div class="main-text">Clique aqui ou arraste um PDF</div>
-            <div class="sub-text">Envio real para a API publicada no Render</div>
+            <div class="sub-text">Envio direto para a API publicada no Render</div>
             <input type="file" id="fileInput" accept=".pdf,application/pdf" hidden />
             <div id="fileName" class="file-name"></div>
           </div>
@@ -551,26 +448,30 @@
           <div class="actions">
             <button class="btn-primary" id="btnProcessar" type="button">Processar relatório</button>
             <button class="btn-secondary" id="btnLimparArquivo" type="button">Limpar seleção</button>
-            <button class="btn-secondary" id="btnAtualizarTudo" type="button">Atualizar dados</button>
+            <button class="btn-secondary" id="btnAtualizar" type="button">Atualizar histórico</button>
             <a id="btnDownload" class="link-btn btn-secondary hidden" href="#" target="_blank" rel="noopener noreferrer">Baixar PDF gerado</a>
           </div>
 
           <div id="statusBox" class="status-box">Nenhum arquivo enviado ainda.</div>
 
-          <div class="metrics-grid">
-            <div class="metric-card"><div class="metric-label">ID do processamento</div><div class="metric-value" id="metricJobId">-</div></div>
-            <div class="metric-card"><div class="metric-label">Tipo detectado</div><div class="metric-value" id="metricTipo">-</div></div>
-            <div class="metric-card"><div class="metric-label">Status</div><div class="metric-value" id="metricStatus">-</div></div>
-            <div class="metric-card"><div class="metric-label">Parser</div><div class="metric-value" id="metricParser">-</div></div>
-            <div class="metric-card"><div class="metric-label">Decisão</div><div class="metric-value" id="metricDecisao">-</div></div>
-            <div class="metric-card"><div class="metric-label">Registros</div><div class="metric-value" id="metricRegistros">0</div></div>
-            <div class="metric-card"><div class="metric-label">Erros do parser</div><div class="metric-value" id="metricErros">0</div></div>
-            <div class="metric-card"><div class="metric-label">Sucesso %</div><div class="metric-value" id="metricSucesso">0</div></div>
-            <div class="metric-card"><div class="metric-label">Total original</div><div class="metric-value" id="metricOriginal">0,00</div></div>
-            <div class="metric-card"><div class="metric-label">Total gerado</div><div class="metric-value" id="metricGerado">0,00</div></div>
+          <div class="simple-metrics">
+            <div class="metric">
+              <div class="metric-label">Arquivo</div>
+              <div class="metric-value" id="metricArquivo">-</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Tipo</div>
+              <div class="metric-value" id="metricTipo">-</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Status</div>
+              <div class="metric-value" id="metricStatus">-</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Registros</div>
+              <div class="metric-value" id="metricRegistros">0</div>
+            </div>
           </div>
-
-          <div class="helper-line" id="statusDetails">API base: <span id="apiBaseLabel"></span></div>
 
           <div class="preview-grid">
             <div class="preview-panel">
@@ -587,56 +488,20 @@
 
       <aside>
         <section class="card">
-          <div class="toolbar">
-            <h2 style="margin:0">Histórico e revisão</h2>
-            <div class="queue-summary">
-              <span class="pill">Pendentes: <strong id="pillPendentes">0</strong></span>
-              <span class="pill">Página: <strong id="pillPagina">1</strong></span>
+          <h2>Histórico simples</h2>
+
+          <div class="history-toolbar">
+            <div class="history-search">
+              <label for="filterBusca">Buscar arquivo</label>
+              <input id="filterBusca" type="text" placeholder="Digite parte do nome do arquivo" />
             </div>
-          </div>
-
-          <div class="filters-container">
-            <div class="filters-left">
-              <div class="filter-group">
-                <label class="label" for="filterBusca">Buscar arquivo</label>
-                <input id="filterBusca" type="text" placeholder="Digite parte do nome do arquivo" />
-              </div>
-
-              <div class="filter-group">
-                <label class="label" for="filterStatus">Decisão do sistema</label>
-                <select id="filterStatus">
-                  <option value="">Todas</option>
-                  <option value="aprovado automaticamente">Aprovado automaticamente</option>
-                  <option value="aprovado com alerta">Aprovado com alerta</option>
-                  <option value="precisa revisão">Precisa revisão</option>
-                  <option value="reprovado">Reprovado</option>
-                  <option value="aprovado manualmente">Aprovado manualmente</option>
-                  <option value="rejeitado manualmente">Rejeitado manualmente</option>
-                </select>
-              </div>
-
-              <div class="filter-group">
-                <label class="label" for="filterRevisao">Status da revisão</label>
-                <select id="filterRevisao">
-                  <option value="">Todos</option>
-                  <option value="pendente">Pendentes</option>
-                  <option value="aprovado">Aprovados</option>
-                  <option value="rejeitado">Rejeitados</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="filters-right">
-              <button class="btn-secondary" id="btnFiltrar" type="button">Filtrar</button>
-              <button class="btn-warning" id="btnPendentes" type="button">Somente pendentes</button>
-              <button class="btn-primary" id="btnNextPending" type="button">Abrir próximo pendente</button>
-            </div>
+            <button class="btn-secondary" id="btnBuscar" type="button">Buscar</button>
           </div>
 
           <div id="historyList" class="history-list"></div>
 
           <div class="pagination-bar">
-            <div class="small-text" id="paginationInfo">Página 1 de 1 • 0 relatórios encontrados</div>
+            <div class="small-text" id="paginationInfo">Página 1 de 1</div>
             <div class="pagination-actions">
               <button class="btn-secondary" id="btnPrevPage" type="button">Página anterior</button>
               <button class="btn-secondary" id="btnNextPage" type="button">Próxima página</button>
@@ -655,26 +520,37 @@
       </div>
 
       <div class="detail-grid">
-        <div class="detail-block"><div class="detail-label">ID do processamento</div><div class="detail-value" id="detailJobId">-</div></div>
-        <div class="detail-block"><div class="detail-label">Arquivo</div><div class="detail-value" id="detailArquivo">-</div></div>
-        <div class="detail-block"><div class="detail-label">Status</div><div class="detail-value" id="detailStatus">-</div></div>
-        <div class="detail-block"><div class="detail-label">Decisão final</div><div class="detail-value" id="detailDecisao">-</div></div>
+        <div class="detail-block">
+          <div class="detail-label">Arquivo</div>
+          <div class="detail-value" id="detailArquivo">-</div>
+        </div>
+        <div class="detail-block">
+          <div class="detail-label">Data/Hora</div>
+          <div class="detail-value" id="detailDataHora">-</div>
+        </div>
+        <div class="detail-block">
+          <div class="detail-label">Status</div>
+          <div class="detail-value" id="detailStatus">-</div>
+        </div>
 
-        <div class="detail-block"><div class="detail-label">Parser</div><div class="detail-value" id="detailParser">-</div></div>
-        <div class="detail-block"><div class="detail-label">Registros</div><div class="detail-value" id="detailRegistros">0</div></div>
-        <div class="detail-block"><div class="detail-label">Qtd. erros parser</div><div class="detail-value" id="detailQtdErros">0</div></div>
-        <div class="detail-block"><div class="detail-label">Sucesso %</div><div class="detail-value" id="detailPercentual">0</div></div>
+        <div class="detail-block">
+          <div class="detail-label">Tipo</div>
+          <div class="detail-value" id="detailTipo">-</div>
+        </div>
+        <div class="detail-block">
+          <div class="detail-label">Registros</div>
+          <div class="detail-value" id="detailRegistros">0</div>
+        </div>
+        <div class="detail-block">
+          <div class="detail-label">Decisão</div>
+          <div class="detail-value" id="detailDecisao">-</div>
+        </div>
 
-        <div class="detail-block"><div class="detail-label">Total original</div><div class="detail-value" id="detailOriginal">0,00</div></div>
-        <div class="detail-block"><div class="detail-label">Total gerado</div><div class="detail-value" id="detailGerado">0,00</div></div>
-        <div class="detail-block"><div class="detail-label">Diferença</div><div class="detail-value" id="detailDiferenca">0,00</div></div>
-        <div class="detail-block"><div class="detail-label">Precisa revisão?</div><div class="detail-value" id="detailNeedsReview">-</div></div>
-
-        <div class="detail-block detail-full"><div class="detail-label">Diagnóstico</div><div class="detail-value" id="detailDiagnostico">-</div></div>
-        <div class="detail-block detail-full"><div class="detail-label">Erros do parser</div><div class="detail-value small-text" id="detailErrosParser">Sem erros registrados.</div></div>
+        <div class="detail-block detail-full">
+          <div class="detail-label">Observação</div>
+          <div class="detail-value" id="detailDiagnostico">Sem observações.</div>
+        </div>
       </div>
-
-      <div id="criticalBox" class="critical-box" style="display:none"></div>
 
       <div class="preview-grid" style="margin-top:18px">
         <div class="preview-panel">
@@ -687,22 +563,10 @@
         </div>
       </div>
 
-      <div class="card" style="margin-top:18px;padding:16px">
-        <h2 style="font-size:18px;margin-bottom:12px">Revisão profissional</h2>
-        <div class="small-text" id="reviewMeta">Sem revisão registrada.</div>
-
-        <div style="margin-top:12px">
-          <label class="label" for="reviewObservation">Observação da revisão</label>
-          <textarea id="reviewObservation" placeholder="Escreva a justificativa ou comentário da revisão"></textarea>
-        </div>
-
-        <div class="actions">
-          <button class="btn-success" id="btnAprovar" type="button">Aprovar</button>
-          <button class="btn-danger" id="btnRejeitar" type="button">Rejeitar</button>
-          <button class="btn-warning" id="btnPendente" type="button">Voltar para pendente</button>
-          <button class="btn-info" id="btnModalNextPending" type="button">Próximo pendente</button>
-          <a id="modalDownload" class="link-btn btn-secondary hidden" href="#" target="_blank" rel="noopener noreferrer">Baixar PDF gerado</a>
-        </div>
+      <div class="actions">
+        <button class="btn-success" id="btnAprovar" type="button">Aprovar</button>
+        <button class="btn-danger" id="btnRejeitar" type="button">Rejeitar</button>
+        <a id="modalDownload" class="link-btn btn-secondary hidden" href="#" target="_blank" rel="noopener noreferrer">Baixar PDF gerado</a>
       </div>
     </div>
   </div>
@@ -711,18 +575,14 @@
     const API_BASE = "https://jaboque.onrender.com";
     const API_URL = `${API_BASE}/upload`;
     const HISTORY_URL = `${API_BASE}/history`;
-    const STATS_URL = `${API_BASE}/stats`;
-    const NEXT_PENDING_URL = `${API_BASE}/history/next-pending`;
 
     let selectedFile = null;
     let localPreviewUrl = "";
-    let selectedHistoryId = "";
+    let selectedReportId = "";
     let currentDetail = null;
-
     let currentPage = 1;
     const currentLimit = 10;
     let totalPages = 1;
-    let totalResults = 0;
     let currentItems = [];
 
     const dropzone = document.getElementById("dropzone");
@@ -735,26 +595,10 @@
     const btnDownload = document.getElementById("btnDownload");
     const btnProcessar = document.getElementById("btnProcessar");
 
-    document.getElementById("apiBaseLabel").textContent = API_BASE;
-
-    function escapeHtml(text){
-      return String(text ?? "")
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
-    }
-
     function absoluteUrl(url){
       if (!url) return "";
       if (url.startsWith("http://") || url.startsWith("https://")) return url;
       return `${API_BASE}${url}`;
-    }
-
-    function formatValue(v){
-      if (v === null || v === undefined || v === "") return "0,00";
-      return String(v);
     }
 
     function lower(v){
@@ -786,101 +630,41 @@
       btnProcessar.textContent = isProcessing ? "Processando..." : "Processar relatório";
     }
 
-    function badgeClassForItem(item){
-      const decisao = lower(item.decisao_final);
-      const revisao = lower(item.revisao_status);
-      const status = lower(item.status);
-      const erros = Number(item.qtd_erros_parser || 0);
-      const percentual = Number(item.percentual_sucesso || 0);
-
-      if (revisao === "rejeitado" || decisao.includes("rejeitado") || decisao.includes("reprov")) return "error";
-      if (revisao === "aprovado" || decisao.includes("aprovado")) return "success";
-      if (status.includes("diverg") || decisao.includes("alerta") || decisao.includes("revis") || erros > 0 || percentual < 80) return "warning";
-      return "blue";
+    function setMetric(id, value){
+      document.getElementById(id).textContent = value ?? "-";
     }
 
-    function setCriticalBox(detail){
-      const box = document.getElementById("criticalBox");
-      const erros = Number(detail.qtd_erros_parser || 0);
-      const percentual = Number(detail.percentual_sucesso || 0);
-      const diferenca = formatValue(detail.diferenca_total);
-      const divergencia = !!detail.divergencia_total || lower(detail.status).includes("diverg");
-      const needsReview = !!detail.needs_review;
-      let html = "";
-      let klass = "good";
-
-      if (needsReview || divergencia || erros > 0 || percentual < 80){
-        klass = divergencia || lower(detail.decisao_final).includes("reprov") ? "critical" : "warning";
-        html = `
-          <strong>Atenção na revisão</strong><br>
-          Diferença total: ${escapeHtml(diferenca)}<br>
-          Erros do parser: ${escapeHtml(String(erros))}<br>
-          Sucesso: ${escapeHtml(String(percentual))}%<br>
-          Precisa revisão: ${detail.needs_review ? "Sim" : "Não"}
-        `;
-      } else {
-        html = `
-          <strong>Relatório com baixo risco</strong><br>
-          Sem divergência crítica detectada e com bom aproveitamento do parser.
-        `;
-      }
-
-      box.className = `critical-box ${klass}`;
-      box.innerHTML = html;
-      box.style.display = "block";
-    }
-
-    function resetMetrics(){
-      const ids = {
-        metricJobId:"-",
-        metricTipo:"-",
-        metricStatus:"-",
-        metricParser:"-",
-        metricDecisao:"-",
-        metricRegistros:"0",
-        metricErros:"0",
-        metricSucesso:"0",
-        metricOriginal:"0,00",
-        metricGerado:"0,00"
-      };
-      Object.entries(ids).forEach(([id,val]) => document.getElementById(id).textContent = val);
-
+    function resetMainView(){
+      setMetric("metricArquivo", "-");
+      setMetric("metricTipo", "-");
+      setMetric("metricStatus", "-");
+      setMetric("metricRegistros", "0");
       previewOriginal.src = "";
       previewFinal.src = "";
       btnDownload.classList.add("hidden");
       btnDownload.href = "#";
-      document.getElementById("statusDetails").innerHTML = `API base: <span>${escapeHtml(API_BASE)}</span>`;
     }
 
-    function applyResultToMainUI(data, keepLocalPreview=false){
-      document.getElementById("metricJobId").textContent = data.job_id || "-";
-      document.getElementById("metricTipo").textContent = data.tipo_detectado || "-";
-      document.getElementById("metricStatus").textContent = data.status || "-";
-      document.getElementById("metricParser").textContent = data.parser_utilizado || "-";
-      document.getElementById("metricDecisao").textContent = data.decisao_final || data.revisao_status || "-";
-      document.getElementById("metricRegistros").textContent = data.qtd_registros ?? 0;
-      document.getElementById("metricErros").textContent = data.qtd_erros_parser ?? 0;
-      document.getElementById("metricSucesso").textContent = data.percentual_sucesso ?? 0;
-      document.getElementById("metricOriginal").textContent = formatValue(data.valor_total_original);
-      document.getElementById("metricGerado").textContent = formatValue(data.valor_total_gerado);
-      document.getElementById("statusDetails").textContent = data.detalhes_status || "Sem observações no momento.";
+    function applyMainResult(data, keepLocalPreview=false){
+      setMetric("metricArquivo", data.nome_arquivo_original || selectedFile?.name || "-");
+      setMetric("metricTipo", data.tipo_detectado || "-");
+      setMetric("metricStatus", data.status || "-");
+      setMetric("metricRegistros", data.qtd_registros ?? 0);
 
       if (!keepLocalPreview && data.preview_original_url) {
-        previewOriginal.src = "";
         previewOriginal.src = absoluteUrl(data.preview_original_url);
       } else if (keepLocalPreview && localPreviewUrl) {
         previewOriginal.src = localPreviewUrl;
       }
 
-      previewFinal.src = "";
       previewFinal.src = data.preview_gerado_url ? absoluteUrl(data.preview_gerado_url) : "";
 
       if (data.download_url) {
         btnDownload.href = absoluteUrl(data.download_url);
         btnDownload.classList.remove("hidden");
       } else {
-        btnDownload.href = "#";
         btnDownload.classList.add("hidden");
+        btnDownload.href = "#";
       }
     }
 
@@ -895,6 +679,7 @@
       if (selectedFile) {
         localPreviewUrl = URL.createObjectURL(selectedFile);
         previewOriginal.src = localPreviewUrl;
+        setMetric("metricArquivo", selectedFile.name);
         setStatus(`Arquivo selecionado com sucesso.\nNome: ${selectedFile.name}`, "success");
       }
     }
@@ -905,7 +690,7 @@
       fileName.textContent = "";
       if (localPreviewUrl) URL.revokeObjectURL(localPreviewUrl);
       localPreviewUrl = "";
-      resetMetrics();
+      resetMainView();
       setStatus("Nenhum arquivo enviado ainda.");
     }
 
@@ -918,12 +703,20 @@
       }
     }
 
-    function getFilters(){
-      return {
-        busca: document.getElementById("filterBusca").value.trim(),
-        decisao_final: document.getElementById("filterStatus").value,
-        revisao_status: document.getElementById("filterRevisao").value
-      };
+    function getStatusBadge(item){
+      const decisao = lower(item.decisao_final);
+      const status = lower(item.status);
+
+      if (decisao.includes("reprov") || decisao.includes("rejeitado")) {
+        return '<span class="badge error">Reprovado</span>';
+      }
+      if (decisao.includes("aprovado")) {
+        return '<span class="badge success">Aprovado</span>';
+      }
+      if (status.includes("diverg") || decisao.includes("revis")) {
+        return '<span class="badge warning">Atenção</span>';
+      }
+      return '<span class="badge blue">Processado</span>';
     }
 
     function buildHistoryUrl(page = 1){
@@ -931,71 +724,34 @@
       params.set("page", page);
       params.set("limit", currentLimit);
 
-      const filters = getFilters();
-      if (filters.busca) params.set("busca", filters.busca);
-      if (filters.decisao_final) params.set("decisao_final", filters.decisao_final);
-      if (filters.revisao_status) params.set("revisao_status", filters.revisao_status);
+      const busca = document.getElementById("filterBusca").value.trim();
+      if (busca) params.set("busca", busca);
 
       return `${HISTORY_URL}?${params.toString()}`;
     }
 
-    async function loadStats(){
-      try {
-        const response = await fetch(STATS_URL);
-        const data = await safeJson(response);
-        if (!response.ok) throw new Error(backendMessage(data));
-
-        document.getElementById("statTotalRelatorios").textContent = data.total_jobs ?? 0;
-        document.getElementById("statPendentes").textContent = data.precisa_revisao ?? 0;
-        document.getElementById("statAprovadosAuto").textContent = data.aprovados_automaticamente ?? 0;
-        document.getElementById("statAprovadosAlerta").textContent = data.aprovados_com_alerta ?? 0;
-        document.getElementById("statReprovados").textContent = data.reprovados ?? 0;
-        document.getElementById("pillPendentes").textContent = data.precisa_revisao ?? 0;
-      } catch (error) {
-        console.error("Erro ao carregar estatísticas:", error);
-      }
-    }
-
     function renderHistory(){
       if (!currentItems.length) {
-        historyList.innerHTML = `<div class="empty">Nenhum relatório encontrado com os filtros atuais.</div>`;
+        historyList.innerHTML = `<div class="empty">Nenhum relatório encontrado.</div>`;
       } else {
-        historyList.innerHTML = currentItems.map(item => {
-          const risco = Number(item.qtd_erros_parser || 0) > 0 || lower(item.status).includes("diverg") || Number(item.percentual_sucesso || 0) < 80;
-          return `
-            <div class="history-item ${item.job_id === selectedHistoryId ? "active" : ""}" data-report-id="${escapeHtml(item.job_id)}">
-              <div class="history-title-row">
-                <strong>${escapeHtml(item.nome_arquivo_original || "Sem nome")}</strong>
-              </div>
-              <div>
-                <span class="badge ${badgeClassForItem(item)}">${escapeHtml(item.revisao_status || item.decisao_final || item.status || "-")}</span>
-                <span class="badge blue">${escapeHtml(item.tipo_detectado || "-")}</span>
-                ${risco ? '<span class="badge warning">Atenção</span>' : '<span class="badge success">OK</span>'}
-              </div>
-              <div class="history-meta">
-                ID: ${escapeHtml(item.job_id || "-")}<br>
-                Status: ${escapeHtml(item.status || "-")}<br>
-                Decisão: ${escapeHtml(item.decisao_final || "-")}<br>
-                Revisão: ${escapeHtml(item.revisao_status || "pendente")}<br>
-                Registros: ${escapeHtml(String(item.qtd_registros ?? 0))}<br>
-                Erros parser: ${escapeHtml(String(item.qtd_erros_parser ?? 0))}<br>
-                Sucesso: ${escapeHtml(String(item.percentual_sucesso ?? 0))}%<br>
-                Data/Hora: ${escapeHtml(item.data_hora || "-")}
-              </div>
-              <div class="small-text">${escapeHtml(item.detalhes_status || "Sem diagnóstico adicional.")}</div>
+        historyList.innerHTML = currentItems.map(item => `
+          <div class="history-item ${item.job_id === selectedReportId ? "active" : ""}" data-report-id="${item.job_id}">
+            <strong>${item.nome_arquivo_original || "Sem nome"}</strong>
+            ${getStatusBadge(item)}
+            <span class="badge gray">${item.tipo_detectado || "-"}</span>
+            <div class="history-meta">
+              Data/Hora: ${item.data_hora || "-"}<br>
+              Status: ${item.status || "-"}
             </div>
-          `;
-        }).join("");
+          </div>
+        `).join("");
       }
 
       document.querySelectorAll(".history-item").forEach(el => {
         el.addEventListener("click", () => openReportDetails(el.dataset.reportId));
       });
 
-      document.getElementById("paginationInfo").textContent =
-        `Página ${currentPage} de ${totalPages} • ${totalResults} relatório(s) encontrado(s)`;
-
-      document.getElementById("pillPagina").textContent = `${currentPage}/${totalPages}`;
+      document.getElementById("paginationInfo").textContent = `Página ${currentPage} de ${totalPages}`;
       document.getElementById("btnPrevPage").disabled = currentPage <= 1;
       document.getElementById("btnNextPage").disabled = currentPage >= totalPages;
     }
@@ -1004,26 +760,20 @@
       try {
         const response = await fetch(buildHistoryUrl(page));
         const data = await safeJson(response);
+
         if (!response.ok) throw new Error(backendMessage(data));
 
-        currentItems = Array.isArray(data.items) ? data.items : [];
-        currentPage = Number(data.page || 1);
+        currentItems = Array.isArray(data.items) ? data.items : Array.isArray(data) ? data : [];
+        currentPage = Number(data.page || page || 1);
         totalPages = Number(data.total_pages || 1);
-        totalResults = Number(data.total || 0);
-
         renderHistory();
       } catch (error) {
         currentItems = [];
         currentPage = 1;
         totalPages = 1;
-        totalResults = 0;
         renderHistory();
         console.error("Erro ao carregar histórico:", error);
       }
-    }
-
-    async function loadStatsAndHistory(){
-      await Promise.all([loadStats(), loadHistory(currentPage)]);
     }
 
     async function processFile(){
@@ -1036,7 +786,6 @@
       formData.append("file", selectedFile);
 
       setStatus("Enviando arquivo para a API...\nAguarde o processamento completo.", "loading");
-      resetMetrics();
       setProcessingState(true);
 
       try {
@@ -1046,10 +795,13 @@
         });
 
         const data = await safeJson(response);
-        if (!response.ok || data.ok === false) throw new Error(backendMessage(data));
 
-        selectedHistoryId = data.job_id || "";
-        applyResultToMainUI(data, true);
+        if (!response.ok || data.ok === false) {
+          throw new Error(backendMessage(data));
+        }
+
+        selectedReportId = data.job_id || "";
+        applyMainResult(data, true);
 
         const warning =
           Boolean(data.divergencia_total) ||
@@ -1060,16 +812,12 @@
         setStatus(
           `${data.mensagem || "Processamento concluído."}
 Status: ${data.status || "-"}
-Decisão: ${data.decisao_final || "-"}
-ID do processamento: ${data.job_id || "-"}
-Registros: ${data.qtd_registros ?? 0}
-Erros parser: ${data.qtd_erros_parser ?? 0}
-Sucesso: ${data.percentual_sucesso ?? 0}%`,
+Registros: ${data.qtd_registros ?? 0}`,
           warning ? "warning" : "success"
         );
 
         currentPage = 1;
-        await loadStatsAndHistory();
+        await loadHistory(currentPage);
       } catch (error) {
         setStatus(`Erro ao processar: ${String(error.message || error)}`, "error");
         console.error("Erro completo no processamento:", error);
@@ -1081,7 +829,10 @@ Sucesso: ${data.percentual_sucesso ?? 0}%`,
     async function fetchReportDetail(reportId){
       const response = await fetch(`${HISTORY_URL}/${reportId}`);
       const data = await safeJson(response);
-      if (!response.ok) throw new Error(backendMessage(data));
+
+      if (!response.ok) {
+        throw new Error(backendMessage(data));
+      }
       return data;
     }
 
@@ -1089,31 +840,19 @@ Sucesso: ${data.percentual_sucesso ?? 0}%`,
       try {
         const data = await fetchReportDetail(reportId);
         currentDetail = data;
-        selectedHistoryId = reportId;
+        selectedReportId = reportId;
         renderHistory();
-        applyResultToMainUI(data, false);
 
-        document.getElementById("detailJobId").textContent = data.job_id || "-";
         document.getElementById("detailArquivo").textContent = data.nome_arquivo_original || "-";
+        document.getElementById("detailDataHora").textContent = data.data_hora || "-";
         document.getElementById("detailStatus").textContent = data.status || "-";
-        document.getElementById("detailDecisao").textContent = data.decisao_final || "-";
-        document.getElementById("detailParser").textContent = data.parser_utilizado || "-";
+        document.getElementById("detailTipo").textContent = data.tipo_detectado || "-";
         document.getElementById("detailRegistros").textContent = data.qtd_registros ?? 0;
-        document.getElementById("detailQtdErros").textContent = data.qtd_erros_parser ?? 0;
-        document.getElementById("detailPercentual").textContent = `${data.percentual_sucesso ?? 0}%`;
-        document.getElementById("detailOriginal").textContent = formatValue(data.valor_total_original);
-        document.getElementById("detailGerado").textContent = formatValue(data.valor_total_gerado);
-        document.getElementById("detailDiferenca").textContent = formatValue(data.diferenca_total);
-        document.getElementById("detailNeedsReview").textContent = data.needs_review ? "Sim" : "Não";
-        document.getElementById("detailDiagnostico").textContent = data.detalhes_status || "Sem diagnóstico.";
-        document.getElementById("detailErrosParser").textContent = data.erros_parser || "Sem erros registrados.";
+        document.getElementById("detailDecisao").textContent = data.decisao_final || "-";
+        document.getElementById("detailDiagnostico").textContent = data.detalhes_status || "Sem observações.";
 
-        const modalOriginal = document.getElementById("modalPreviewOriginal");
-        const modalFinal = document.getElementById("modalPreviewFinal");
-        modalOriginal.src = "";
-        modalFinal.src = "";
-        modalOriginal.src = data.preview_original_url ? absoluteUrl(data.preview_original_url) : "";
-        modalFinal.src = data.preview_gerado_url ? absoluteUrl(data.preview_gerado_url) : "";
+        document.getElementById("modalPreviewOriginal").src = data.preview_original_url ? absoluteUrl(data.preview_original_url) : "";
+        document.getElementById("modalPreviewFinal").src = data.preview_gerado_url ? absoluteUrl(data.preview_gerado_url) : "";
 
         const modalDownload = document.getElementById("modalDownload");
         if (data.download_url) {
@@ -1124,11 +863,6 @@ Sucesso: ${data.percentual_sucesso ?? 0}%`,
           modalDownload.classList.add("hidden");
         }
 
-        document.getElementById("reviewObservation").value = data.revisao_observacao || "";
-        document.getElementById("reviewMeta").textContent =
-          `Revisão: ${data.revisao_status || "pendente"} | Revisado por: ${data.revisado_por || "-"} | Em: ${data.revisado_em || "-"}`;
-
-        setCriticalBox(data);
         document.getElementById("reportModalBackdrop").style.display = "flex";
       } catch (error) {
         setStatus(`Erro ao carregar detalhes: ${String(error.message || error)}`, "error");
@@ -1136,41 +870,12 @@ Sucesso: ${data.percentual_sucesso ?? 0}%`,
       }
     }
 
-    async function getNextPending(autoOpen = true){
-      try {
-        const response = await fetch(NEXT_PENDING_URL);
-        const data = await safeJson(response);
-
-        if (!response.ok) throw new Error(backendMessage(data));
-
-        if (!data || !data.job_id) {
-          setStatus("Não há mais relatórios pendentes de revisão.", "success");
-          return null;
-        }
-
-        if (autoOpen) {
-          await openReportDetails(data.job_id);
-        }
-        return data;
-      } catch (error) {
-        setStatus(`Erro ao buscar próximo pendente: ${String(error.message || error)}`, "error");
-        console.error("Erro no próximo pendente:", error);
-        return null;
-      }
-    }
-
     async function submitReview(status){
       if (!currentDetail?.job_id) return;
 
-      const observacao = document.getElementById("reviewObservation").value || "";
-      if (status === "rejeitado" && !observacao.trim()) {
-        setStatus("Escreva uma observação antes de rejeitar o relatório.", "warning");
-        return;
-      }
-
       const body = {
         revisao_status: status,
-        revisao_observacao: observacao,
+        revisao_observacao: "",
         revisado_por: "operador_web"
       };
 
@@ -1182,24 +887,14 @@ Sucesso: ${data.percentual_sucesso ?? 0}%`,
         });
 
         const data = await safeJson(response);
-        if (!response.ok) throw new Error(backendMessage(data));
 
-        const revisaoMsg = status === "aprovado" ? "aprovada" : status === "rejeitado" ? "rejeitada" : "marcada como pendente";
-        setStatus(`Revisão ${revisaoMsg} com sucesso.`, status === "rejeitado" ? "warning" : "success");
-
-        await loadStats();
-        await loadHistory(currentPage);
-
-        if (status === "aprovado" || status === "rejeitado") {
-          const next = await getNextPending(false);
-          if (next?.job_id) {
-            await openReportDetails(next.job_id);
-          } else {
-            document.getElementById("reportModalBackdrop").style.display = "none";
-          }
-        } else {
-          await openReportDetails(currentDetail.job_id);
+        if (!response.ok) {
+          throw new Error(backendMessage(data));
         }
+
+        setStatus(`Revisão atualizada com sucesso.`, status === "rejeitado" ? "warning" : "success");
+        document.getElementById("reportModalBackdrop").style.display = "none";
+        await loadHistory(currentPage);
       } catch (error) {
         setStatus(`Erro na revisão: ${String(error.message || error)}`, "error");
         console.error("Erro completo na revisão:", error);
@@ -1230,54 +925,30 @@ Sucesso: ${data.percentual_sucesso ?? 0}%`,
 
     document.getElementById("btnProcessar").addEventListener("click", processFile);
     document.getElementById("btnLimparArquivo").addEventListener("click", clearSelectedFile);
-    document.getElementById("btnAtualizarTudo").addEventListener("click", async () => {
-      await loadStatsAndHistory();
-      setStatus("Dados atualizados com sucesso.", "success");
-    });
-
-    document.getElementById("btnFiltrar").addEventListener("click", async () => {
+    document.getElementById("btnAtualizar").addEventListener("click", () => loadHistory(currentPage));
+    document.getElementById("btnBuscar").addEventListener("click", () => {
       currentPage = 1;
-      await loadHistory(currentPage);
+      loadHistory(currentPage);
     });
 
-    document.getElementById("btnPendentes").addEventListener("click", async () => {
-      document.getElementById("filterRevisao").value = "pendente";
-      currentPage = 1;
-      await loadHistory(currentPage);
-    });
-
-    document.getElementById("btnNextPending").addEventListener("click", async () => {
-      await getNextPending(true);
-    });
-
-    document.getElementById("filterBusca").addEventListener("keydown", async e => {
+    document.getElementById("filterBusca").addEventListener("keydown", e => {
       if (e.key === "Enter") {
         currentPage = 1;
-        await loadHistory(currentPage);
+        loadHistory(currentPage);
       }
     });
 
-    document.getElementById("filterStatus").addEventListener("change", async () => {
-      currentPage = 1;
-      await loadHistory(currentPage);
-    });
-
-    document.getElementById("filterRevisao").addEventListener("change", async () => {
-      currentPage = 1;
-      await loadHistory(currentPage);
-    });
-
-    document.getElementById("btnPrevPage").addEventListener("click", async () => {
+    document.getElementById("btnPrevPage").addEventListener("click", () => {
       if (currentPage > 1) {
         currentPage -= 1;
-        await loadHistory(currentPage);
+        loadHistory(currentPage);
       }
     });
 
-    document.getElementById("btnNextPage").addEventListener("click", async () => {
+    document.getElementById("btnNextPage").addEventListener("click", () => {
       if (currentPage < totalPages) {
         currentPage += 1;
-        await loadHistory(currentPage);
+        loadHistory(currentPage);
       }
     });
 
@@ -1287,10 +958,6 @@ Sucesso: ${data.percentual_sucesso ?? 0}%`,
 
     document.getElementById("btnAprovar").addEventListener("click", () => submitReview("aprovado"));
     document.getElementById("btnRejeitar").addEventListener("click", () => submitReview("rejeitado"));
-    document.getElementById("btnPendente").addEventListener("click", () => submitReview("pendente"));
-    document.getElementById("btnModalNextPending").addEventListener("click", async () => {
-      await getNextPending(true);
-    });
 
     document.getElementById("reportModalBackdrop").addEventListener("click", e => {
       if (e.target.id === "reportModalBackdrop") {
@@ -1298,7 +965,7 @@ Sucesso: ${data.percentual_sucesso ?? 0}%`,
       }
     });
 
-    loadStatsAndHistory();
+    loadHistory();
   </script>
 </body>
 </html>
