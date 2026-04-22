@@ -691,6 +691,28 @@
     }
 
 
+  
+    .history-panel.hidden-panel{
+      display:none;
+    }
+
+    .toolbar-inline{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .btn-outline-danger{
+      background:#fff;
+      color:#b91c1c;
+      border:1px solid #fecaca;
+    }
+
+    .btn-outline-danger:hover{
+      background:#fff5f5;
+    }
+
   </style>
 </head>
 <body>
@@ -836,25 +858,31 @@
           <div class="section-head">
             <div>
               <h2>Histórico</h2>
-              <p>Pesquise relatórios processados e abra o detalhe completo.</p>
+              <p>Abra o histórico sob demanda e gerencie os relatórios recentes.</p>
+            </div>
+            <div class="toolbar-inline">
+              <button class="btn-primary" id="btnToggleHistory" type="button">Abrir histórico</button>
+              <button class="btn-outline-danger" id="btnDeleteRecent" type="button">Apagar relatórios recentes</button>
             </div>
           </div>
 
-          <div class="history-toolbar">
-            <div class="history-search">
-              <label for="filterBusca">Buscar arquivo</label>
-              <input id="filterBusca" type="text" placeholder="Digite parte do nome do arquivo" />
+          <div id="historyPanel" class="history-panel hidden-panel">
+            <div class="history-toolbar">
+              <div class="history-search">
+                <label for="filterBusca">Buscar arquivo</label>
+                <input id="filterBusca" type="text" placeholder="Digite parte do nome do arquivo" />
+              </div>
+              <button class="btn-secondary" id="btnBuscar" type="button">Buscar</button>
             </div>
-            <button class="btn-secondary" id="btnBuscar" type="button">Buscar</button>
-          </div>
 
-          <div id="historyList" class="history-list"></div>
+            <div id="historyList" class="history-list"></div>
 
-          <div class="pagination-bar">
-            <div class="small-text" id="paginationInfo">Página 1 de 1</div>
-            <div class="pagination-actions">
-              <button class="btn-secondary" id="btnPrevPage" type="button">Página anterior</button>
-              <button class="btn-secondary" id="btnNextPage" type="button">Próxima página</button>
+            <div class="pagination-bar">
+              <div class="small-text" id="paginationInfo">Página 1 de 1</div>
+              <div class="pagination-actions">
+                <button class="btn-secondary" id="btnPrevPage" type="button">Página anterior</button>
+                <button class="btn-secondary" id="btnNextPage" type="button">Próxima página</button>
+              </div>
             </div>
           </div>
         </section>
@@ -1241,6 +1269,51 @@
       }
     }
 
+
+    function toggleHistoryPanel(forceOpen = null){
+      const panel = document.getElementById("historyPanel");
+      const btn = document.getElementById("btnToggleHistory");
+
+      const shouldOpen = forceOpen === null ? panel.classList.contains("hidden-panel") : !!forceOpen;
+      panel.classList.toggle("hidden-panel", !shouldOpen);
+      btn.textContent = shouldOpen ? "Fechar histórico" : "Abrir histórico";
+
+      if (shouldOpen && !currentItems.length) {
+        loadHistory(currentPage);
+      }
+    }
+
+    async function deleteRecentReports(){
+      const confirmed = window.confirm("Tem certeza que deseja apagar os relatórios recentes exibidos no histórico atual?");
+      if (!confirmed) return;
+
+      const itemsToDelete = currentItems.slice(0, 10);
+      if (!itemsToDelete.length) {
+        alert("Não há relatórios recentes carregados para apagar.");
+        return;
+      }
+
+      const failed = [];
+      for (const item of itemsToDelete) {
+        try {
+          const response = await fetch(`${API_BASE}/history/${item.job_id}`, { method: "DELETE" });
+          if (!response.ok) {
+            failed.push(item.nome_arquivo_original || item.job_id);
+          }
+        } catch {
+          failed.push(item.nome_arquivo_original || item.job_id);
+        }
+      }
+
+      await loadHistory(1);
+
+      if (failed.length) {
+        alert(`Alguns relatórios não puderam ser apagados:\n- ${failed.join("\n- ")}`);
+      } else {
+        alert("Relatórios recentes apagados com sucesso.");
+      }
+    }
+
     function renderHistory(){
       if (!currentItems.length) {
         historyList.innerHTML = `<div class="empty">Nenhum relatório encontrado.</div>`;
@@ -1533,13 +1606,19 @@
 
     document.getElementById("btnProcessar").addEventListener("click", processFile);
     document.getElementById("btnLimparArquivo").addEventListener("click", clearSelectedFile);
-    document.getElementById("btnAtualizar").addEventListener("click", () => loadHistory(currentPage));
-    document.getElementById("btnBuscar").addEventListener("click", () => loadHistory(1));
-    document.getElementById("btnPrevPage").addEventListener("click", () => currentPage > 1 && loadHistory(currentPage - 1));
-    document.getElementById("btnNextPage").addEventListener("click", () => currentPage < totalPages && loadHistory(currentPage + 1));
+    document.getElementById("btnAtualizar").addEventListener("click", () => { toggleHistoryPanel(true); loadHistory(currentPage); });
+    document.getElementById("btnToggleHistory").addEventListener("click", () => toggleHistoryPanel());
+    document.getElementById("btnDeleteRecent").addEventListener("click", async () => {
+      toggleHistoryPanel(true);
+      if (!currentItems.length) await loadHistory(1);
+      await deleteRecentReports();
+    });
+    document.getElementById("btnBuscar").addEventListener("click", () => { toggleHistoryPanel(true); loadHistory(1); });
+    document.getElementById("btnPrevPage").addEventListener("click", () => { if (currentPage > 1) { toggleHistoryPanel(true); loadHistory(currentPage - 1); } });
+    document.getElementById("btnNextPage").addEventListener("click", () => { if (currentPage < totalPages) { toggleHistoryPanel(true); loadHistory(currentPage + 1); } });
 
     document.getElementById("filterBusca").addEventListener("keydown", (e) => {
-      if (e.key === "Enter") loadHistory(1);
+      if (e.key === "Enter") { toggleHistoryPanel(true); loadHistory(1); }
     });
 
     document.getElementById("btnFecharModal").addEventListener("click", () => {
