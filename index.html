@@ -775,10 +775,484 @@
       .history-item-top{flex-direction:column}
       .history-item-actions{width:100%}
     }
+  
+    .card,.metric,.history-item,.preview-panel,.detail-block,.diag-item,.status-panel,.feedback-box{
+      animation: fadeUp .28s ease;
+    }
+
+    @keyframes fadeUp{
+      from{opacity:0; transform:translateY(6px)}
+      to{opacity:1; transform:translateY(0)}
+    }
+
+    .metric,.history-item,.preview-panel,.detail-block,.diag-item,.dropzone,.btn-primary,.btn-secondary,.btn-success,.btn-danger,.btn-outline-danger,.btn-mini-danger,.link-btn{
+      transition: transform .16s ease, box-shadow .16s ease, background .16s ease, border-color .16s ease, opacity .16s ease;
+    }
+
+    .metric:hover,.preview-panel:hover,.detail-block:hover,.diag-item:hover{
+      transform:translateY(-1px);
+      box-shadow:0 12px 28px rgba(15,23,42,.06);
+    }
+
+    .dropzone-icon,.badge{
+      transition: transform .18s ease;
+    }
+
+    .dropzone:hover .dropzone-icon{
+      transform:scale(1.05);
+    }
+
+    .history-item.active{
+      animation: pulseActive .24s ease;
+    }
+
+    @keyframes pulseActive{
+      0%{transform:scale(.995)}
+      100%{transform:scale(1)}
+    }
+
+    .toast-container{
+      position:fixed;
+      top:18px;
+      right:18px;
+      z-index:3000;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      width:min(380px, calc(100vw - 24px));
+    }
+
+    .toast{
+      background:#fff;
+      border:1px solid var(--line);
+      border-left:5px solid #cbd5e1;
+      border-radius:16px;
+      box-shadow:0 18px 34px rgba(15,23,42,.14);
+      padding:14px 16px;
+      animation: toastIn .22s ease;
+    }
+
+    @keyframes toastIn{
+      from{opacity:0; transform:translateY(-8px) scale(.98)}
+      to{opacity:1; transform:translateY(0) scale(1)}
+    }
+
+    .toast-title{
+      font-size:14px;
+      font-weight:700;
+      margin-bottom:4px;
+      color:#0f172a;
+    }
+
+    .toast-message{
+      font-size:13px;
+      color:#475569;
+      line-height:1.5;
+      white-space:pre-wrap;
+      word-break:break-word;
+    }
+
+    .toast-success{border-left-color:#22c55e}
+    .toast-error{border-left-color:#ef4444}
+    .toast-warning{border-left-color:#f59e0b}
+    .toast-info{border-left-color:#3b82f6}
+
+    @media (prefers-reduced-motion: reduce){
+      *{
+        animation:none !important;
+        transition:none !important;
+        scroll-behavior:auto !important;
+      }
+    }
+  
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:14px;
+      margin-bottom:14px;
+      flex-wrap:wrap;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+
+    .brand-mark{
+      width:44px;
+      height:44px;
+      border-radius:14px;
+      background:linear-gradient(135deg,#2563eb,#38bdf8);
+      color:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:12px;
+      font-weight:700;
+      box-shadow:0 12px 28px rgba(37,99,235,.24);
+    }
+
+    .brand-meta{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+    }
+
+    .brand-title{
+      font-size:15px;
+      font-weight:700;
+      color:#0f172a;
+    }
+
+    .brand-subtitle{
+      font-size:12px;
+      color:#64748b;
+    }
+
+    .env-pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      background:#fff;
+      border:1px solid var(--line);
+      color:#0f172a;
+      font-size:12px;
+      font-weight:700;
+      box-shadow:var(--shadow-soft);
+    }
+
+    .env-dot{
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:#22c55e;
+      box-shadow:0 0 0 4px rgba(34,197,94,.16);
+    }
+
+    .hero-actions{
+      margin-top:18px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .hero-chip{
+      padding:10px 12px;
+      border-radius:14px;
+      background:rgba(255,255,255,.12);
+      border:1px solid rgba(255,255,255,.18);
+      color:#fff;
+      font-size:12px;
+      font-weight:700;
+    }
+
+    .section-kicker{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:7px 11px;
+      background:#eef4ff;
+      color:#1d4ed8;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:700;
+      margin-bottom:10px;
+    }
+
+    .metric-value-lg{
+      font-size:28px !important;
+    }
+
+    .results-summary{
+      margin-top:14px;
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:12px;
+    }
+
+    .summary-card{
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:14px;
+      background:#fff;
+    }
+
+    .summary-title{
+      font-size:12px;
+      font-weight:700;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.03em;
+      margin-bottom:8px;
+    }
+
+    .summary-value{
+      font-size:18px;
+      font-weight:700;
+      color:#10284f;
+    }
+
+    .history-header-row{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      margin-bottom:14px;
+      flex-wrap:wrap;
+    }
+
+    .history-total{
+      font-size:13px;
+      color:#64748b;
+      font-weight:700;
+    }
+
+    .status-panel strong{
+      color:#0f172a;
+    }
+
+    .modal-backdrop.confirm-backdrop{
+      z-index:4000;
+    }
+
+    .confirm-modal{
+      width:min(520px,100%);
+      background:#fff;
+      border-radius:24px;
+      box-shadow:0 30px 80px rgba(0,0,0,.28);
+      padding:22px;
+    }
+
+    .confirm-icon{
+      width:56px;
+      height:56px;
+      border-radius:18px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:#fff5f5;
+      color:#b91c1c;
+      font-size:24px;
+      font-weight:700;
+      margin-bottom:14px;
+    }
+
+    .confirm-title{
+      font-size:22px;
+      font-weight:700;
+      color:#0f172a;
+      margin-bottom:8px;
+    }
+
+    .confirm-message{
+      font-size:14px;
+      line-height:1.7;
+      color:#475569;
+      white-space:pre-wrap;
+    }
+
+    .confirm-actions{
+      display:flex;
+      justify-content:flex-end;
+      gap:10px;
+      margin-top:18px;
+      flex-wrap:wrap;
+    }
+
+    .processing-backdrop{
+      position:fixed;
+      inset:0;
+      background:rgba(15,23,42,.52);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+      z-index:3500;
+      backdrop-filter: blur(4px);
+    }
+
+    .processing-modal{
+      width:min(560px,100%);
+      background:#fff;
+      border-radius:24px;
+      box-shadow:0 30px 80px rgba(0,0,0,.25);
+      padding:24px;
+    }
+
+    .processing-title{
+      font-size:22px;
+      font-weight:700;
+      color:#0f172a;
+      margin-bottom:8px;
+    }
+
+    .processing-text{
+      color:#475569;
+      font-size:14px;
+      line-height:1.65;
+      margin-bottom:16px;
+    }
+
+    .progress-shell{
+      width:100%;
+      height:12px;
+      border-radius:999px;
+      background:#e8eef8;
+      overflow:hidden;
+      position:relative;
+    }
+
+    .progress-bar{
+      width:18%;
+      height:100%;
+      border-radius:999px;
+      background:linear-gradient(90deg,#2563eb,#38bdf8);
+      transition:width .35s ease;
+    }
+
+    .processing-steps{
+      margin-top:16px;
+      display:grid;
+      gap:10px;
+    }
+
+    .processing-step{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:10px 12px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:#fbfdff;
+    }
+
+    .processing-step-label{
+      font-size:13px;
+      font-weight:700;
+      color:#334155;
+    }
+
+    .processing-step-status{
+      font-size:12px;
+      font-weight:700;
+      color:#64748b;
+    }
+
+    .processing-step.active{
+      border-color:#bfdbfe;
+      background:#eff6ff;
+    }
+
+    .processing-step.active .processing-step-status{
+      color:#2563eb;
+    }
+
+    .processing-step.done{
+      border-color:#bbf7d0;
+      background:#f0fdf4;
+    }
+
+    .processing-step.done .processing-step-status{
+      color:#15803d;
+    }
+
+    .skeleton{
+      position:relative;
+      overflow:hidden;
+      background:#eef2f7;
+      border-radius:12px;
+    }
+
+    .skeleton::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      transform:translateX(-100%);
+      background:linear-gradient(90deg,rgba(255,255,255,0) 0%, rgba(255,255,255,.8) 50%, rgba(255,255,255,0) 100%);
+      animation:skeletonMove 1.3s infinite;
+    }
+
+    @keyframes skeletonMove{
+      100%{transform:translateX(100%)}
+    }
+
+    .history-skeleton{
+      display:grid;
+      gap:12px;
+    }
+
+    .history-skeleton-card{
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:16px;
+      background:#fbfdff;
+    }
+
+    .sk-line{
+      height:12px;
+      margin-bottom:10px;
+    }
+
+    .sk-line.lg{height:16px; width:68%;}
+    .sk-line.md{width:42%;}
+    .sk-line.sm{width:28%; margin-bottom:0;}
+
+    .empty-state{
+      border:1px dashed var(--line-strong);
+      border-radius:18px;
+      background:#fafcff;
+      padding:22px;
+      text-align:center;
+      color:#64748b;
+    }
+
+    .empty-state-title{
+      font-size:16px;
+      font-weight:700;
+      color:#0f172a;
+      margin-bottom:6px;
+    }
+
+    .empty-state-text{
+      font-size:14px;
+      line-height:1.6;
+    }
+
+    .footer-system{
+      margin-top:10px;
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:center;
+      flex-wrap:wrap;
+      color:#64748b;
+      font-size:12px;
+    }
+
+    @media (max-width:900px){
+      .results-summary{grid-template-columns:1fr}
+    }
+
   </style>
 </head>
 <body>
+  <div id="toastContainer" class="toast-container"></div>
   <div class="container">
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-mark">PDF</div>
+        <div class="brand-meta">
+          <div class="brand-title">Jaboque • Organizador de Relatórios</div>
+          <div class="brand-subtitle">Painel operacional para leitura, validação e histórico de PDFs</div>
+        </div>
+      </div>
+      <div class="env-pill"><span class="env-dot"></span><span>Ambiente ativo: DEV</span></div>
+    </div>
     <section class="hero">
       <div class="hero-top">
         <div>
@@ -787,6 +1261,11 @@
             Envie o PDF, acompanhe o processamento, compare o original com o arquivo gerado,
             visualize diagnóstico técnico quando necessário e consulte o histórico em um painel mais limpo e profissional.
           </p>
+          <div class="hero-actions">
+            <span class="hero-chip">Upload e reorganização</span>
+            <span class="hero-chip">Diagnóstico de layout</span>
+            <span class="hero-chip">Histórico e revisão</span>
+          </div>
         </div>
 
         <div class="hero-mini-grid">
@@ -811,6 +1290,7 @@
         <section class="card">
           <div class="section-head">
             <div>
+              <div class="section-kicker">Fluxo principal</div>
               <h2>Enviar relatório</h2>
               <p>Faça upload do PDF, acompanhe o processamento e visualize o resultado em uma saída mais clara e auditável.</p>
             </div>
@@ -877,6 +1357,21 @@
             </div>
           </div>
 
+          <div class="results-summary">
+            <div class="summary-card">
+              <div class="summary-title">Situação</div>
+              <div class="summary-value" id="summaryStatus">Aguardando processamento</div>
+            </div>
+            <div class="summary-card">
+              <div class="summary-title">Registros encontrados</div>
+              <div class="summary-value" id="summaryRegistros">0</div>
+            </div>
+            <div class="summary-card">
+              <div class="summary-title">PDF gerado</div>
+              <div class="summary-value" id="summaryPdfGerado">Ainda não disponível</div>
+            </div>
+          </div>
+
           <div class="preview-grid">
             <div class="preview-panel" id="previewOriginalPanel">
               <div class="preview-panel-head">
@@ -919,6 +1414,7 @@
         <section class="card">
           <div class="section-head">
             <div>
+              <div class="section-kicker">Acompanhamento</div>
               <h2>Histórico</h2>
               <p>Abra o histórico sob demanda e gerencie os relatórios recentes em uma visualização mais limpa.</p>
             </div>
@@ -937,6 +1433,9 @@
               <button class="btn-secondary" id="btnBuscar" type="button">Buscar</button>
             </div>
 
+            <div class="history-header-row">
+              <div class="history-total" id="historyTotalInfo">Nenhum relatório carregado</div>
+            </div>
             <div id="historyList" class="history-list"></div>
 
             <div class="pagination-bar">
@@ -1054,6 +1553,46 @@
       <div class="footer-note">
         Ajuste a constante <strong>API_BASE</strong> no script se você quiser alternar entre DEV e produção.
       </div>
+      <div class="footer-system">
+        <span>Interface refinada para operação diária</span>
+        <span>Versão visual 1.0</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop confirm-backdrop" id="confirmBackdrop">
+    <div class="confirm-modal">
+      <div class="confirm-icon">!</div>
+      <div class="confirm-title" id="confirmTitle">Confirmar ação</div>
+      <div class="confirm-message" id="confirmMessage">Deseja continuar?</div>
+      <div class="confirm-actions">
+        <button class="btn-secondary" id="confirmCancelBtn" type="button">Cancelar</button>
+        <button class="btn-danger" id="confirmAcceptBtn" type="button">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="processing-backdrop" id="processingBackdrop">
+    <div class="processing-modal">
+      <div class="processing-title">Processando relatório</div>
+      <div class="processing-text" id="processingText">Estamos enviando o arquivo e preparando a leitura. Isso pode levar alguns segundos.</div>
+      <div class="progress-shell">
+        <div class="progress-bar" id="processingBar"></div>
+      </div>
+      <div class="processing-steps">
+        <div class="processing-step active" data-step="1">
+          <div class="processing-step-label">Enviando arquivo</div>
+          <div class="processing-step-status">Em andamento</div>
+        </div>
+        <div class="processing-step" data-step="2">
+          <div class="processing-step-label">Lendo conteúdo</div>
+          <div class="processing-step-status">Aguardando</div>
+        </div>
+        <div class="processing-step" data-step="3">
+          <div class="processing-step-label">Gerando resultado</div>
+          <div class="processing-step-status">Aguardando</div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1070,6 +1609,7 @@
     const currentLimit = 10;
     let totalPages = 1;
     let currentItems = [];
+    let processingInterval = null;
 
     const dropzone = document.getElementById("dropzone");
     const fileInput = document.getElementById("fileInput");
@@ -1100,6 +1640,55 @@
       if (data?.erro) return JSON.stringify(data.erro, null, 2);
       if (data?.raw) return String(data.raw);
       return JSON.stringify(data, null, 2);
+    }
+
+    function showToast(title, message = "", type = "info", timeout = 3200){
+      const container = document.getElementById("toastContainer");
+      if (!container) return;
+
+      const toast = document.createElement("div");
+      toast.className = `toast toast-${type}`;
+      toast.innerHTML = `
+        <div class="toast-title">${title || "Aviso"}</div>
+        <div class="toast-message">${message || ""}</div>
+      `;
+
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = "0";
+        toast.style.transform = "translateY(-6px)";
+        setTimeout(() => toast.remove(), 180);
+      }, timeout);
+    }
+
+    function confirmAction({title = "Confirmar ação", message = "Deseja continuar?", confirmText = "Confirmar"} = {}){
+      return new Promise((resolve) => {
+        const backdrop = document.getElementById("confirmBackdrop");
+        const titleEl = document.getElementById("confirmTitle");
+        const messageEl = document.getElementById("confirmMessage");
+        const cancelBtn = document.getElementById("confirmCancelBtn");
+        const acceptBtn = document.getElementById("confirmAcceptBtn");
+
+        titleEl.textContent = title;
+        messageEl.textContent = message;
+        acceptBtn.textContent = confirmText;
+        backdrop.style.display = "flex";
+
+        function cleanup(result){
+          backdrop.style.display = "none";
+          cancelBtn.onclick = null;
+          acceptBtn.onclick = null;
+          backdrop.onclick = null;
+          resolve(result);
+        }
+
+        cancelBtn.onclick = () => cleanup(false);
+        acceptBtn.onclick = () => cleanup(true);
+        backdrop.onclick = (e) => {
+          if (e.target.id === "confirmBackdrop") cleanup(false);
+        };
+      });
     }
 
     function setStatus(message){
@@ -1156,6 +1745,42 @@
       badge.textContent = status;
     }
 
+    function updateProcessingStep(step){
+      const bar = document.getElementById("processingBar");
+      const text = document.getElementById("processingText");
+      const steps = document.querySelectorAll(".processing-step");
+
+      steps.forEach((el, idx) => {
+        const current = idx + 1;
+        el.classList.remove("active", "done");
+        const status = el.querySelector(".processing-step-status");
+
+        if (current < step) {
+          el.classList.add("done");
+          status.textContent = "Concluído";
+        } else if (current === step) {
+          el.classList.add("active");
+          status.textContent = "Em andamento";
+        } else {
+          status.textContent = "Aguardando";
+        }
+      });
+
+      if (step === 1) {
+        bar.style.width = "24%";
+        text.textContent = "Estamos enviando o arquivo e iniciando o processamento.";
+      } else if (step === 2) {
+        bar.style.width = "58%";
+        text.textContent = "O sistema está lendo o conteúdo do PDF e analisando a estrutura.";
+      } else if (step === 3) {
+        bar.style.width = "88%";
+        text.textContent = "Estamos gerando o PDF final e preparando os resultados.";
+      } else {
+        bar.style.width = "100%";
+        text.textContent = "Processamento concluído com sucesso.";
+      }
+    }
+
     function setProcessingState(isProcessing){
       btnProcessar.disabled = isProcessing;
       btnProcessar.textContent = isProcessing ? "Processando..." : "Processar relatório";
@@ -1209,6 +1834,9 @@
       setText("diagMotivoDetectado", "-");
       setText("diagMotivoTotal", "-");
       setText("diagDetalhesStatus", "-");
+      setText("summaryStatus", "Aguardando processamento");
+      setText("summaryRegistros", "0");
+      setText("summaryPdfGerado", "Ainda não disponível");
       previewOriginal.src = "";
       previewFinal.src = "";
       btnDownload.classList.add("hidden");
@@ -1231,6 +1859,7 @@
         setText("metricArquivo", selectedFile.name);
         setStatus("Arquivo selecionado com sucesso. Clique em “Processar relatório” para enviar.");
         setStatusBadge("arquivo selecionado");
+        showToast("Arquivo selecionado", selectedFile.name, "info", 2200);
       }
     }
 
@@ -1311,6 +1940,9 @@
       setText("diagMotivoDetectado", data.motivo_detectado || "-");
       setText("diagMotivoTotal", data.total_original_motivo || "-");
       setText("diagDetalhesStatus", data.detalhes_status || "-");
+      setText("summaryStatus", data.status || data.mensagem || "-");
+      setText("summaryRegistros", String(data.qtd_registros || 0));
+      setText("summaryPdfGerado", data.download_url ? "Disponível para download" : "Ainda não disponível");
 
       const resumoStatus = [
         data.mensagem || "Relatório processado.",
@@ -1364,6 +1996,7 @@
       }
       if (shouldOpen) {
         setStatus("Histórico carregado. Clique em um item para ver os detalhes.");
+        showToast("Histórico aberto", "Clique em um item para ver os detalhes.", "info", 2200);
       }
     }
 
@@ -1379,8 +2012,9 @@
         }
 
         await loadHistory(currentPage);
+        showToast("Relatório apagado", `${fileName} foi removido com sucesso.`, "success");
       } catch (error) {
-        alert(`Não foi possível apagar ${fileName}.\n${error.message}`);
+        showToast("Falha ao apagar", `Não foi possível apagar ${fileName}.\n${error.message}`, "error", 4200);
       }
     }
 
@@ -1397,15 +2031,20 @@
         document.getElementById("reportModalBackdrop").style.display = "none";
         currentItems = [];
         await loadHistory(1);
-        alert("Todos os relatórios foram apagados com sucesso.");
+        showToast("Histórico limpo", "Todos os relatórios foram apagados com sucesso.", "success");
       } catch (error) {
-        alert(`Não foi possível apagar todos os relatórios.\n${error.message}`);
+        showToast("Falha ao apagar todos", `Não foi possível apagar todos os relatórios.\n${error.message}`, "error", 4200);
       }
     }
 
     function renderHistory(){
       if (!currentItems.length) {
-        historyList.innerHTML = `<div class="empty">Nenhum relatório encontrado no histórico.</div>`;
+        historyList.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-title">Nenhum relatório encontrado</div>
+            <div class="empty-state-text">Assim que você processar arquivos, eles aparecerão aqui para consulta e revisão.</div>
+          </div>
+        `;
       } else {
         historyList.innerHTML = currentItems.map(item => `
           <div class="history-item ${item.job_id === selectedReportId ? "active" : ""}" data-report-id="${item.job_id}">
@@ -1454,6 +2093,20 @@
 
     async function loadHistory(page = 1){
       try {
+        historyList.innerHTML = `
+          <div class="history-skeleton">
+            <div class="history-skeleton-card">
+              <div class="skeleton sk-line lg"></div>
+              <div class="skeleton sk-line md"></div>
+              <div class="skeleton sk-line sm"></div>
+            </div>
+            <div class="history-skeleton-card">
+              <div class="skeleton sk-line lg"></div>
+              <div class="skeleton sk-line md"></div>
+              <div class="skeleton sk-line sm"></div>
+            </div>
+          </div>
+        `;
         const response = await fetch(buildHistoryUrl(page));
         const data = await safeJson(response);
         if (!response.ok) throw new Error(backendMessage(data));
@@ -1462,7 +2115,9 @@
         currentPage = Number(data.page || page || 1);
         totalPages = Number(data.total_pages || 1);
 
-        updateHeroHistoryCount(Number(data.total || currentItems.length || 0));
+        const total = Number(data.total || currentItems.length || 0);
+        updateHeroHistoryCount(total);
+        document.getElementById("historyTotalInfo").textContent = total ? `${total} relatório(s) no histórico` : "Nenhum relatório no histórico";
         renderHistory();
         if (!currentItems.length) {
           setStatus("Histórico carregado. Nenhum relatório encontrado.");
@@ -1484,7 +2139,7 @@
         fillDetailModal(data);
         document.getElementById("reportModalBackdrop").style.display = "flex";
       } catch (error) {
-        alert(`Erro ao abrir detalhes: ${error.message}`);
+        showToast("Erro ao abrir detalhes", error.message, "error", 4200);
       }
     }
 
@@ -1540,7 +2195,7 @@
         await loadHistory(currentPage);
         if (selectedReportId) await openReportDetails(selectedReportId);
       } catch (error) {
-        alert(`Erro na revisão: ${error.message}`);
+        showToast("Erro na revisão", error.message, "error", 4200);
       }
     }
 
@@ -1601,7 +2256,7 @@
 
     async function processFile(){
       if (!selectedFile) {
-        alert("Selecione um arquivo PDF antes de processar.");
+        showToast("Selecione um arquivo", "Escolha um PDF antes de processar.", "warning");
         return;
       }
 
@@ -1625,6 +2280,7 @@
         setStatusErrorVisual(false);
         applyMainResult(data, true);
         await loadHistory(1);
+        showToast("Processamento concluído", "Relatório processado com sucesso.", "success");
       } catch (error) {
         const errorBox = document.getElementById("errorBox");
         if (errorBox.classList.contains("hidden")) {
