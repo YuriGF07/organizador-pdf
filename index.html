@@ -1783,10 +1783,31 @@
 
     function setProcessingState(isProcessing){
       btnProcessar.disabled = isProcessing;
-      btnProcessar.textContent = isProcessing ? "Processando..." : "Processar relatório";
+      const backdrop = document.getElementById("processingBackdrop");
+
       if (isProcessing) {
+        btnProcessar.innerHTML = '<span class="loading-dot"></span>Processando...';
+        btnProcessar.style.opacity = "0.7";
         setStatusBadge("processando");
-        setStatus("Processando PDF e aguardando resposta da API...");
+        setStatus("Processando PDF... isso pode levar alguns segundos.");
+        backdrop.style.display = "flex";
+        updateProcessingStep(1);
+
+        let step = 1;
+        clearInterval(processingInterval);
+        processingInterval = setInterval(() => {
+          step = Math.min(step + 1, 3);
+          updateProcessingStep(step);
+        }, 1400);
+      } else {
+        clearInterval(processingInterval);
+        processingInterval = null;
+        updateProcessingStep(4);
+        setTimeout(() => {
+          backdrop.style.display = "none";
+        }, 350);
+        btnProcessar.textContent = "Processar relatório";
+        btnProcessar.style.opacity = "1";
       }
     }
 
@@ -2019,7 +2040,11 @@
     }
 
     async function deleteAllReports(){
-      const confirmed = window.confirm("Tem certeza que deseja apagar TODOS os relatórios?\n\nEssa ação não pode ser desfeita.");
+      const confirmed = await confirmAction({
+        title: "Apagar todos os relatórios",
+        message: "Tem certeza que deseja apagar TODOS os relatórios?\n\nEssa ação não pode ser desfeita.",
+        confirmText: "Apagar tudo"
+      });
       if (!confirmed) return;
 
       try {
@@ -2080,7 +2105,11 @@
           e.stopPropagation();
           const jobId = btn.dataset.jobId;
           const fileName = btn.dataset.fileName || "este relatório";
-          const confirmed = window.confirm(`Tem certeza que deseja apagar ${fileName}?\n\nEssa ação não pode ser desfeita.`);
+          const confirmed = await confirmAction({
+            title: "Apagar relatório",
+            message: `Tem certeza que deseja apagar ${fileName}?\n\nEssa ação não pode ser desfeita.`,
+            confirmText: "Apagar"
+          });
           if (!confirmed) return;
           await deleteOneReport(jobId, fileName);
         });
@@ -2181,7 +2210,11 @@
     async function submitReview(jobId, action){
       try {
         const url = `${API_BASE}/review/${jobId}`;
-        const payload = { decisao: action, observacao: "" };
+        const payload = {
+          revisao_status: action,
+          revisao_observacao: "",
+          revisado_por: "operador_web"
+        };
 
         const response = await fetch(url, {
           method: "POST",
@@ -2194,6 +2227,12 @@
 
         await loadHistory(currentPage);
         if (selectedReportId) await openReportDetails(selectedReportId);
+
+        showToast(
+          action === "aprovado" ? "Relatório aprovado" : "Relatório rejeitado",
+          "A revisão foi salva com sucesso.",
+          "success"
+        );
       } catch (error) {
         showToast("Erro na revisão", error.message, "error", 4200);
       }
