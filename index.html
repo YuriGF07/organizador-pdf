@@ -878,7 +878,7 @@
           </div>
 
           <div class="preview-grid">
-            <div class="preview-panel">
+            <div class="preview-panel" id="previewOriginalPanel">
               <div class="preview-panel-head">
                 <h3>Preview do PDF original</h3>
                 <span class="badge badge-muted">Original</span>
@@ -886,7 +886,7 @@
               <iframe id="previewOriginal" class="preview-frame"></iframe>
             </div>
 
-            <div class="preview-panel">
+            <div class="preview-panel" id="previewFinalPanel">
               <div class="preview-panel-head">
                 <h3>Preview do PDF gerado</h3>
                 <span class="badge badge-info">Gerado</span>
@@ -1106,6 +1106,18 @@
       statusBox.textContent = message || "-";
     }
 
+    function setStatusErrorVisual(active){
+      const panel = document.querySelector(".status-panel");
+      if (!panel) return;
+      if (active) {
+        panel.style.background = "#fff5f5";
+        panel.style.borderColor = "#fecaca";
+      } else {
+        panel.style.background = "#fbfcff";
+        panel.style.borderColor = "var(--line)";
+      }
+    }
+
     function setStatusBadge(status){
       const badge = document.getElementById("statusBadge");
       const value = lower(status);
@@ -1205,6 +1217,7 @@
     }
 
     function updateSelectedFile(file){
+      hideErrorFeedback();
       selectedFile = file || null;
       fileName.textContent = selectedFile ? `Arquivo selecionado: ${selectedFile.name}` : "";
 
@@ -1261,6 +1274,26 @@
       return `${HISTORY_URL}?${params.toString()}`;
     }
 
+    function ensurePreviewPlaceholder(panelId, iframeId, message){
+      const panel = document.getElementById(panelId);
+      const iframe = document.getElementById(iframeId);
+      if (!panel || !iframe) return;
+
+      let empty = panel.querySelector(".preview-empty");
+      if (!iframe.src) {
+        if (!empty) {
+          empty = document.createElement("div");
+          empty.className = "preview-empty";
+          empty.textContent = message || "Nenhum preview disponível.";
+          panel.appendChild(empty);
+        } else {
+          empty.textContent = message || "Nenhum preview disponível.";
+        }
+      } else if (empty) {
+        empty.remove();
+      }
+    }
+
     function applyMainResult(data, keepLocalPreview=false){
       setText("metricArquivo", data.nome_arquivo_original || selectedFile?.name || "-");
       setText("metricTipo", data.tipo_detectado || "-");
@@ -1279,24 +1312,45 @@
       setText("diagMotivoTotal", data.total_original_motivo || "-");
       setText("diagDetalhesStatus", data.detalhes_status || "-");
 
-      setStatus(data.mensagem || data.status || "-");
+      const resumoStatus = [
+        data.mensagem || "Relatório processado.",
+        "",
+        `✔ ${data.qtd_registros || 0} registro(s) encontrados`,
+        `✔ Tipo identificado: ${data.tipo_detectado || "-"}`,
+        data.download_url ? "✔ PDF gerado disponível para download" : "• PDF gerado não disponível"
+      ].join("\n");
+
+      setStatus(resumoStatus);
       setStatusBadge(data.status || data.mensagem || "-");
 
       if (!keepLocalPreview && data.preview_original_url) {
         previewOriginal.src = absoluteUrl(data.preview_original_url);
       } else if (keepLocalPreview && localPreviewUrl) {
         previewOriginal.src = localPreviewUrl;
+      } else {
+        previewOriginal.src = "";
       }
 
       previewFinal.src = data.preview_gerado_url ? absoluteUrl(data.preview_gerado_url) : "";
 
+      ensurePreviewPlaceholder("previewOriginalPanel", "previewOriginal", "Nenhum preview do PDF original disponível.");
+      ensurePreviewPlaceholder("previewFinalPanel", "previewFinal", "Nenhum preview do PDF gerado disponível.");
+
       if (data.download_url) {
         btnDownload.href = absoluteUrl(data.download_url);
+        btnDownload.textContent = "⬇ Baixar PDF gerado";
         btnDownload.classList.remove("hidden");
       } else {
         btnDownload.classList.add("hidden");
         btnDownload.href = "#";
       }
+
+      setTimeout(() => {
+        document.querySelector(".metrics-grid")?.scrollIntoView({
+          behavior: "smooth",
+          block: "start"
+        });
+      }, 300);
     }
 
     function toggleHistoryPanel(forceOpen = null){
@@ -1307,6 +1361,9 @@
       btn.textContent = shouldOpen ? "Fechar histórico" : "Abrir histórico";
       if (shouldOpen && !currentItems.length) {
         loadHistory(currentPage);
+      }
+      if (shouldOpen) {
+        setStatus("Histórico carregado. Clique em um item para ver os detalhes.");
       }
     }
 
@@ -1328,7 +1385,7 @@
     }
 
     async function deleteAllReports(){
-      const confirmed = window.confirm("Tem certeza que deseja apagar TODOS os relatórios?");
+      const confirmed = window.confirm("Tem certeza que deseja apagar TODOS os relatórios?\n\nEssa ação não pode ser desfeita.");
       if (!confirmed) return;
 
       try {
@@ -1384,7 +1441,7 @@
           e.stopPropagation();
           const jobId = btn.dataset.jobId;
           const fileName = btn.dataset.fileName || "este relatório";
-          const confirmed = window.confirm(`Tem certeza que deseja apagar ${fileName}?`);
+          const confirmed = window.confirm(`Tem certeza que deseja apagar ${fileName}?\n\nEssa ação não pode ser desfeita.`);
           if (!confirmed) return;
           await deleteOneReport(jobId, fileName);
         });
@@ -1407,6 +1464,9 @@
 
         updateHeroHistoryCount(Number(data.total || currentItems.length || 0));
         renderHistory();
+        if (!currentItems.length) {
+          setStatus("Histórico carregado. Nenhum relatório encontrado.");
+        }
       } catch (error) {
         historyList.innerHTML = `<div class="empty">Erro ao carregar histórico: ${error.message}</div>`;
       }
@@ -1491,6 +1551,7 @@
       box.classList.add("hidden");
       message.textContent = "";
       technical.textContent = "";
+      setStatusErrorVisual(false);
     }
 
     function humanizeError(data, responseStatus = 0){
@@ -1561,6 +1622,7 @@
         }
 
         hideErrorFeedback();
+        setStatusErrorVisual(false);
         applyMainResult(data, true);
         await loadHistory(1);
       } catch (error) {
@@ -1627,6 +1689,8 @@
     });
 
     resetMainView();
+    ensurePreviewPlaceholder("previewOriginalPanel", "previewOriginal", "Nenhum preview do PDF original disponível.");
+    ensurePreviewPlaceholder("previewFinalPanel", "previewFinal", "Nenhum preview do PDF gerado disponível.");
     setStatus("Nenhum arquivo enviado ainda.");
     loadHistory();
   </script>
