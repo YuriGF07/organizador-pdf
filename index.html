@@ -1011,6 +1011,119 @@
       font-weight:700;
     }
 
+    .history-kpi-grid{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:10px;
+      margin-bottom:16px;
+    }
+
+    .history-kpi{
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:12px;
+      background:#fff;
+      min-height:78px;
+    }
+
+    .history-kpi-label{
+      font-size:11px;
+      color:var(--muted);
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:.035em;
+      margin-bottom:7px;
+    }
+
+    .history-kpi-value{
+      font-size:22px;
+      color:#10284f;
+      font-weight:800;
+      line-height:1;
+    }
+
+    .history-kpi-sub{
+      margin-top:7px;
+      font-size:11px;
+      color:#64748b;
+      line-height:1.35;
+    }
+
+    .history-kpi.warning{
+      background:#fffbeb;
+      border-color:#fde68a;
+    }
+
+    .history-kpi.error{
+      background:#fff5f5;
+      border-color:#fecaca;
+    }
+
+    .history-kpi.ok{
+      background:#f0fdf4;
+      border-color:#bbf7d0;
+    }
+
+    .history-meta-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px;
+      margin-top:12px;
+    }
+
+    .history-meta-box{
+      border:1px solid var(--line);
+      background:#fff;
+      border-radius:13px;
+      padding:9px 10px;
+      min-width:0;
+    }
+
+    .history-meta-label{
+      font-size:10px;
+      color:#64748b;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:.03em;
+      margin-bottom:4px;
+    }
+
+    .history-meta-value{
+      font-size:13px;
+      color:#0f172a;
+      font-weight:700;
+      word-break:break-word;
+    }
+
+    .history-card-note{
+      margin-top:10px;
+      padding:10px 12px;
+      border-radius:13px;
+      background:#f8fafc;
+      color:#475569;
+      font-size:12px;
+      line-height:1.45;
+      border:1px solid var(--line);
+    }
+
+    .history-filter-active{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:7px 10px;
+      border-radius:999px;
+      background:#eef4ff;
+      color:#1d4ed8;
+      font-size:12px;
+      font-weight:700;
+      margin:0 6px 8px 0;
+    }
+
+    .history-filter-strip{
+      margin-bottom:10px;
+      min-height:0;
+    }
+
     .status-panel strong{
       color:#0f172a;
     }
@@ -1235,7 +1348,7 @@
     }
 
     @media (max-width:900px){
-      .results-summary{grid-template-columns:1fr}
+      .results-summary,.history-kpi-grid,.history-meta-grid{grid-template-columns:1fr}
     }
 
   
@@ -1495,6 +1608,31 @@
           </div>
 
           <div id="historyPanel" class="history-panel hidden-panel">
+            <div class="history-kpi-grid" id="historyKpiGrid">
+              <div class="history-kpi">
+                <div class="history-kpi-label">Total filtrado</div>
+                <div class="history-kpi-value" id="kpiTotal">0</div>
+                <div class="history-kpi-sub">Relatórios encontrados</div>
+              </div>
+              <div class="history-kpi warning">
+                <div class="history-kpi-label">Precisam revisão</div>
+                <div class="history-kpi-value" id="kpiRevisao">0</div>
+                <div class="history-kpi-sub">Pendentes ou com alerta</div>
+              </div>
+              <div class="history-kpi error">
+                <div class="history-kpi-label">Divergência / sem total</div>
+                <div class="history-kpi-value" id="kpiProblemas">0</div>
+                <div class="history-kpi-sub">Exigem atenção</div>
+              </div>
+              <div class="history-kpi ok">
+                <div class="history-kpi-label">Aprovados</div>
+                <div class="history-kpi-value" id="kpiAprovados">0</div>
+                <div class="history-kpi-sub">Automático ou manual</div>
+              </div>
+            </div>
+
+            <div class="history-filter-strip" id="historyFilterStrip"></div>
+
             <div class="filter-grid">
               <div class="filter-field">
                 <label for="filterBusca">Buscar arquivo</label>
@@ -1741,6 +1879,7 @@
     const currentLimit = 10;
     let totalPages = 1;
     let currentItems = [];
+    let currentHistorySummary = {};
     let processingInterval = null;
 
     const dropzone = document.getElementById("dropzone");
@@ -2055,17 +2194,65 @@
     }
 
     function getHistoryStatusBadge(item){
+      const rotulo = item.resultado_rotulo || "";
+      const classe = item.resultado_classe || "";
+      if (rotulo) {
+        if (classe === "ok") return `<span class="badge badge-ok">${escapeHtml(rotulo)}</span>`;
+        if (classe === "warning") return `<span class="badge badge-warning">${escapeHtml(rotulo)}</span>`;
+        if (classe === "error") return `<span class="badge badge-error">${escapeHtml(rotulo)}</span>`;
+        return `<span class="badge badge-info">${escapeHtml(rotulo)}</span>`;
+      }
+
       const status = lower(item.status);
       const decisao = lower(item.decisao_final);
-
       const revisao = lower(item.revisao_status);
 
       if (status.includes("diverg")) return `<span class="badge badge-error">Diferença</span>`;
       if (status.includes("sem total")) return `<span class="badge badge-warning">Sem total</span>`;
-      if (decisao.includes("reprov") || decisao.includes("rejeit") || revisao.includes("rejeit")) return `<span class="badge badge-error">Reprovado</span>`;
+      if (decisao.includes("reprov") || decisao.includes("rejeit") || revisao.includes("rejeit")) return `<span class="badge badge-error">Rejeitado</span>`;
       if (decisao.includes("aprov") || revisao.includes("aprov")) return `<span class="badge badge-ok">Aprovado</span>`;
       if (item.needs_review || revisao.includes("pendente")) return `<span class="badge badge-warning">Revisão</span>`;
       return `<span class="badge badge-info">Processado</span>`;
+    }
+
+    function reviewBadge(item){
+      const revisao = lower(item.revisao_status);
+      if (revisao.includes("aprov")) return `<span class="badge badge-ok">Revisão aprovada</span>`;
+      if (revisao.includes("rejeit")) return `<span class="badge badge-error">Revisão rejeitada</span>`;
+      if (item.needs_review || revisao.includes("pendente")) return `<span class="badge badge-warning">Revisão pendente</span>`;
+      return `<span class="badge badge-muted">Sem revisão</span>`;
+    }
+
+    function activeFiltersText(){
+      const filters = [];
+      const busca = document.getElementById("filterBusca").value.trim();
+      const tipo = document.getElementById("filterTipo")?.value || "";
+      const status = document.getElementById("filterStatus")?.value || "";
+      const revisao = document.getElementById("filterRevisao")?.value || "";
+      const dataInicio = document.getElementById("filterDataInicio")?.value || "";
+      const dataFim = document.getElementById("filterDataFim")?.value || "";
+
+      if (busca) filters.push(`Busca: ${busca}`);
+      if (tipo) filters.push(`Tipo: ${tipo}`);
+      if (status) filters.push(`Status: ${status}`);
+      if (revisao) filters.push(`Revisão: ${revisao}`);
+      if (dataInicio) filters.push(`De: ${dataInicio}`);
+      if (dataFim) filters.push(`Até: ${dataFim}`);
+
+      const strip = document.getElementById("historyFilterStrip");
+      if (!strip) return;
+      strip.innerHTML = filters.length
+        ? filters.map(f => `<span class="history-filter-active">${escapeHtml(f)}</span>`).join("")
+        : "";
+    }
+
+    function updateHistoryKpis(total = 0, summary = {}){
+      const problemas = Number(summary.divergencias || 0) + Number(summary.sem_total || 0);
+      setText("kpiTotal", total);
+      setText("kpiRevisao", summary.precisa_revisao ?? summary.pendentes ?? 0);
+      setText("kpiProblemas", problemas);
+      setText("kpiAprovados", summary.aprovados ?? 0);
+      activeFiltersText();
     }
 
     function buildHistoryUrl(page = 1){
@@ -2230,17 +2417,23 @@
     }
 
     function renderHistory(){
+      updateHistoryKpis(Number(document.getElementById("historyTotalInfo")?.dataset.total || currentItems.length || 0), currentHistorySummary);
+
       if (!currentItems.length) {
         historyList.innerHTML = `
           <div class="empty-state">
             <div class="empty-state-title">Nenhum relatório encontrado</div>
-            <div class="empty-state-text">Assim que você processar arquivos, eles aparecerão aqui para consulta e revisão.</div>
+            <div class="empty-state-text">Ajuste os filtros ou processe um novo PDF para alimentar o histórico.</div>
           </div>
         `;
       } else {
         historyList.innerHTML = currentItems.map(item => {
           const nomeArquivo = item.nome_arquivo_original || "Sem nome";
           const jobId = item.job_id || "";
+          const descricao = item.resultado_descricao || item.detalhes_status || "Clique para abrir os detalhes completos.";
+          const totalOriginal = item.valor_total_original || "0,00";
+          const totalGerado = item.valor_total_gerado || "0,00";
+          const diferenca = getTotalConfidence(item) === "alta" ? (item.diferenca_total || "0,00") : "Não comparada";
           return `
           <div class="history-item ${jobId === selectedReportId ? "active" : ""}" data-report-id="${escapeHtml(jobId)}">
             <div class="history-item-top">
@@ -2248,6 +2441,7 @@
                 <div class="history-title">${escapeHtml(nomeArquivo)}</div>
                 <div class="history-badges">
                   ${getHistoryStatusBadge(item)}
+                  ${reviewBadge(item)}
                   <span class="badge badge-muted">${escapeHtml(item.tipo_detectado || "-")}</span>
                 </div>
               </div>
@@ -2255,9 +2449,28 @@
                 <button class="btn-mini-danger btn-delete-one" type="button" data-job-id="${escapeHtml(jobId)}" data-file-name="${escapeHtml(nomeArquivo)}">Apagar</button>
               </div>
             </div>
-            <div class="history-meta">
-              Data/Hora: ${escapeHtml(item.data_hora || "-")}<br>
-              Status: ${escapeHtml(item.status || "-")}
+
+            <div class="history-meta-grid">
+              <div class="history-meta-box">
+                <div class="history-meta-label">Data/Hora</div>
+                <div class="history-meta-value">${escapeHtml(item.data_hora || "-")}</div>
+              </div>
+              <div class="history-meta-box">
+                <div class="history-meta-label">Registros</div>
+                <div class="history-meta-value">${escapeHtml(item.qtd_registros ?? 0)}</div>
+              </div>
+              <div class="history-meta-box">
+                <div class="history-meta-label">Total original</div>
+                <div class="history-meta-value">R$ ${escapeHtml(totalOriginal)}</div>
+              </div>
+              <div class="history-meta-box">
+                <div class="history-meta-label">Total gerado / diferença</div>
+                <div class="history-meta-value">R$ ${escapeHtml(totalGerado)} • ${escapeHtml(diferenca)}</div>
+              </div>
+            </div>
+
+            <div class="history-card-note">
+              ${escapeHtml(descricao)}
             </div>
           </div>
         `}).join("");
@@ -2311,12 +2524,18 @@
         if (!response.ok) throw new Error(backendMessage(data));
 
         currentItems = Array.isArray(data.items) ? data.items : Array.isArray(data) ? data : [];
+        currentHistorySummary = data.summary || {};
         currentPage = Number(data.page || page || 1);
         totalPages = Number(data.total_pages || 1);
 
         const total = Number(data.total || currentItems.length || 0);
         updateHeroHistoryCount(total);
-        document.getElementById("historyTotalInfo").textContent = total ? `${total} relatório(s) no histórico` : "Nenhum relatório no histórico";
+        const historyTotalInfo = document.getElementById("historyTotalInfo");
+        historyTotalInfo.dataset.total = String(total);
+        historyTotalInfo.textContent = total
+          ? `${total} relatório(s) encontrado(s) • página ${currentPage} de ${totalPages}`
+          : "Nenhum relatório no histórico";
+        updateHistoryKpis(total, currentHistorySummary);
         renderHistory();
         if (!currentItems.length) {
           setStatus("Histórico carregado. Nenhum relatório encontrado.");
