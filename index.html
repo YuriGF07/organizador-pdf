@@ -1763,6 +1763,24 @@
       return String(v || "").toLowerCase();
     }
 
+    function escapeHtml(value){
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function getTotalConfidence(data){
+      const explicit = lower(data?.total_original_confidence);
+      if (explicit) return explicit;
+      const status = lower(data?.status);
+      const total = String(data?.valor_total_original || "").trim();
+      if (status.includes("sem total") || total === "" || total === "0,00") return "inexistente";
+      return "alta";
+    }
+
     function backendMessage(data){
       if (typeof data === "string") return data;
       if (data?.detail && typeof data.detail === "string") return data.detail;
@@ -2040,10 +2058,13 @@
       const status = lower(item.status);
       const decisao = lower(item.decisao_final);
 
+      const revisao = lower(item.revisao_status);
+
       if (status.includes("diverg")) return `<span class="badge badge-error">Diferença</span>`;
       if (status.includes("sem total")) return `<span class="badge badge-warning">Sem total</span>`;
-      if (decisao.includes("reprov") || decisao.includes("rejeit")) return `<span class="badge badge-error">Reprovado</span>`;
-      if (decisao.includes("aprov")) return `<span class="badge badge-ok">Aprovado</span>`;
+      if (decisao.includes("reprov") || decisao.includes("rejeit") || revisao.includes("rejeit")) return `<span class="badge badge-error">Reprovado</span>`;
+      if (decisao.includes("aprov") || revisao.includes("aprov")) return `<span class="badge badge-ok">Aprovado</span>`;
+      if (item.needs_review || revisao.includes("pendente")) return `<span class="badge badge-warning">Revisão</span>`;
       return `<span class="badge badge-info">Processado</span>`;
     }
 
@@ -2093,11 +2114,12 @@
       setText("metricArquivo", data.nome_arquivo_original || selectedFile?.name || "-");
       setText("metricTipo", data.tipo_detectado || "-");
       setText("metricPontuacao", formatPontuacao(data));
+      const totalConfidence = getTotalConfidence(data);
       setText("metricTotalOriginal", data.valor_total_original || "0,00");
-      setText("metricConfidence", `Confiança: ${formatConfidence(data.total_original_confidence)}`);
+      setText("metricConfidence", `Confiança: ${formatConfidence(totalConfidence)}`);
       setText("metricTotalGerado", data.valor_total_gerado || "0,00");
 
-      if (lower(data.total_original_confidence) === "alta") {
+      if (totalConfidence === "alta") {
         setText("metricDiferenca", `Diferença: ${data.diferenca_total || "0,00"}`);
       } else {
         setText("metricDiferenca", "Diferença: não comparada");
@@ -2216,26 +2238,29 @@
           </div>
         `;
       } else {
-        historyList.innerHTML = currentItems.map(item => `
-          <div class="history-item ${item.job_id === selectedReportId ? "active" : ""}" data-report-id="${item.job_id}">
+        historyList.innerHTML = currentItems.map(item => {
+          const nomeArquivo = item.nome_arquivo_original || "Sem nome";
+          const jobId = item.job_id || "";
+          return `
+          <div class="history-item ${jobId === selectedReportId ? "active" : ""}" data-report-id="${escapeHtml(jobId)}">
             <div class="history-item-top">
               <div style="min-width:0;flex:1">
-                <div class="history-title">${item.nome_arquivo_original || "Sem nome"}</div>
+                <div class="history-title">${escapeHtml(nomeArquivo)}</div>
                 <div class="history-badges">
                   ${getHistoryStatusBadge(item)}
-                  <span class="badge badge-muted">${item.tipo_detectado || "-"}</span>
+                  <span class="badge badge-muted">${escapeHtml(item.tipo_detectado || "-")}</span>
                 </div>
               </div>
               <div class="history-item-actions">
-                <button class="btn-mini-danger btn-delete-one" type="button" data-job-id="${item.job_id}" data-file-name="${(item.nome_arquivo_original || "Sem nome").replace(/"/g, '&quot;')}">Apagar</button>
+                <button class="btn-mini-danger btn-delete-one" type="button" data-job-id="${escapeHtml(jobId)}" data-file-name="${escapeHtml(nomeArquivo)}">Apagar</button>
               </div>
             </div>
             <div class="history-meta">
-              Data/Hora: ${item.data_hora || "-"}<br>
-              Status: ${item.status || "-"}
+              Data/Hora: ${escapeHtml(item.data_hora || "-")}<br>
+              Status: ${escapeHtml(item.status || "-")}
             </div>
           </div>
-        `).join("");
+        `}).join("");
       }
 
       document.querySelectorAll(".history-item").forEach(el => {
@@ -2324,10 +2349,11 @@
       setText("detailRegistros", data.qtd_registros ?? 0);
       setText("detailDataHora", data.data_hora || "-");
       setText("detailParser", data.parser_utilizado || "-");
+      const totalConfidence = getTotalConfidence(data);
       setText("detailTotalOriginal", data.valor_total_original || "0,00");
       setText("detailTotalGerado", data.valor_total_gerado || "0,00");
-      setText("detailDiferenca", lower(data.total_original_confidence) === "alta" ? (data.diferenca_total || "0,00") : "Não comparada");
-      setText("detailConfidence", formatConfidence(data.total_original_confidence || "inexistente"));
+      setText("detailDiferenca", totalConfidence === "alta" ? (data.diferenca_total || "0,00") : "Não comparada");
+      setText("detailConfidence", formatConfidence(totalConfidence || "inexistente"));
       setText("detailDecisao", data.decisao_final || "-");
       setText("detailRevisaoStatus", data.revisao_status || "-");
       setText("detailMotivoDetectado", data.motivo_detectado || "-");
