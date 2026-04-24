@@ -1595,6 +1595,10 @@
               <div class="summary-title">PDF gerado</div>
               <div class="summary-value" id="summaryPdfGerado">Ainda não disponível</div>
             </div>
+            <div class="summary-card">
+              <div class="summary-title">Confiabilidade</div>
+              <div class="summary-value" id="summaryConfiabilidade">Aguardando</div>
+            </div>
           </div>
 
           <div class="preview-grid">
@@ -1625,6 +1629,10 @@
               <div class="diag-item">
                 <div class="diag-label">Motivo do total original</div>
                 <div class="diag-value" id="diagMotivoTotal">-</div>
+              </div>
+              <div class="diag-item">
+                <div class="diag-label">Confiabilidade operacional</div>
+                <div class="diag-value" id="diagConfiabilidade">-</div>
               </div>
               <div class="diag-item">
                 <div class="diag-label">Detalhes gerais</div>
@@ -1800,6 +1808,10 @@
         <div class="detail-block">
           <div class="detail-label">Confiança do total</div>
           <div class="detail-value" id="detailConfidence">-</div>
+        </div>
+        <div class="detail-block">
+          <div class="detail-label">Confiabilidade</div>
+          <div class="detail-value" id="detailConfiabilidade">-</div>
         </div>
         <div class="detail-block">
           <div class="detail-label">Decisão final</div>
@@ -2022,6 +2034,23 @@
       const total = String(data?.valor_total_original || "").trim();
       if (status.includes("sem total") || total === "" || total === "0,00") return "inexistente";
       return "alta";
+    }
+
+    function getReliabilityLabel(data){
+      const conf = data?.confiabilidade_operacional;
+      if (conf && conf.rotulo) return conf.rotulo;
+      if (data?.divergencia_total) return "Baixa";
+      if (data?.needs_review) return "Média";
+      if (getTotalConfidence(data) === "inexistente") return "Média";
+      return "Alta";
+    }
+
+    function getReliabilityText(data){
+      const conf = data?.confiabilidade_operacional;
+      if (conf && Array.isArray(conf.motivos) && conf.motivos.length) {
+        return `${conf.rotulo || "-"} — ${conf.motivos.join(" | ")}`;
+      }
+      return `${getReliabilityLabel(data)} — sem apontamentos críticos adicionais.`;
     }
 
     function backendMessage(data){
@@ -2251,6 +2280,7 @@
       setText("summaryStatus", "Aguardando processamento");
       setText("summaryRegistros", "0");
       setText("summaryPdfGerado", "Ainda não disponível");
+      setText("summaryConfiabilidade", "Aguardando");
       previewOriginal.src = "";
       previewFinal.src = "";
       btnDownload.classList.add("hidden");
@@ -2418,6 +2448,7 @@
 
       setText("diagMotivoDetectado", data.motivo_detectado || "-");
       setText("diagMotivoTotal", data.total_original_motivo || "-");
+      setText("diagConfiabilidade", getReliabilityText(data));
       setText("diagDetalhesStatus", data.detalhes_status || "-");
       setText("summaryStatus", data.status || data.mensagem || "-");
       setText("summaryRegistros", String(data.qtd_registros || 0));
@@ -2546,6 +2577,7 @@
                 <div class="history-badges">
                   ${getHistoryStatusBadge(item)}
                   ${reviewBadge(item)}
+                  <span class="badge badge-info">Conf. ${escapeHtml(getReliabilityLabel(item))}</span>
                   <span class="badge badge-muted">${escapeHtml(item.tipo_detectado || "-")}</span>
                 </div>
               </div>
@@ -2677,6 +2709,7 @@
       setText("detailTotalGerado", data.valor_total_gerado || "0,00");
       setText("detailDiferenca", totalConfidence === "alta" ? (data.diferenca_total || "0,00") : "Não comparada");
       setText("detailConfidence", formatConfidence(totalConfidence || "inexistente"));
+      setText("detailConfiabilidade", getReliabilityLabel(data));
       setText("detailDecisao", data.decisao_final || "-");
       setText("detailRevisaoStatus", data.revisao_status || "-");
       setText("detailRevisaoMotivo", data.revisao_motivo || "-");
@@ -2685,7 +2718,7 @@
       setText("detailRevisadoEm", data.revisado_em || "-");
       setText("detailMotivoDetectado", data.motivo_detectado || "-");
       setText("detailMotivoTotal", data.total_original_motivo || "-");
-      setText("detailDiagnostico", data.detalhes_status || "-");
+      setText("detailDiagnostico", `${data.detalhes_status || "-"}\n\nConfiabilidade operacional: ${getReliabilityText(data)}`);
       setText("reviewCurrentStatus", data.revisao_status || "-");
       setText("reviewCurrentMotivo", data.revisao_motivo || "-");
       setText("reviewCurrentPrioridade", data.revisao_prioridade || "normal");
