@@ -1463,6 +1463,116 @@
     @media (max-width:900px){
       .filter-grid,.filter-date-grid,.review-form-grid,.review-current{grid-template-columns:1fr}
     }
+  
+    .quality-panel{
+      margin-top:18px;
+      border:1px solid var(--line);
+      border-radius:18px;
+      background:#fbfdff;
+      padding:16px;
+    }
+
+    .quality-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:14px;
+    }
+
+    .quality-title{
+      font-size:16px;
+      font-weight:700;
+      color:#103b77;
+      margin-bottom:4px;
+    }
+
+    .quality-subtitle{
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.5;
+    }
+
+    .quality-score{
+      min-width:116px;
+      text-align:center;
+      border-radius:16px;
+      padding:12px;
+      background:#fff;
+      border:1px solid var(--line);
+    }
+
+    .quality-score-value{
+      font-size:28px;
+      font-weight:700;
+      color:#10284f;
+      line-height:1;
+    }
+
+    .quality-score-label{
+      font-size:12px;
+      color:var(--muted);
+      font-weight:700;
+      margin-top:6px;
+      text-transform:uppercase;
+      letter-spacing:.03em;
+    }
+
+    .quality-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:12px;
+    }
+
+    .quality-col{
+      border:1px solid var(--line);
+      border-radius:16px;
+      background:#fff;
+      padding:14px;
+      min-height:130px;
+    }
+
+    .quality-col-title{
+      font-size:13px;
+      font-weight:700;
+      margin-bottom:10px;
+      color:#0f172a;
+    }
+
+    .quality-list{
+      margin:0;
+      padding-left:18px;
+      color:#475569;
+      font-size:13px;
+      line-height:1.55;
+    }
+
+    .quality-list li{margin-bottom:6px}
+
+    .quality-col.error{border-color:#fecaca;background:#fff7f7}
+    .quality-col.warning{border-color:#fde68a;background:#fffdf2}
+    .quality-col.ok{border-color:#bbf7d0;background:#f7fff9}
+
+    .quality-next{
+      margin-top:12px;
+      border:1px solid #dbeafe;
+      border-radius:16px;
+      background:#f8fbff;
+      padding:14px;
+    }
+
+    .quality-next-title{
+      font-size:13px;
+      font-weight:700;
+      color:#1d4ed8;
+      margin-bottom:8px;
+    }
+
+    @media (max-width:900px){
+      .quality-grid{grid-template-columns:1fr}
+    }
+
   </style>
 </head>
 <body>
@@ -1473,7 +1583,7 @@
         <div class="brand-mark">PDF</div>
         <div class="brand-meta">
           <div class="brand-title">Jaboque • Organizador de Relatórios</div>
-          <div class="brand-subtitle">Painel operacional para leitura, validação e histórico de PDFs</div>
+          <div class="brand-subtitle">Painel operacional para leitura, validação, diagnóstico e histórico de PDFs</div>
         </div>
       </div>
       <div class="env-pill"><span class="env-dot"></span><span>Ambiente ativo: DEV</span></div>
@@ -1598,6 +1708,37 @@
             <div class="summary-card">
               <div class="summary-title">Confiabilidade</div>
               <div class="summary-value" id="summaryConfiabilidade">Aguardando</div>
+            </div>
+          </div>
+
+          <div class="quality-panel" id="mainQualityPanel">
+            <div class="quality-head">
+              <div>
+                <div class="quality-title">Diagnóstico de qualidade</div>
+                <div class="quality-subtitle" id="qualityResumo">Aguardando processamento.</div>
+              </div>
+              <div class="quality-score">
+                <div class="quality-score-value" id="qualityScore">-</div>
+                <div class="quality-score-label" id="qualityNivel">Aguardando</div>
+              </div>
+            </div>
+            <div class="quality-grid">
+              <div class="quality-col error">
+                <div class="quality-col-title">Problemas críticos</div>
+                <ul class="quality-list" id="qualityProblemas"><li>Nenhum processamento ainda.</li></ul>
+              </div>
+              <div class="quality-col warning">
+                <div class="quality-col-title">Alertas</div>
+                <ul class="quality-list" id="qualityAlertas"><li>Nenhum processamento ainda.</li></ul>
+              </div>
+              <div class="quality-col ok">
+                <div class="quality-col-title">Pontos positivos</div>
+                <ul class="quality-list" id="qualityPositivos"><li>Nenhum processamento ainda.</li></ul>
+              </div>
+            </div>
+            <div class="quality-next">
+              <div class="quality-next-title">Próximos passos sugeridos</div>
+              <ul class="quality-list" id="qualityProximosPassos"><li>Envie um PDF para análise.</li></ul>
             </div>
           </div>
 
@@ -1847,6 +1988,10 @@
           <div class="detail-value soft" id="detailMotivoTotal">-</div>
         </div>
         <div class="detail-block full">
+          <div class="detail-label">Diagnóstico de qualidade</div>
+          <div class="detail-value soft" id="detailQualidade">-</div>
+        </div>
+        <div class="detail-block full">
           <div class="detail-label">Detalhes técnicos</div>
           <div class="detail-value soft" id="detailDiagnostico">-</div>
         </div>
@@ -2053,6 +2198,80 @@
       return `${getReliabilityLabel(data)} — sem apontamentos críticos adicionais.`;
     }
 
+
+    function qualityItemsToList(items, emptyText){
+      if (!Array.isArray(items) || !items.length) {
+        return `<li>${escapeHtml(emptyText)}</li>`;
+      }
+      return items.map(item => {
+        if (typeof item === "string") return `<li>${escapeHtml(item)}</li>`;
+        const title = item?.titulo || item?.codigo || "Item";
+        const desc = item?.descricao || "";
+        return `<li><strong>${escapeHtml(title)}</strong>${desc ? ` — ${escapeHtml(desc)}` : ""}</li>`;
+      }).join("");
+    }
+
+    function getQuality(data){
+      const q = data?.diagnostico_qualidade;
+      if (q && typeof q === "object") return q;
+
+      const conf = data?.confiabilidade_operacional || {};
+      const motivos = Array.isArray(conf.motivos) ? conf.motivos : [];
+      return {
+        nivel: getReliabilityLabel(data),
+        classe: conf.classe || "info",
+        score: conf.score || 0,
+        resumo: motivos.length ? `${motivos.length} apontamento(s) de qualidade.` : "Sem diagnóstico detalhado disponível.",
+        problemas: data?.divergencia_total ? [{titulo:"Divergência de total", descricao:"Total original e gerado não conferem."}] : [],
+        alertas: motivos.map(m => ({titulo:"Atenção", descricao:m})),
+        positivos: motivos.length ? [] : [{titulo:"Sem bloqueio crítico", descricao:"Nenhum problema crítico identificado nos campos atuais."}],
+        proximos_passos: data?.needs_review ? ["Revisar manualmente antes de aprovar."] : ["Pode seguir o fluxo normal de aprovação/uso operacional."]
+      };
+    }
+
+    function renderQualityPanel(data, prefix = "quality"){
+      const q = getQuality(data || {});
+      const scoreId = prefix === "quality" ? "qualityScore" : `${prefix}Score`;
+      const nivelId = prefix === "quality" ? "qualityNivel" : `${prefix}Nivel`;
+      const resumoId = prefix === "quality" ? "qualityResumo" : `${prefix}Resumo`;
+      const problemasId = prefix === "quality" ? "qualityProblemas" : `${prefix}Problemas`;
+      const alertasId = prefix === "quality" ? "qualityAlertas" : `${prefix}Alertas`;
+      const positivosId = prefix === "quality" ? "qualityPositivos" : `${prefix}Positivos`;
+      const passosId = prefix === "quality" ? "qualityProximosPassos" : `${prefix}ProximosPassos`;
+
+      const setHtml = (id, html) => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = html;
+      };
+
+      setText(scoreId, q.score ? `${q.score}` : "-");
+      setText(nivelId, q.nivel || "Aguardando");
+      setText(resumoId, q.resumo || "Sem diagnóstico disponível.");
+      setHtml(problemasId, qualityItemsToList(q.problemas, "Nenhum problema crítico identificado."));
+      setHtml(alertasId, qualityItemsToList(q.alertas, "Nenhum alerta operacional identificado."));
+      setHtml(positivosId, qualityItemsToList(q.positivos, "Nenhum ponto positivo registrado ainda."));
+      setHtml(passosId, qualityItemsToList(q.proximos_passos || [], "Sem ação sugerida."));
+    }
+
+    function qualityTextForModal(data){
+      const q = getQuality(data || {});
+      const lines = [
+        `Nível: ${q.nivel || "-"}`,
+        `Score: ${q.score || "-"}`,
+        `Resumo: ${q.resumo || "-"}`,
+        "",
+        "Problemas críticos:",
+        ...(Array.isArray(q.problemas) && q.problemas.length ? q.problemas.map(x => `- ${(x.titulo || x.codigo || "Item")}: ${x.descricao || ""}`) : ["- Nenhum problema crítico identificado."]),
+        "",
+        "Alertas:",
+        ...(Array.isArray(q.alertas) && q.alertas.length ? q.alertas.map(x => `- ${(x.titulo || x.codigo || "Item")}: ${x.descricao || ""}`) : ["- Nenhum alerta operacional identificado."]),
+        "",
+        "Próximos passos:",
+        ...(Array.isArray(q.proximos_passos) && q.proximos_passos.length ? q.proximos_passos.map(x => `- ${x}`) : ["- Sem ação sugerida."])
+      ];
+      return lines.join("\n");
+    }
+
     function backendMessage(data){
       if (typeof data === "string") return data;
       if (data?.detail && typeof data.detail === "string") return data.detail;
@@ -2141,6 +2360,21 @@
       if (value === "ok" || value.includes("sucesso")) {
         badge.className = "badge badge-ok";
         badge.textContent = "OK";
+        return;
+      }
+      if (value.includes("inválido") || value.includes("invalido") || value.includes("corrompido")) {
+        badge.className = "badge badge-error";
+        badge.textContent = "PDF inválido";
+        return;
+      }
+      if (value.includes("sem texto") || value.includes("escaneado")) {
+        badge.className = "badge badge-error";
+        badge.textContent = "PDF sem texto";
+        return;
+      }
+      if (value.includes("desconhecido")) {
+        badge.className = "badge badge-warning";
+        badge.textContent = "Tipo desconhecido";
         return;
       }
       if (value.includes("sem total")) {
@@ -2281,6 +2515,17 @@
       setText("summaryRegistros", "0");
       setText("summaryPdfGerado", "Ainda não disponível");
       setText("summaryConfiabilidade", "Aguardando");
+      renderQualityPanel({
+        diagnostico_qualidade: {
+          nivel: "Aguardando",
+          score: 0,
+          resumo: "Aguardando processamento.",
+          problemas: [],
+          alertas: [],
+          positivos: [],
+          proximos_passos: ["Envie um PDF para análise."]
+        }
+      });
       previewOriginal.src = "";
       previewFinal.src = "";
       btnDownload.classList.add("hidden");
@@ -2381,7 +2626,7 @@
     }
 
     function updateHistoryKpis(total = 0, summary = {}){
-      const problemas = Number(summary.divergencias || 0) + Number(summary.sem_total || 0);
+      const problemas = Number(summary.divergencias || 0) + Number(summary.sem_total || 0) + Number(summary.pdfs_invalidos || 0) + Number(summary.pdfs_sem_texto || 0) + Number(summary.tipos_desconhecidos || 0);
       setText("kpiTotal", total);
       setText("kpiRevisao", summary.precisa_revisao ?? summary.pendentes ?? 0);
       setText("kpiProblemas", problemas);
@@ -2453,6 +2698,8 @@
       setText("summaryStatus", data.status || data.mensagem || "-");
       setText("summaryRegistros", String(data.qtd_registros || 0));
       setText("summaryPdfGerado", data.download_url ? "Disponível para download" : "Ainda não disponível");
+      setText("summaryConfiabilidade", getReliabilityLabel(data));
+      renderQualityPanel(data);
 
       const resumoStatus = [
         data.mensagem || "Relatório processado.",
@@ -2565,7 +2812,8 @@
         historyList.innerHTML = currentItems.map(item => {
           const nomeArquivo = item.nome_arquivo_original || "Sem nome";
           const jobId = item.job_id || "";
-          const descricao = item.resultado_descricao || item.detalhes_status || "Clique para abrir os detalhes completos.";
+          const qualidade = getQuality(item);
+          const descricao = qualidade?.resumo || item.resultado_descricao || item.detalhes_status || "Clique para abrir os detalhes completos.";
           const totalOriginal = item.valor_total_original || "0,00";
           const totalGerado = item.valor_total_gerado || "0,00";
           const diferenca = getTotalConfidence(item) === "alta" ? (item.diferenca_total || "0,00") : "Não comparada";
@@ -2577,7 +2825,7 @@
                 <div class="history-badges">
                   ${getHistoryStatusBadge(item)}
                   ${reviewBadge(item)}
-                  <span class="badge badge-info">Conf. ${escapeHtml(getReliabilityLabel(item))}</span>
+                  <span class="badge ${qualidade.classe === "error" ? "badge-error" : qualidade.classe === "warning" ? "badge-warning" : "badge-ok"}">Qualidade ${escapeHtml(qualidade.nivel || getReliabilityLabel(item))}</span>
                   <span class="badge badge-muted">${escapeHtml(item.tipo_detectado || "-")}</span>
                 </div>
               </div>
@@ -2718,6 +2966,7 @@
       setText("detailRevisadoEm", data.revisado_em || "-");
       setText("detailMotivoDetectado", data.motivo_detectado || "-");
       setText("detailMotivoTotal", data.total_original_motivo || "-");
+      setText("detailQualidade", qualityTextForModal(data));
       setText("detailDiagnostico", `${data.detalhes_status || "-"}\n\nConfiabilidade operacional: ${getReliabilityText(data)}`);
       setText("reviewCurrentStatus", data.revisao_status || "-");
       setText("reviewCurrentMotivo", data.revisao_motivo || "-");
