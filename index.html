@@ -1238,6 +1238,76 @@
       .results-summary{grid-template-columns:1fr}
     }
 
+  
+    select, textarea{
+      width:100%;
+      padding:12px 14px;
+      border:1px solid #d2d9e6;
+      background:#fff;
+      color:var(--text);
+      outline:none;
+      font:inherit;
+      border-radius:14px;
+    }
+
+    textarea{
+      min-height:92px;
+      resize:vertical;
+      line-height:1.5;
+    }
+
+    select:focus, textarea:focus{
+      border-color:#7aa6ff;
+      box-shadow:0 0 0 3px rgba(37,99,235,.08);
+    }
+
+    .filter-grid{
+      display:grid;
+      grid-template-columns:1.2fr .9fr .9fr .9fr;
+      gap:12px;
+      align-items:end;
+      margin-bottom:14px;
+    }
+
+    .filter-field label{
+      display:block;
+      font-size:12px;
+      color:var(--muted);
+      margin-bottom:6px;
+      font-weight:700;
+    }
+
+    .filter-date-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
+      margin-bottom:14px;
+    }
+
+    .review-panel{
+      margin-top:18px;
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:16px;
+      background:#fbfdff;
+    }
+
+    .review-panel-title{
+      font-size:16px;
+      font-weight:700;
+      color:#103b77;
+      margin-bottom:12px;
+    }
+
+    .review-form-grid{
+      display:grid;
+      grid-template-columns:1fr 2fr;
+      gap:12px;
+    }
+
+    @media (max-width:900px){
+      .filter-grid,.filter-date-grid,.review-form-grid{grid-template-columns:1fr}
+    }
   </style>
 </head>
 <body>
@@ -1425,12 +1495,60 @@
           </div>
 
           <div id="historyPanel" class="history-panel hidden-panel">
-            <div class="history-toolbar">
-              <div class="history-search">
+            <div class="filter-grid">
+              <div class="filter-field">
                 <label for="filterBusca">Buscar arquivo</label>
                 <input id="filterBusca" type="text" placeholder="Digite parte do nome do arquivo" />
               </div>
-              <button class="btn-secondary" id="btnBuscar" type="button">Buscar</button>
+
+              <div class="filter-field">
+                <label for="filterTipo">Tipo</label>
+                <select id="filterTipo">
+                  <option value="">Todos</option>
+                  <option value="relatorio1">Relatório 1</option>
+                  <option value="relatorio2">Relatório 2</option>
+                  <option value="relatorio3">Relatório 3</option>
+                  <option value="desconhecido">Desconhecido</option>
+                </select>
+              </div>
+
+              <div class="filter-field">
+                <label for="filterStatus">Status</label>
+                <select id="filterStatus">
+                  <option value="">Todos</option>
+                  <option value="sucesso">Sucesso</option>
+                  <option value="sem total">Sem total</option>
+                  <option value="diferença">Diferença</option>
+                  <option value="parser parcial">Parser parcial</option>
+                  <option value="retorno vazio">Retorno vazio</option>
+                </select>
+              </div>
+
+              <div class="filter-field">
+                <label for="filterRevisao">Revisão</label>
+                <select id="filterRevisao">
+                  <option value="">Todas</option>
+                  <option value="pendente">Pendente</option>
+                  <option value="aprovado">Aprovado</option>
+                  <option value="rejeitado">Rejeitado</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="filter-date-grid">
+              <div class="filter-field">
+                <label for="filterDataInicio">Data inicial</label>
+                <input id="filterDataInicio" type="date" />
+              </div>
+              <div class="filter-field">
+                <label for="filterDataFim">Data final</label>
+                <input id="filterDataFim" type="date" />
+              </div>
+            </div>
+
+            <div class="toolbar-inline" style="margin-bottom:16px">
+              <button class="btn-secondary" id="btnBuscar" type="button">Aplicar filtros</button>
+              <button class="btn-secondary" id="btnLimparFiltros" type="button">Limpar filtros</button>
             </div>
 
             <div class="history-header-row">
@@ -1544,6 +1662,20 @@
         </div>
       </div>
 
+      <div class="review-panel">
+        <div class="review-panel-title">Revisão manual</div>
+        <div class="review-form-grid">
+          <div class="filter-field">
+            <label for="reviewedBy">Revisado por</label>
+            <input id="reviewedBy" type="text" placeholder="Nome do responsável" value="Operador" />
+          </div>
+          <div class="filter-field">
+            <label for="reviewObservation">Observação</label>
+            <textarea id="reviewObservation" placeholder="Escreva uma observação opcional para a revisão"></textarea>
+          </div>
+        </div>
+      </div>
+
       <div class="actions">
         <button class="btn-success" id="btnAprovar" type="button">Aprovar</button>
         <button class="btn-danger" id="btnRejeitar" type="button">Rejeitar</button>
@@ -1597,7 +1729,7 @@
   </div>
 
   <script>
-    const API_BASE = "https://jaboque.onrender.com";
+    const API_BASE = "https://meu-projeto-dev.onrender.com";
     const API_URL = `${API_BASE}/upload`;
     const HISTORY_URL = `${API_BASE}/history`;
 
@@ -1919,8 +2051,21 @@
       const params = new URLSearchParams();
       params.set("page", page);
       params.set("limit", currentLimit);
+
       const busca = document.getElementById("filterBusca").value.trim();
+      const tipo = document.getElementById("filterTipo")?.value || "";
+      const status = document.getElementById("filterStatus")?.value || "";
+      const revisao = document.getElementById("filterRevisao")?.value || "";
+      const dataInicio = document.getElementById("filterDataInicio")?.value || "";
+      const dataFim = document.getElementById("filterDataFim")?.value || "";
+
       if (busca) params.set("busca", busca);
+      if (tipo) params.set("tipo", tipo);
+      if (status) params.set("status", status);
+      if (revisao) params.set("revisao_status", revisao);
+      if (dataInicio) params.set("data_inicio", dataInicio);
+      if (dataFim) params.set("data_fim", dataFim);
+
       return `${HISTORY_URL}?${params.toString()}`;
     }
 
@@ -2188,6 +2333,10 @@
       setText("detailMotivoDetectado", data.motivo_detectado || "-");
       setText("detailMotivoTotal", data.total_original_motivo || "-");
       setText("detailDiagnostico", data.detalhes_status || "-");
+      const reviewedByInput = document.getElementById("reviewedBy");
+      const reviewObservationInput = document.getElementById("reviewObservation");
+      if (reviewedByInput) reviewedByInput.value = data.revisado_por || "Operador";
+      if (reviewObservationInput) reviewObservationInput.value = data.revisao_observacao || "";
 
       document.getElementById("modalPreviewOriginal").src = data.preview_original_url ? absoluteUrl(data.preview_original_url) : "";
       document.getElementById("modalPreviewFinal").src = data.preview_gerado_url ? absoluteUrl(data.preview_gerado_url) : "";
@@ -2210,10 +2359,13 @@
     async function submitReview(jobId, action){
       try {
         const url = `${API_BASE}/review/${jobId}`;
+        const revisadoPor = document.getElementById("reviewedBy")?.value?.trim() || "Operador";
+        const observacao = document.getElementById("reviewObservation")?.value?.trim() || "";
+
         const payload = {
           revisao_status: action,
-          revisao_observacao: "",
-          revisado_por: "operador_web"
+          revisao_observacao: observacao,
+          revisado_por: revisadoPor
         };
 
         const response = await fetch(url, {
@@ -2366,6 +2518,22 @@
       await deleteAllReports();
     });
     document.getElementById("btnBuscar").addEventListener("click", () => { toggleHistoryPanel(true); loadHistory(1); });
+    document.getElementById("btnLimparFiltros").addEventListener("click", () => {
+      document.getElementById("filterBusca").value = "";
+      document.getElementById("filterTipo").value = "";
+      document.getElementById("filterStatus").value = "";
+      document.getElementById("filterRevisao").value = "";
+      document.getElementById("filterDataInicio").value = "";
+      document.getElementById("filterDataFim").value = "";
+      toggleHistoryPanel(true);
+      loadHistory(1);
+    });
+    ["filterTipo", "filterStatus", "filterRevisao", "filterDataInicio", "filterDataFim"].forEach(id => {
+      document.getElementById(id)?.addEventListener("change", () => {
+        toggleHistoryPanel(true);
+        loadHistory(1);
+      });
+    });
     document.getElementById("btnPrevPage").addEventListener("click", () => { if (currentPage > 1) { toggleHistoryPanel(true); loadHistory(currentPage - 1); } });
     document.getElementById("btnNextPage").addEventListener("click", () => { if (currentPage < totalPages) { toggleHistoryPanel(true); loadHistory(currentPage + 1); } });
 
