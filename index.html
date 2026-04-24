@@ -2086,7 +2086,7 @@
       </div>
       <div class="footer-system">
         <span>Interface refinada para operação diária • backend organizado para próxima modularização</span>
-        <span>Versão visual 1.1 • Fase 5</span>
+        <span id="storageInfo">Versão visual 1.2 • Fase 7</span>
       </div>
     </div>
   </div>
@@ -2131,6 +2131,9 @@
     const API_BASE = "https://jaboque.onrender.com";
     const API_URL = `${API_BASE}/upload`;
     const HISTORY_URL = `${API_BASE}/history`;
+    const STORAGE_URL = `${API_BASE}/maintenance/storage`;
+    const MAX_UPLOAD_MB_CLIENT = 25;
+    const MAX_UPLOAD_BYTES_CLIENT = MAX_UPLOAD_MB_CLIENT * 1024 * 1024;
 
     let selectedFile = null;
     let localPreviewUrl = "";
@@ -2500,6 +2503,51 @@
       document.getElementById("heroHistoryCount").textContent = String(total ?? 0);
     }
 
+
+    function formatBytesClient(bytes){
+      const value = Number(bytes || 0);
+      if (value < 1024) return `${value} B`;
+      const kb = value / 1024;
+      if (kb < 1024) return `${kb.toFixed(1)} KB`;
+      const mb = kb / 1024;
+      if (mb < 1024) return `${mb.toFixed(1)} MB`;
+      const gb = mb / 1024;
+      return `${gb.toFixed(2)} GB`;
+    }
+
+    function validarArquivoLocal(file){
+      if (!file) return { ok: false, message: "Nenhum arquivo selecionado." };
+      const name = String(file.name || "").toLowerCase();
+      if (!name.endsWith(".pdf")) {
+        return { ok: false, message: "Selecione apenas arquivos PDF." };
+      }
+      if (file.size > MAX_UPLOAD_BYTES_CLIENT) {
+        return {
+          ok: false,
+          message: `Arquivo muito grande. Limite atual: ${MAX_UPLOAD_MB_CLIENT} MB. Tamanho selecionado: ${formatBytesClient(file.size)}.`
+        };
+      }
+      return { ok: true, message: "" };
+    }
+
+    async function loadStorageInfo(){
+      try {
+        const response = await fetch(STORAGE_URL);
+        const data = await safeJson(response);
+        if (!response.ok || !data?.storage) return;
+
+        const total = data.storage.total || {};
+        const limite = data.storage.limite_upload_mb || MAX_UPLOAD_MB_CLIENT;
+        const el = document.getElementById("storageInfo");
+        if (el) {
+          el.textContent = `Fase 7 • Storage: ${total.tamanho || "-"} em ${total.arquivos || 0} arquivo(s) • Upload até ${limite} MB`;
+        }
+      } catch {
+        const el = document.getElementById("storageInfo");
+        if (el) el.textContent = "Fase 7 • Segurança e manutenção";
+      }
+    }
+
     function resetMainView(){
       setText("metricArquivo", "-");
       setText("metricTipo", "-");
@@ -2535,12 +2583,24 @@
 
     function updateSelectedFile(file){
       hideErrorFeedback();
-      selectedFile = file || null;
-      fileName.textContent = selectedFile ? `Arquivo selecionado: ${selectedFile.name}` : "";
 
       if (localPreviewUrl) URL.revokeObjectURL(localPreviewUrl);
       localPreviewUrl = "";
       previewOriginal.src = "";
+
+      const validation = validarArquivoLocal(file);
+      if (!validation.ok) {
+        selectedFile = null;
+        fileInput.value = "";
+        fileName.textContent = "";
+        setStatus(validation.message);
+        setStatusBadge("erro");
+        showToast("Arquivo recusado", validation.message, "warning", 4200);
+        return;
+      }
+
+      selectedFile = file || null;
+      fileName.textContent = selectedFile ? `Arquivo selecionado: ${selectedFile.name} • ${formatBytesClient(selectedFile.size)}` : "";
 
       if (selectedFile) {
         localPreviewUrl = URL.createObjectURL(selectedFile);
@@ -2548,7 +2608,7 @@
         setText("metricArquivo", selectedFile.name);
         setStatus("Arquivo selecionado com sucesso. Clique em “Processar relatório” para enviar.");
         setStatusBadge("arquivo selecionado");
-        showToast("Arquivo selecionado", selectedFile.name, "info", 2200);
+        showToast("Arquivo selecionado", `${selectedFile.name}\n${formatBytesClient(selectedFile.size)}`, "info", 2200);
       }
     }
 
@@ -2769,7 +2829,9 @@
         }
 
         await loadHistory(currentPage);
-        showToast("Relatório apagado", `${fileName} foi removido com sucesso.`, "success");
+        await loadStorageInfo();
+        const removidos = data?.arquivos_removidos || {};
+        showToast("Relatório apagado", `${fileName} foi removido com sucesso.\nArquivos removidos: ${Number(removidos.originais || 0) + Number(removidos.gerados || 0)}.`, "success");
       } catch (error) {
         showToast("Falha ao apagar", `Não foi possível apagar ${fileName}.\n${error.message}`, "error", 4200);
       }
@@ -2792,7 +2854,9 @@
         document.getElementById("reportModalBackdrop").style.display = "none";
         currentItems = [];
         await loadHistory(1);
-        showToast("Histórico limpo", "Todos os relatórios foram apagados com sucesso.", "success");
+        await loadStorageInfo();
+        const removidos = data?.arquivos_removidos || {};
+        showToast("Histórico limpo", `Todos os relatórios foram apagados com sucesso.\nOriginais: ${removidos.originais || 0} • Gerados: ${removidos.gerados || 0}`, "success");
       } catch (error) {
         showToast("Falha ao apagar todos", `Não foi possível apagar todos os relatórios.\n${error.message}`, "error", 4200);
       }
@@ -3058,8 +3122,8 @@
       const raw = data?.detail || data?.erro || data?.message || data?.raw || "";
       const text = String(typeof raw === "object" ? JSON.stringify(raw) : raw).toLowerCase();
 
-      if (responseStatus === 413) {
-        return { title: "Arquivo muito grande", message: "O PDF enviado é grande demais para ser processado.", technical: raw };
+      if (responseStatus === 413 || text.includes("arquivo muito grande")) {
+        return { title: "Arquivo muito grande", message: `O PDF enviado ultrapassa o limite permitido (${MAX_UPLOAD_MB_CLIENT} MB).`, technical: raw };
       }
       if (responseStatus === 500) {
         return { title: "Erro interno no servidor", message: "O servidor encontrou um erro ao processar o relatório.", technical: raw };
@@ -3102,6 +3166,12 @@
     async function processFile(){
       if (!selectedFile) {
         showToast("Selecione um arquivo", "Escolha um PDF antes de processar.", "warning");
+        return;
+      }
+
+      const validation = validarArquivoLocal(selectedFile);
+      if (!validation.ok) {
+        showToast("Arquivo recusado", validation.message, "warning", 4200);
         return;
       }
 
@@ -3181,6 +3251,7 @@
       document.getElementById("filterDataFim").value = "";
       toggleHistoryPanel(true);
       loadHistory(1);
+    loadStorageInfo();
     });
     ["filterTipo", "filterStatus", "filterRevisao", "filterDataInicio", "filterDataFim"].forEach(id => {
       document.getElementById(id)?.addEventListener("change", () => {
