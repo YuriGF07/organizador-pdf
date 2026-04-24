@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+  <script>
+    (function(){
+      try{
+        var savedTheme = localStorage.getItem("jaboque-theme");
+        var prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+        var theme = savedTheme || (prefersDark ? "dark" : "light");
+        document.documentElement.setAttribute("data-theme", theme);
+      }catch(e){}
+    })();
+  </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Organizador Inteligente de Relatórios PDF</title>
@@ -1621,6 +1631,498 @@
       .quality-grid{grid-template-columns:1fr}
     }
 
+  
+
+    /* =========================================================
+       FASE VISUAL AVANÇADA — SaaS Branding + Dark Mode
+       ========================================================= */
+
+    :root{
+      --brand-blue:#0f3f8f;
+      --brand-blue-2:#2563eb;
+      --brand-green:#37b24d;
+      --brand-cyan:#38bdf8;
+      --brand-ink:#0f172a;
+      --brand-slate:#334155;
+      --brand-glass:rgba(255,255,255,.76);
+      --brand-glass-line:rgba(148,163,184,.22);
+      --bg:
+        radial-gradient(circle at 12% 8%, rgba(56,189,248,.18), transparent 28%),
+        radial-gradient(circle at 82% 12%, rgba(55,178,77,.14), transparent 30%),
+        linear-gradient(180deg,#f8fbff 0%,#eef4fb 100%);
+      --card:rgba(255,255,255,.86);
+      --text:#0f172a;
+      --muted:#475569;
+      --line:rgba(148,163,184,.24);
+      --line-strong:rgba(100,116,139,.34);
+      --primary:#2563eb;
+      --primary-dark:#1d4ed8;
+      --primary-soft:#eaf1ff;
+      --shadow:0 24px 70px rgba(15,23,42,.10);
+      --shadow-soft:0 14px 32px rgba(15,23,42,.07);
+      --shadow-glow:0 26px 70px rgba(37,99,235,.18);
+    }
+
+    html[data-theme="dark"]{
+      color-scheme:dark;
+      --bg:
+        radial-gradient(circle at 12% 8%, rgba(37,99,235,.22), transparent 30%),
+        radial-gradient(circle at 82% 12%, rgba(55,178,77,.16), transparent 28%),
+        linear-gradient(180deg,#080d17 0%,#111827 52%,#0f172a 100%);
+      --card:rgba(17,24,39,.82);
+      --text:#f8fafc;
+      --muted:#cbd5e1;
+      --line:rgba(148,163,184,.18);
+      --line-strong:rgba(203,213,225,.26);
+      --primary:#60a5fa;
+      --primary-dark:#3b82f6;
+      --primary-soft:rgba(96,165,250,.14);
+      --success-bg:rgba(34,197,94,.16);
+      --warning-bg:rgba(245,158,11,.18);
+      --danger-bg:rgba(239,68,68,.16);
+      --info-bg:rgba(59,130,246,.17);
+      --shadow:0 26px 80px rgba(0,0,0,.34);
+      --shadow-soft:0 16px 38px rgba(0,0,0,.24);
+      --shadow-glow:0 30px 80px rgba(37,99,235,.18);
+    }
+
+    body{
+      background:var(--bg);
+      color:var(--text);
+      transition:background .28s ease,color .28s ease;
+    }
+
+    .container{
+      max-width:1480px;
+      padding-top:18px;
+    }
+
+    .topbar{
+      position:sticky;
+      top:14px;
+      z-index:900;
+      min-height:86px;
+      padding:14px 18px;
+      border:1px solid var(--brand-glass-line);
+      border-radius:28px;
+      background:var(--brand-glass);
+      backdrop-filter:blur(18px);
+      -webkit-backdrop-filter:blur(18px);
+      box-shadow:0 18px 50px rgba(15,23,42,.08);
+      animation:softEnter .48s ease both;
+    }
+
+    html[data-theme="dark"] .topbar{
+      background:rgba(15,23,42,.74);
+      border-color:rgba(148,163,184,.18);
+      box-shadow:0 18px 60px rgba(0,0,0,.28);
+    }
+
+    .brand{
+      gap:16px;
+      min-width:0;
+    }
+
+    .brand-mark{
+      width:112px;
+      height:84px;
+      border-radius:24px;
+      background:transparent;
+      border:none;
+      padding:0;
+      box-shadow:none;
+      overflow:visible;
+      transform:translateZ(0);
+    }
+
+    .brand-mark img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      filter:drop-shadow(0 12px 18px rgba(15,23,42,.16));
+      animation:logoFloat 4.5s ease-in-out infinite;
+      transition:transform .22s ease, filter .22s ease, opacity .22s ease;
+    }
+
+    .brand:hover .brand-mark img{
+      transform:translateY(-2px) scale(1.055) rotate(-1deg);
+      filter:drop-shadow(0 18px 24px rgba(15,23,42,.20));
+    }
+
+    html[data-theme="dark"] .brand-mark img{
+      filter:drop-shadow(0 14px 24px rgba(0,0,0,.32));
+    }
+
+    .brand-title{
+      font-size:21px;
+      font-weight:850;
+      color:var(--text);
+      letter-spacing:-.035em;
+      line-height:1.08;
+    }
+
+    .brand-subtitle{
+      margin-top:5px;
+      font-size:13.5px;
+      font-weight:650;
+      color:var(--muted);
+      line-height:1.35;
+    }
+
+    .topbar-actions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .theme-toggle{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.72);
+      color:#0f172a;
+      padding:10px 13px;
+      border-radius:999px;
+      font-size:13px;
+      font-weight:800;
+      gap:8px;
+      box-shadow:var(--shadow-soft);
+    }
+
+    .theme-toggle:hover{
+      transform:translateY(-2px);
+      box-shadow:0 18px 36px rgba(15,23,42,.12);
+    }
+
+    html[data-theme="dark"] .theme-toggle{
+      background:rgba(30,41,59,.82);
+      color:#f8fafc;
+      border-color:rgba(148,163,184,.22);
+    }
+
+    .env-pill{
+      background:rgba(255,255,255,.74);
+      border-color:var(--line);
+      color:var(--text);
+      box-shadow:var(--shadow-soft);
+    }
+
+    html[data-theme="dark"] .env-pill{
+      background:rgba(30,41,59,.76);
+      color:#f8fafc;
+      border-color:rgba(148,163,184,.22);
+    }
+
+    .hero{
+      margin-top:20px;
+      border:1px solid rgba(255,255,255,.38);
+      border-radius:34px;
+      background:
+        radial-gradient(circle at 50% 0%, rgba(255,255,255,.30), transparent 34%),
+        radial-gradient(circle at 22% 25%, rgba(56,189,248,.24), transparent 28%),
+        radial-gradient(circle at 84% 18%, rgba(55,178,77,.24), transparent 28%),
+        linear-gradient(135deg,#0b2d67 0%,#2563eb 52%,#2fbd76 100%);
+      box-shadow:0 34px 90px rgba(37,99,235,.24);
+      padding:36px 32px 30px;
+      animation:softEnter .55s .06s ease both;
+    }
+
+    html[data-theme="dark"] .hero{
+      border-color:rgba(148,163,184,.18);
+      background:
+        radial-gradient(circle at 50% 0%, rgba(96,165,250,.20), transparent 34%),
+        radial-gradient(circle at 22% 25%, rgba(56,189,248,.18), transparent 28%),
+        radial-gradient(circle at 84% 18%, rgba(55,178,77,.18), transparent 28%),
+        linear-gradient(135deg,#07111f 0%,#0f2e67 52%,#0d4f35 100%);
+      box-shadow:0 34px 110px rgba(0,0,0,.34);
+    }
+
+    .hero::before{
+      content:"";
+      position:absolute;
+      inset:auto 16% -80px 16%;
+      height:160px;
+      background:linear-gradient(90deg,rgba(56,189,248,.22),rgba(55,178,77,.20));
+      filter:blur(42px);
+      border-radius:999px;
+      pointer-events:none;
+    }
+
+    .hero-logo-center{
+      width:132px;
+      height:132px;
+      margin:0 auto 18px;
+      border-radius:34px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:rgba(255,255,255,.12);
+      border:1px solid rgba(255,255,255,.18);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.16), 0 28px 60px rgba(0,0,0,.16);
+      backdrop-filter:blur(12px);
+      -webkit-backdrop-filter:blur(12px);
+      animation:heroLogoIn .72s .08s cubic-bezier(.2,.8,.2,1) both;
+    }
+
+    .hero-logo-center img{
+      width:104px;
+      height:104px;
+      object-fit:contain;
+      filter:drop-shadow(0 14px 22px rgba(0,0,0,.22));
+      transition:transform .24s ease, filter .24s ease;
+    }
+
+    .hero-logo-center:hover img{
+      transform:scale(1.07) rotate(-1.4deg);
+      filter:drop-shadow(0 18px 26px rgba(0,0,0,.28));
+    }
+
+    .hero h1{
+      text-align:center;
+      font-size:42px;
+      letter-spacing:-.045em;
+      max-width:980px;
+      margin:0 auto 12px;
+    }
+
+    .hero p{
+      text-align:center;
+      margin:0 auto;
+      max-width:850px;
+      font-size:15.5px;
+      color:rgba(255,255,255,.92);
+    }
+
+    .hero-top{
+      justify-content:center;
+    }
+
+    .hero-mini-grid{
+      margin-top:22px;
+      width:100%;
+      max-width:720px;
+      min-width:unset;
+    }
+
+    .hero-stat{
+      background:rgba(255,255,255,.14);
+      border-color:rgba(255,255,255,.18);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
+    }
+
+    .hero-actions{
+      justify-content:center;
+    }
+
+    .hero-chip{
+      background:rgba(255,255,255,.14);
+      border-color:rgba(255,255,255,.18);
+      backdrop-filter:blur(10px);
+    }
+
+    .main-grid{
+      animation:softEnter .58s .12s ease both;
+    }
+
+    .card,.metric,.history-item,.preview-panel,.detail-block,.diag-item,.status-panel,.feedback-box,.summary-card,.review-panel,.modal,.confirm-modal,.processing-modal{
+      background:var(--card);
+      border-color:var(--line);
+      color:var(--text);
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(12px);
+      -webkit-backdrop-filter:blur(12px);
+    }
+
+    .card h2,.preview-panel h3,.modal-header h3,.review-panel-title,.section-kicker,.history-title,.detail-value,.metric-value,.summary-value,.empty-state-title{
+      color:var(--text);
+    }
+
+    .section-head p,.history-meta,.small-text,.metric-sub,.detail-label,.metric-label,.summary-title,.diag-label,.empty-state-text,.footer-note,.footer-system{
+      color:var(--muted);
+    }
+
+    input,select,textarea{
+      background:rgba(255,255,255,.82);
+      color:var(--text);
+      border-color:var(--line-strong);
+    }
+
+    html[data-theme="dark"] input,
+    html[data-theme="dark"] select,
+    html[data-theme="dark"] textarea{
+      background:rgba(15,23,42,.76);
+      color:#f8fafc;
+      border-color:rgba(148,163,184,.28);
+    }
+
+    html[data-theme="dark"] input::placeholder,
+    html[data-theme="dark"] textarea::placeholder{
+      color:#94a3b8;
+    }
+
+    .dropzone{
+      background:linear-gradient(180deg,rgba(255,255,255,.86),rgba(239,246,255,.76));
+      border-color:rgba(37,99,235,.36);
+    }
+
+    html[data-theme="dark"] .dropzone{
+      background:linear-gradient(180deg,rgba(30,41,59,.84),rgba(15,23,42,.74));
+      border-color:rgba(96,165,250,.36);
+    }
+
+    .dropzone:hover{
+      box-shadow:var(--shadow-glow);
+    }
+
+    .dropzone .main-text,.dropzone-icon{
+      color:var(--primary-dark);
+    }
+
+    html[data-theme="dark"] .dropzone .main-text,
+    html[data-theme="dark"] .dropzone-icon{
+      color:#bfdbfe;
+    }
+
+    .btn-primary{
+      background:linear-gradient(135deg,#2563eb 0%,#1d4ed8 52%,#1ba66a 100%);
+      box-shadow:0 18px 36px rgba(37,99,235,.24);
+    }
+
+    .btn-primary:hover{
+      box-shadow:0 22px 44px rgba(37,99,235,.30);
+    }
+
+    .btn-secondary,.link-btn{
+      background:var(--primary-soft);
+      color:var(--primary-dark);
+    }
+
+    html[data-theme="dark"] .btn-secondary,
+    html[data-theme="dark"] .link-btn{
+      color:#dbeafe;
+    }
+
+    .history-item:hover,.metric:hover,.preview-panel:hover,.detail-block:hover,.diag-item:hover{
+      box-shadow:var(--shadow-glow);
+    }
+
+    .history-item.active{
+      border-color:rgba(37,99,235,.52);
+      background:rgba(37,99,235,.08);
+    }
+
+    html[data-theme="dark"] .history-item.active{
+      border-color:rgba(96,165,250,.48);
+      background:rgba(96,165,250,.10);
+    }
+
+    .modal-header,.status-header,.preview-panel-head{
+      background:rgba(255,255,255,.82);
+      border-color:var(--line);
+    }
+
+    html[data-theme="dark"] .modal-header,
+    html[data-theme="dark"] .status-header,
+    html[data-theme="dark"] .preview-panel-head{
+      background:rgba(15,23,42,.88);
+    }
+
+    .preview-frame{
+      background:#fff;
+    }
+
+    .logo-mono{
+      filter:grayscale(1) contrast(1.15) brightness(.72) !important;
+    }
+
+    html[data-theme="dark"] .logo-mono{
+      filter:grayscale(1) contrast(1.1) brightness(1.55) drop-shadow(0 14px 22px rgba(0,0,0,.28)) !important;
+    }
+
+    .mono-toggle{
+      border:1px solid var(--line);
+      background:rgba(255,255,255,.72);
+      color:var(--text);
+      padding:10px 13px;
+      border-radius:999px;
+      font-size:13px;
+      font-weight:800;
+      gap:8px;
+      box-shadow:var(--shadow-soft);
+    }
+
+    html[data-theme="dark"] .mono-toggle{
+      background:rgba(30,41,59,.82);
+      color:#f8fafc;
+      border-color:rgba(148,163,184,.22);
+    }
+
+    @keyframes softEnter{
+      from{opacity:0; transform:translateY(12px)}
+      to{opacity:1; transform:translateY(0)}
+    }
+
+    @keyframes logoFloat{
+      0%,100%{transform:translateY(0)}
+      50%{transform:translateY(-4px)}
+    }
+
+    @keyframes heroLogoIn{
+      from{opacity:0; transform:translateY(12px) scale(.92)}
+      to{opacity:1; transform:translateY(0) scale(1)}
+    }
+
+    @media (max-width:760px){
+      .topbar{
+        top:8px;
+        border-radius:22px;
+      }
+
+      .brand{
+        width:100%;
+      }
+
+      .brand-mark{
+        width:86px;
+        height:68px;
+      }
+
+      .brand-title{
+        font-size:17px;
+      }
+
+      .brand-subtitle{
+        font-size:12.5px;
+      }
+
+      .topbar-actions{
+        width:100%;
+      }
+
+      .theme-toggle,.mono-toggle,.env-pill{
+        flex:1;
+      }
+
+      .hero{
+        padding:28px 18px 24px;
+        border-radius:28px;
+      }
+
+      .hero-logo-center{
+        width:106px;
+        height:106px;
+        border-radius:28px;
+      }
+
+      .hero-logo-center img{
+        width:84px;
+        height:84px;
+      }
+
+      .hero h1{
+        font-size:30px;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -1628,15 +2130,20 @@
   <div class="container">
     <div class="topbar">
       <div class="brand">
-        <div class="brand-mark"><img src="static/logo.png" alt="Logo Jaboque"></div>
+        <div class="brand-mark"><img class="brand-logo-img" src="static/logo.png" alt="Logo Jaboque"></div>
         <div class="brand-meta">
           <div class="brand-title">Jaboque • Organizador de Relatórios</div>
           <div class="brand-subtitle">Painel operacional para leitura, validação, diagnóstico e histórico de PDFs</div>
         </div>
       </div>
-      <div class="env-pill"><span class="env-dot"></span><span>Ambiente ativo: DEV</span></div>
+      <div class="topbar-actions">
+        <button type="button" id="monoToggle" class="mono-toggle" title="Alternar versão monocromática da logo">◐ Logo mono</button>
+        <button type="button" id="themeToggle" class="theme-toggle" title="Alternar tema claro/escuro">🌙 Dark mode</button>
+        <div class="env-pill"><span class="env-dot"></span><span>Ambiente ativo: DEV</span></div>
+      </div>
     </div>
     <section class="hero">
+      <div class="hero-logo-center"><img class="brand-logo-img hero-logo-img" src="static/logo.png" alt="Logo Jaboque"></div>
       <div class="hero-top">
         <div>
           <h1>Organizador Inteligente de Relatórios PDF</h1>
@@ -3330,5 +3837,57 @@
     setStatus("Nenhum arquivo enviado ainda.");
     loadHistory();
   </script>
+
+  <script>
+    (function(){
+      function setTheme(theme){
+        document.documentElement.setAttribute("data-theme", theme);
+        try{ localStorage.setItem("jaboque-theme", theme); }catch(e){}
+        var btn = document.getElementById("themeToggle");
+        if(btn){
+          btn.textContent = theme === "dark" ? "☀️ Light mode" : "🌙 Dark mode";
+          btn.setAttribute("aria-label", theme === "dark" ? "Ativar modo claro" : "Ativar modo escuro");
+        }
+      }
+
+      function setMonoLogo(enabled){
+        document.querySelectorAll(".brand-logo-img").forEach(function(img){
+          img.classList.toggle("logo-mono", enabled);
+        });
+        try{ localStorage.setItem("jaboque-logo-mono", enabled ? "1" : "0"); }catch(e){}
+        var btn = document.getElementById("monoToggle");
+        if(btn){
+          btn.textContent = enabled ? "◑ Logo colorida" : "◐ Logo mono";
+          btn.setAttribute("aria-label", enabled ? "Usar logo colorida" : "Usar logo monocromática");
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", function(){
+        var currentTheme = document.documentElement.getAttribute("data-theme") || "light";
+        setTheme(currentTheme);
+
+        var savedMono = false;
+        try{ savedMono = localStorage.getItem("jaboque-logo-mono") === "1"; }catch(e){}
+        setMonoLogo(savedMono);
+
+        var themeToggle = document.getElementById("themeToggle");
+        if(themeToggle){
+          themeToggle.addEventListener("click", function(){
+            var theme = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+            setTheme(theme);
+          });
+        }
+
+        var monoToggle = document.getElementById("monoToggle");
+        if(monoToggle){
+          monoToggle.addEventListener("click", function(){
+            var enabled = !(document.querySelector(".brand-logo-img") || {}).classList?.contains("logo-mono");
+            setMonoLogo(enabled);
+          });
+        }
+      });
+    })();
+  </script>
+
 </body>
 </html>
