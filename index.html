@@ -2811,6 +2811,80 @@ html[data-theme="dark"] textarea{
   border:1px solid rgba(148,163,184,.4) !important;
 }
 
+
+/* ===== DARK MODE TEXT CONTRAST FINAL ===== */
+
+/* KPIs do histórico */
+html[data-theme="dark"] .history-kpi-label,
+html[data-theme="dark"] .history-kpi-sub,
+html[data-theme="dark"] .summary-title,
+html[data-theme="dark"] .metric-label,
+html[data-theme="dark"] .detail-label,
+html[data-theme="dark"] .history-meta-label,
+html[data-theme="dark"] .review-current-label{
+  color:#dbeafe !important;
+  opacity:1 !important;
+}
+
+html[data-theme="dark"] .history-kpi-value,
+html[data-theme="dark"] .summary-value,
+html[data-theme="dark"] .metric-value,
+html[data-theme="dark"] .detail-value,
+html[data-theme="dark"] .history-meta-value,
+html[data-theme="dark"] .review-current-value{
+  color:#ffffff !important;
+  opacity:1 !important;
+}
+
+/* Textos auxiliares dentro de cards */
+html[data-theme="dark"] .small-text,
+html[data-theme="dark"] .history-meta,
+html[data-theme="dark"] .metric-sub,
+html[data-theme="dark"] .quality-subtitle,
+html[data-theme="dark"] .quality-list,
+html[data-theme="dark"] .quality-list li,
+html[data-theme="dark"] .review-help,
+html[data-theme="dark"] .footer-note,
+html[data-theme="dark"] .footer-system{
+  color:#cbd5e1 !important;
+  opacity:1 !important;
+}
+
+/* Caixas internas dos detalhes do relatório */
+html[data-theme="dark"] .history-meta-box,
+html[data-theme="dark"] .review-current-card,
+html[data-theme="dark"] .detail-block,
+html[data-theme="dark"] .history-kpi,
+html[data-theme="dark"] .summary-card{
+  background:#111827 !important;
+  border-color:rgba(148,163,184,.38) !important;
+}
+
+/* Força contraste em qualquer texto dentro dessas caixas */
+html[data-theme="dark"] .history-meta-box *,
+html[data-theme="dark"] .review-current-card *,
+html[data-theme="dark"] .detail-block *,
+html[data-theme="dark"] .history-kpi *,
+html[data-theme="dark"] .summary-card *{
+  opacity:1 !important;
+}
+
+/* Evita valores azul-escuro herdados no dark mode */
+html[data-theme="dark"] [class*="value"],
+html[data-theme="dark"] [class*="valor"],
+html[data-theme="dark"] [class*="total"],
+html[data-theme="dark"] [class*="registro"],
+html[data-theme="dark"] [class*="data"]{
+  color:#f8fafc !important;
+}
+
+/* Mantém labels legíveis */
+html[data-theme="dark"] [class*="label"],
+html[data-theme="dark"] [class*="title"],
+html[data-theme="dark"] [class*="subtitle"]{
+  opacity:1 !important;
+}
+
 </style>
 </head>
 <body>
