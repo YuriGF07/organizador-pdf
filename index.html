@@ -4,9 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Organizador Inteligente de Relatórios PDF</title>
-    <link rel="icon" href="static/favicon.ico" sizes="any" />
+
+  <link rel="icon" href="static/favicon.ico" sizes="any" />
   <link rel="icon" type="image/png" sizes="192x192" href="static/logo-192.png" />
-  <link rel="icon" type="image/png" sizes="512x512" href="static/logo-512.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="static/logo.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="static/apple-touch-icon.png" />
   <meta name="theme-color" content="#f3f6fb" media="(prefers-color-scheme: light)" />
   <meta name="theme-color" content="#111827" media="(prefers-color-scheme: dark)" />
@@ -889,15 +890,16 @@
     .brand-mark{
       width:110px;
       height:110px;
-      border-radius:22px;
-      background:#ffffff;
-      border:1px solid #e2e8f0;
+      border-radius:0;
+      background:transparent;
+      border:none;
       display:flex;
       align-items:center;
       justify-content:center;
-      padding:10px;
-      box-shadow:0 12px 28px rgba(15,23,42,.12);
-      overflow:hidden;
+      padding:0;
+      box-shadow:none;
+      overflow:visible;
+      flex:0 0 auto;
     }
 
     .brand-mark img{
@@ -905,6 +907,7 @@
       height:100%;
       display:block;
       object-fit:contain;
+      filter:drop-shadow(0 10px 18px rgba(15,23,42,.12));
     }
 
     .brand-meta{
@@ -914,35 +917,45 @@
     }
 
     .brand-title{
-      font-size:18px;
-      font-weight:700;
-      color:#0b1f3a;
+      font-size:22px;
+      font-weight:800;
+      color:#0f172a;
+      letter-spacing:-.02em;
+      line-height:1.15;
+      text-shadow:none;
     }
 
     .brand-subtitle{
-      font-size:13px;
+      font-size:14px;
+      font-weight:600;
       color:#334155;
+      line-height:1.35;
+      text-shadow:none;
     }
 
     @media (prefers-color-scheme: dark){
       .brand-mark{
-        background:#ffffff;
-        border-color:#e2e8f0;
-        box-shadow:0 12px 28px rgba(0,0,0,.15);
+        background:transparent;
+        border:none;
+        box-shadow:none;
+      }
+
+      .brand-mark img{
+        filter:drop-shadow(0 10px 20px rgba(0,0,0,.26));
       }
 
       .brand-title{
-        color:#f1f5f9;
+        color:#0f172a;
       }
 
       .brand-subtitle{
-        color:#a8b4c6;
+        color:#334155;
       }
 
       .env-pill{
-        background:rgba(15,23,42,.78);
-        border-color:rgba(148,163,184,.25);
-        color:#f1f5f9;
+        background:rgba(255,255,255,.92);
+        border-color:#e2e8f0;
+        color:#0f172a;
       }
     }
 
