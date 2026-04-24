@@ -1414,12 +1414,54 @@
 
     .review-form-grid{
       display:grid;
-      grid-template-columns:1fr 2fr;
+      grid-template-columns:1fr 1fr 1fr;
       gap:12px;
     }
 
+    .review-form-grid .wide-field{
+      grid-column:1/-1;
+    }
+
+    .review-current{
+      margin-bottom:14px;
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:10px;
+    }
+
+    .review-current-card{
+      border:1px solid var(--line);
+      border-radius:16px;
+      background:#fff;
+      padding:12px;
+    }
+
+    .review-current-label{
+      font-size:11px;
+      color:var(--muted);
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:.03em;
+      margin-bottom:6px;
+    }
+
+    .review-current-value{
+      font-size:14px;
+      font-weight:700;
+      color:#10284f;
+      word-break:break-word;
+      line-height:1.45;
+    }
+
+    .review-help{
+      margin-top:10px;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.5;
+    }
+
     @media (max-width:900px){
-      .filter-grid,.filter-date-grid,.review-form-grid{grid-template-columns:1fr}
+      .filter-grid,.filter-date-grid,.review-form-grid,.review-current{grid-template-columns:1fr}
     }
   </style>
 </head>
@@ -1767,6 +1809,22 @@
           <div class="detail-label">Revisão</div>
           <div class="detail-value" id="detailRevisaoStatus">-</div>
         </div>
+        <div class="detail-block">
+          <div class="detail-label">Motivo revisão</div>
+          <div class="detail-value" id="detailRevisaoMotivo">-</div>
+        </div>
+        <div class="detail-block">
+          <div class="detail-label">Prioridade</div>
+          <div class="detail-value" id="detailRevisaoPrioridade">-</div>
+        </div>
+        <div class="detail-block">
+          <div class="detail-label">Revisado por</div>
+          <div class="detail-value" id="detailRevisadoPor">-</div>
+        </div>
+        <div class="detail-block">
+          <div class="detail-label">Revisado em</div>
+          <div class="detail-value" id="detailRevisadoEm">-</div>
+        </div>
 
         <div class="detail-block full">
           <div class="detail-label">Motivo da detecção</div>
@@ -1801,16 +1859,62 @@
       </div>
 
       <div class="review-panel">
-        <div class="review-panel-title">Revisão manual</div>
+        <div class="review-panel-title">Revisão manual completa</div>
+
+        <div class="review-current">
+          <div class="review-current-card">
+            <div class="review-current-label">Status atual</div>
+            <div class="review-current-value" id="reviewCurrentStatus">-</div>
+          </div>
+          <div class="review-current-card">
+            <div class="review-current-label">Motivo atual</div>
+            <div class="review-current-value" id="reviewCurrentMotivo">-</div>
+          </div>
+          <div class="review-current-card">
+            <div class="review-current-label">Prioridade</div>
+            <div class="review-current-value" id="reviewCurrentPrioridade">-</div>
+          </div>
+          <div class="review-current-card">
+            <div class="review-current-label">Responsável</div>
+            <div class="review-current-value" id="reviewCurrentResponsavel">-</div>
+          </div>
+        </div>
+
         <div class="review-form-grid">
           <div class="filter-field">
             <label for="reviewedBy">Revisado por</label>
             <input id="reviewedBy" type="text" placeholder="Nome do responsável" value="Operador" />
           </div>
           <div class="filter-field">
-            <label for="reviewObservation">Observação</label>
-            <textarea id="reviewObservation" placeholder="Escreva uma observação opcional para a revisão"></textarea>
+            <label for="reviewReason">Motivo padronizado</label>
+            <select id="reviewReason">
+              <option value="">Selecione um motivo</option>
+              <option value="dados conferidos">Dados conferidos</option>
+              <option value="total divergente">Total divergente</option>
+              <option value="pdf sem total confiável">PDF sem total confiável</option>
+              <option value="parser parcial">Parser parcial</option>
+              <option value="layout desconhecido">Layout desconhecido</option>
+              <option value="arquivo inválido">Arquivo inválido</option>
+              <option value="outro">Outro</option>
+            </select>
           </div>
+          <div class="filter-field">
+            <label for="reviewPriority">Prioridade</label>
+            <select id="reviewPriority">
+              <option value="baixa">Baixa</option>
+              <option value="normal" selected>Normal</option>
+              <option value="alta">Alta</option>
+              <option value="critica">Crítica</option>
+            </select>
+          </div>
+          <div class="filter-field wide-field">
+            <label for="reviewObservation">Observação</label>
+            <textarea id="reviewObservation" placeholder="Descreva o que foi conferido, o motivo da aprovação/rejeição ou o ajuste necessário"></textarea>
+          </div>
+        </div>
+
+        <div class="review-help">
+          Para rejeitar um relatório, o motivo padronizado é obrigatório. Para aprovar, recomenda-se usar “Dados conferidos”.
         </div>
       </div>
 
@@ -2575,13 +2679,26 @@
       setText("detailConfidence", formatConfidence(totalConfidence || "inexistente"));
       setText("detailDecisao", data.decisao_final || "-");
       setText("detailRevisaoStatus", data.revisao_status || "-");
+      setText("detailRevisaoMotivo", data.revisao_motivo || "-");
+      setText("detailRevisaoPrioridade", data.revisao_prioridade || "normal");
+      setText("detailRevisadoPor", data.revisado_por || "-");
+      setText("detailRevisadoEm", data.revisado_em || "-");
       setText("detailMotivoDetectado", data.motivo_detectado || "-");
       setText("detailMotivoTotal", data.total_original_motivo || "-");
       setText("detailDiagnostico", data.detalhes_status || "-");
+      setText("reviewCurrentStatus", data.revisao_status || "-");
+      setText("reviewCurrentMotivo", data.revisao_motivo || "-");
+      setText("reviewCurrentPrioridade", data.revisao_prioridade || "normal");
+      setText("reviewCurrentResponsavel", data.revisado_por || "-");
+
       const reviewedByInput = document.getElementById("reviewedBy");
       const reviewObservationInput = document.getElementById("reviewObservation");
+      const reviewReasonInput = document.getElementById("reviewReason");
+      const reviewPriorityInput = document.getElementById("reviewPriority");
       if (reviewedByInput) reviewedByInput.value = data.revisado_por || "Operador";
       if (reviewObservationInput) reviewObservationInput.value = data.revisao_observacao || "";
+      if (reviewReasonInput) reviewReasonInput.value = data.revisao_motivo || "";
+      if (reviewPriorityInput) reviewPriorityInput.value = data.revisao_prioridade || "normal";
 
       document.getElementById("modalPreviewOriginal").src = data.preview_original_url ? absoluteUrl(data.preview_original_url) : "";
       document.getElementById("modalPreviewFinal").src = data.preview_gerado_url ? absoluteUrl(data.preview_gerado_url) : "";
@@ -2606,11 +2723,21 @@
         const url = `${API_BASE}/review/${jobId}`;
         const revisadoPor = document.getElementById("reviewedBy")?.value?.trim() || "Operador";
         const observacao = document.getElementById("reviewObservation")?.value?.trim() || "";
+        const motivo = document.getElementById("reviewReason")?.value?.trim() || "";
+        const prioridade = document.getElementById("reviewPriority")?.value?.trim() || "normal";
+
+        if (action === "rejeitado" && !motivo) {
+          showToast("Motivo obrigatório", "Selecione um motivo padronizado antes de rejeitar o relatório.", "warning", 4200);
+          return;
+        }
 
         const payload = {
           revisao_status: action,
           revisao_observacao: observacao,
-          revisado_por: revisadoPor
+          revisado_por: revisadoPor,
+          revisao_motivo: motivo,
+          revisao_prioridade: prioridade,
+          revisao_origem: "manual"
         };
 
         const response = await fetch(url, {
