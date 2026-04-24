@@ -2515,6 +2515,104 @@
       border-color:rgba(148,163,184,.24) !important;
     }
 
+  
+
+    /* =========================================================
+       CORREÇÃO DEFINITIVA — anti-flicker da logo no scroll
+       Motivo: PNG transparente + sticky + backdrop-filter + animação
+       pode piscar no Chrome/Edge durante composição da GPU.
+       ========================================================= */
+
+    .topbar{
+      backdrop-filter:none !important;
+      -webkit-backdrop-filter:none !important;
+      background:rgba(248,251,255,.96) !important;
+      transform:none !important;
+      will-change:auto !important;
+      contain:paint;
+    }
+
+    html[data-theme="dark"] .topbar{
+      backdrop-filter:none !important;
+      -webkit-backdrop-filter:none !important;
+      background:rgba(15,23,42,.98) !important;
+      transform:none !important;
+      will-change:auto !important;
+      contain:paint;
+    }
+
+    .brand-mark,
+    .hero-logo-center{
+      isolation:isolate;
+      transform:none !important;
+      will-change:auto !important;
+      contain:paint;
+    }
+
+    .brand-mark img,
+    .hero-logo-center img,
+    .brand-logo-img,
+    .hero-logo-img{
+      animation:none !important;
+      transform:none !important;
+      transition:opacity .18s ease !important;
+      filter:none !important;
+      mix-blend-mode:normal !important;
+      opacity:1 !important;
+      backface-visibility:visible !important;
+      will-change:auto !important;
+      image-rendering:auto !important;
+      object-fit:contain !important;
+    }
+
+    .brand:hover .brand-mark img,
+    .hero-logo-center:hover img{
+      transform:none !important;
+      filter:none !important;
+      opacity:.94 !important;
+    }
+
+    .brand-mark::after,
+    .hero-logo-center::after{
+      content:"";
+      position:absolute;
+      inset:10px;
+      z-index:-1;
+      border-radius:inherit;
+      background:radial-gradient(circle at 50% 50%, rgba(15,23,42,.12), transparent 62%);
+      opacity:.45;
+      pointer-events:none;
+    }
+
+    html[data-theme="dark"] .brand-mark::after,
+    html[data-theme="dark"] .hero-logo-center::after{
+      background:radial-gradient(circle at 50% 50%, rgba(0,0,0,.34), transparent 62%);
+      opacity:.40;
+    }
+
+    .logo-mono{
+      filter:grayscale(1) contrast(1.05) brightness(.96) !important;
+    }
+
+    html[data-theme="dark"] .logo-mono{
+      filter:grayscale(1) contrast(1.03) brightness(1.08) !important;
+    }
+
+    @media (prefers-reduced-motion: no-preference){
+      .hero-logo-center{
+        animation:heroLogoStableIn .42s ease both !important;
+      }
+
+      .topbar{
+        animation:softEnter .42s ease both !important;
+      }
+    }
+
+    @keyframes heroLogoStableIn{
+      from{opacity:0}
+      to{opacity:1}
+    }
+
   </style>
 </head>
 <body>
