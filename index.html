@@ -3363,6 +3363,39 @@ html[data-theme="dark"] .brand-subtitle{
   }
 }
 
+
+/* =========================================================
+   AMBIENTE AUTOMÁTICO — DEV / PRODUÇÃO
+   ========================================================= */
+.env-pill{
+  font-weight:800 !important;
+  letter-spacing:.01em !important;
+}
+
+.env-prod{
+  background:rgba(34,197,94,.16) !important;
+  color:#166534 !important;
+  border-color:rgba(34,197,94,.32) !important;
+}
+
+.env-dev{
+  background:rgba(245,158,11,.16) !important;
+  color:#92400e !important;
+  border-color:rgba(245,158,11,.34) !important;
+}
+
+html[data-theme="dark"] .env-prod{
+  background:rgba(34,197,94,.18) !important;
+  color:#bbf7d0 !important;
+  border-color:rgba(74,222,128,.36) !important;
+}
+
+html[data-theme="dark"] .env-dev{
+  background:rgba(245,158,11,.18) !important;
+  color:#fde68a !important;
+  border-color:rgba(251,191,36,.36) !important;
+}
+
 </style>
 </head>
 <body>
@@ -5314,6 +5347,70 @@ html[data-theme="dark"] .brand-subtitle{
   }
 
   window.addEventListener("load", initButtons);
+})();
+</script>
+
+
+<script>
+/* =========================================================
+   Ambiente automático
+   PRODUÇÃO: GitHub Pages / Render oficial
+   DEV: localhost, 127.0.0.1, dev/staging ou fallback local
+   ========================================================= */
+(function(){
+  function detectEnvironment(){
+    var host = (window.location.hostname || "").toLowerCase();
+    var href = (window.location.href || "").toLowerCase();
+
+    var isLocal =
+      host === "localhost" ||
+      host === "127.0.0.1" ||
+      host === "0.0.0.0" ||
+      host.endsWith(".local");
+
+    var isDev =
+      isLocal ||
+      href.includes("dev") ||
+      href.includes("staging") ||
+      href.includes("homolog") ||
+      href.includes("teste");
+
+    var isProduction =
+      host === "yurigf07.github.io" ||
+      host === "jaboque.onrender.com" ||
+      href.includes("organizador-pdf");
+
+    if(isDev && !isProduction){
+      return "DEV";
+    }
+
+    return "PRODUÇÃO";
+  }
+
+  function applyEnvironment(){
+    var env = detectEnvironment();
+    var pills = document.querySelectorAll(".env-pill");
+
+    pills.forEach(function(pill){
+      pill.classList.remove("env-dev", "env-prod");
+
+      if(env === "PRODUÇÃO"){
+        pill.classList.add("env-prod");
+        pill.innerHTML = '<span class="env-dot"></span><span>Ambiente ativo: PRODUÇÃO</span>';
+      }else{
+        pill.classList.add("env-dev");
+        pill.innerHTML = '<span class="env-dot"></span><span>Ambiente ativo: DEV</span>';
+      }
+    });
+  }
+
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", applyEnvironment);
+  }else{
+    applyEnvironment();
+  }
+
+  window.addEventListener("load", applyEnvironment);
 })();
 </script>
 
