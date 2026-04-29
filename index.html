@@ -5187,35 +5187,133 @@ html[data-theme="dark"] .brand-subtitle{
 })();
 </script>
 
-
 <script>
+/* =========================================================
+   PATCH FINAL 3 — Botões Logo mono e Light/Dark mode funcionando
+   ========================================================= */
 (function(){
-  function setThemeFinal(theme){
-    document.documentElement.setAttribute("data-theme", theme);
-    try{ localStorage.setItem("jaboque-theme", theme); }catch(e){}
-    var btn = document.getElementById("themeToggle");
-    if(btn){
-      btn.textContent = theme === "dark" ? "☀️ Light mode" : "🌙 Dark mode";
+  function applyTheme(theme){
+    if(theme !== "dark" && theme !== "light"){
+      theme = "light";
     }
+
+    document.documentElement.setAttribute("data-theme", theme);
+
+    try{
+      localStorage.setItem("jaboque-theme", theme);
+    }catch(e){}
+
+    document.querySelectorAll("#themeToggle, .theme-toggle").forEach(function(btn){
+      btn.textContent = theme === "dark" ? "☀️ Light mode" : "🌙 Dark mode";
+      btn.setAttribute("aria-label", theme === "dark" ? "Ativar modo claro" : "Ativar modo escuro");
+      btn.setAttribute("type", "button");
+    });
   }
 
-  window.toggleTheme = function(){
-    var current = document.documentElement.getAttribute("data-theme") || "light";
-    setThemeFinal(current === "dark" ? "light" : "dark");
-  };
+  function getCurrentTheme(){
+    return document.documentElement.getAttribute("data-theme") || "light";
+  }
 
-  document.addEventListener("DOMContentLoaded", function(){
-    var current = document.documentElement.getAttribute("data-theme") || "light";
-    setThemeFinal(current);
+  function toggleThemeFinal(){
+    var current = getCurrentTheme();
+    applyTheme(current === "dark" ? "light" : "dark");
+  }
 
-    var btn = document.getElementById("themeToggle");
-    if(btn){
-      btn.onclick = function(){
-        var active = document.documentElement.getAttribute("data-theme") || "light";
-        setThemeFinal(active === "dark" ? "light" : "dark");
-      };
+  function applyMono(enabled){
+    var logos = document.querySelectorAll(
+      ".brand-logo-img, .hero-logo-img, .brand-mark img, .hero-logo-center img"
+    );
+
+    logos.forEach(function(img){
+      img.classList.toggle("logo-mono", enabled);
+    });
+
+    try{
+      localStorage.setItem("jaboque-logo-mono", enabled ? "1" : "0");
+    }catch(e){}
+
+    document.querySelectorAll("#monoToggle, .mono-toggle").forEach(function(btn){
+      btn.textContent = enabled ? "◑ Logo colorida" : "◐ Logo mono";
+      btn.setAttribute("aria-label", enabled ? "Usar logo colorida" : "Usar logo monocromática");
+      btn.setAttribute("type", "button");
+    });
+  }
+
+  function isMonoEnabled(){
+    var firstLogo = document.querySelector(".brand-logo-img, .hero-logo-img, .brand-mark img, .hero-logo-center img");
+    return !!(firstLogo && firstLogo.classList.contains("logo-mono"));
+  }
+
+  function toggleMonoFinal(){
+    applyMono(!isMonoEnabled());
+  }
+
+  window.toggleTheme = toggleThemeFinal;
+  window.setJaboqueTheme = applyTheme;
+  window.toggleJaboqueMonoLogo = toggleMonoFinal;
+
+  function initButtons(){
+    var savedTheme = null;
+    try{
+      savedTheme = localStorage.getItem("jaboque-theme");
+    }catch(e){}
+
+    if(!savedTheme){
+      savedTheme = document.documentElement.getAttribute("data-theme") || "light";
     }
-  });
+
+    applyTheme(savedTheme);
+
+    var savedMono = false;
+    try{
+      savedMono = localStorage.getItem("jaboque-logo-mono") === "1";
+    }catch(e){}
+
+    applyMono(savedMono);
+
+    document.querySelectorAll("#themeToggle, .theme-toggle").forEach(function(btn){
+      btn.onclick = function(event){
+        event.preventDefault();
+        event.stopPropagation();
+        toggleThemeFinal();
+        return false;
+      };
+    });
+
+    document.querySelectorAll("#monoToggle, .mono-toggle").forEach(function(btn){
+      btn.onclick = function(event){
+        event.preventDefault();
+        event.stopPropagation();
+        toggleMonoFinal();
+        return false;
+      };
+    });
+  }
+
+  document.addEventListener("click", function(event){
+    var themeBtn = event.target.closest("#themeToggle, .theme-toggle");
+    if(themeBtn){
+      event.preventDefault();
+      event.stopPropagation();
+      toggleThemeFinal();
+      return;
+    }
+
+    var monoBtn = event.target.closest("#monoToggle, .mono-toggle");
+    if(monoBtn){
+      event.preventDefault();
+      event.stopPropagation();
+      toggleMonoFinal();
+    }
+  }, true);
+
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", initButtons);
+  }else{
+    initButtons();
+  }
+
+  window.addEventListener("load", initButtons);
 })();
 </script>
 
