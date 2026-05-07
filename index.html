@@ -3434,7 +3434,7 @@ html[data-theme="dark"] .env-dev{
         <div class="hero-mini-grid">
           <div class="hero-stat">
             <div class="hero-stat-label">Ambiente</div>
-            <div class="hero-stat-value">DEV</div>
+            <div class="hero-stat-value"><span id="heroEnvironmentValue">PRODUÇÃO</span></div>
           </div>
           <div class="hero-stat">
             <div class="hero-stat-label">Formato</div>
@@ -5411,6 +5411,69 @@ html[data-theme="dark"] .env-dev{
   }
 
   window.addEventListener("load", applyEnvironment);
+})();
+</script>
+
+
+<script>
+/* PATCH ambiente automático também no Hero */
+(function(){
+  function detectEnvironmentFinal(){
+    var host = (window.location.hostname || "").toLowerCase();
+    var href = (window.location.href || "").toLowerCase();
+
+    var isLocal =
+      host === "localhost" ||
+      host === "127.0.0.1" ||
+      host === "0.0.0.0" ||
+      host.endsWith(".local");
+
+    var isDev =
+      isLocal ||
+      href.includes("dev") ||
+      href.includes("staging") ||
+      href.includes("homolog") ||
+      href.includes("teste");
+
+    var isProduction =
+      host === "yurigf07.github.io" ||
+      host === "jaboque.onrender.com" ||
+      href.includes("organizador-pdf");
+
+    if(isDev && !isProduction){
+      return "DEV";
+    }
+
+    return "PRODUÇÃO";
+  }
+
+  function applyEnvironmentFinal(){
+    var env = detectEnvironmentFinal();
+
+    document.querySelectorAll(".env-pill").forEach(function(pill){
+      pill.classList.remove("env-dev", "env-prod");
+      if(env === "PRODUÇÃO"){
+        pill.classList.add("env-prod");
+        pill.innerHTML = '<span class="env-dot"></span><span>Ambiente ativo: PRODUÇÃO</span>';
+      }else{
+        pill.classList.add("env-dev");
+        pill.innerHTML = '<span class="env-dot"></span><span>Ambiente ativo: DEV</span>';
+      }
+    });
+
+    var heroEnv = document.getElementById("heroEnvironmentValue");
+    if(heroEnv){
+      heroEnv.textContent = env;
+    }
+  }
+
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", applyEnvironmentFinal);
+  }else{
+    applyEnvironmentFinal();
+  }
+
+  window.addEventListener("load", applyEnvironmentFinal);
 })();
 </script>
 
