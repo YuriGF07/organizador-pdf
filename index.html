@@ -2029,34 +2029,9 @@
     .preview-frame{
       background:#fff;
     }
-
-    .logo-mono{
-      filter:grayscale(1) contrast(1.15) brightness(.72) !important;
-    }
-
-    html[data-theme="dark"] .logo-mono{
-      filter:grayscale(1) contrast(1.1) brightness(1.55) drop-shadow(0 14px 22px rgba(0,0,0,.28)) !important;
-    }
-
-    .mono-toggle{
-      border:1px solid var(--line);
-      background:rgba(255,255,255,.72);
-      color:var(--text);
-      padding:10px 13px;
-      border-radius:999px;
-      font-size:13px;
-      font-weight:800;
-      gap:8px;
-      box-shadow:var(--shadow-soft);
-    }
-
-    html[data-theme="dark"] .mono-toggle{
-      background:rgba(30,41,59,.82);
-      color:#f8fafc;
-      border-color:rgba(148,163,184,.22);
-    }
-
-    @keyframes softEnter{
+html[data-theme="dark"]
+html[data-theme="dark"]
+@keyframes softEnter{
       from{opacity:0; transform:translateY(12px)}
       to{opacity:1; transform:translateY(0)}
     }
@@ -2098,7 +2073,7 @@
         width:100%;
       }
 
-      .theme-toggle,.mono-toggle,.env-pill{
+      .theme-toggle,.env-pill{
         flex:1;
       }
 
@@ -2394,16 +2369,10 @@
     }
 
     .hero-logo-center img.logo-mono,
-    .brand-mark img.logo-mono{
-      filter:grayscale(1) contrast(1.04) brightness(.95) drop-shadow(0 12px 18px rgba(15,23,42,.16)) !important;
-    }
-
-    html[data-theme="dark"] .hero-logo-center img.logo-mono,
-    html[data-theme="dark"] .brand-mark img.logo-mono{
-      filter:grayscale(1) contrast(1.02) brightness(1.12) drop-shadow(0 14px 22px rgba(0,0,0,.30)) !important;
-    }
-
-    html[data-theme="dark"] .hero-logo-center{
+    .brand-mark img
+html[data-theme="dark"] .hero-logo-center img.logo-mono,
+    html[data-theme="dark"] .brand-mark img
+html[data-theme="dark"] .hero-logo-center{
       background:rgba(255,255,255,.08) !important;
       border-color:rgba(255,255,255,.18) !important;
       box-shadow:inset 0 1px 0 rgba(255,255,255,.12), 0 28px 60px rgba(0,0,0,.22) !important;
@@ -2589,16 +2558,8 @@
       background:radial-gradient(circle at 50% 50%, rgba(0,0,0,.34), transparent 62%);
       opacity:.40;
     }
-
-    .logo-mono{
-      filter:grayscale(1) contrast(1.05) brightness(.96) !important;
-    }
-
-    html[data-theme="dark"] .logo-mono{
-      filter:grayscale(1) contrast(1.03) brightness(1.08) !important;
-    }
-
-    @media (prefers-reduced-motion: no-preference){
+html[data-theme="dark"]
+@media (prefers-reduced-motion: no-preference){
       .hero-logo-center{
         animation:heroLogoStableIn .42s ease both !important;
       }
@@ -3209,7 +3170,6 @@ html[data-theme="dark"] .preview-frame{
   }
 
   .theme-toggle,
-  .mono-toggle,
   .env-pill{
     flex:1 1 auto !important;
   }
@@ -3288,17 +3248,6 @@ html[data-theme="dark"] .topbar{
 }
 
 .theme-toggle,
-.mono-toggle{
-  border:1px solid rgba(148,163,184,.30) !important;
-  background:#ffffff !important;
-  color:#0f172a !important;
-  padding:10px 14px !important;
-  border-radius:999px !important;
-  font-size:13px !important;
-  font-weight:800 !important;
-  box-shadow:0 10px 22px rgba(15,23,42,.07) !important;
-}
-
 html[data-theme="dark"] .theme-toggle,
 html[data-theme="dark"] .mono-toggle,
 html[data-theme="dark"] .env-pill{
@@ -3357,7 +3306,6 @@ html[data-theme="dark"] .brand-subtitle{
   }
 
   .theme-toggle,
-  .mono-toggle,
   .env-pill{
     flex:1 1 auto !important;
   }
@@ -3396,6 +3344,17 @@ html[data-theme="dark"] .env-dev{
   border-color:rgba(251,191,36,.36) !important;
 }
 
+
+/* =========================================================
+   PATCH FINAL — Remoção definitiva do botão Logo mono
+   ========================================================= */
+#monoToggle,
+.mono-toggle{
+  display:none !important;
+  visibility:hidden !important;
+  pointer-events:none !important;
+}
+
 </style>
 </head>
 <body>
@@ -3410,7 +3369,6 @@ html[data-theme="dark"] .env-dev{
         </div>
       </div>
       <div class="topbar-actions">
-        <button type="button" id="monoToggle" class="mono-toggle" title="Alternar versão monocromática da logo">◐ Logo mono</button>
         <button type="button" id="themeToggle" class="theme-toggle" title="Alternar tema claro/escuro">🌙 Dark mode</button>
         <div class="env-pill"><span class="env-dot"></span><span>Ambiente ativo: DEV</span></div>
       </div>
@@ -5123,40 +5081,17 @@ html[data-theme="dark"] .env-dev{
         }
       }
 
-      function setMonoLogo(enabled){
-        document.querySelectorAll(".brand-logo-img").forEach(function(img){
-          img.classList.toggle("logo-mono", enabled);
-        });
-        try{ localStorage.setItem("jaboque-logo-mono", enabled ? "1" : "0"); }catch(e){}
-        var btn = document.getElementById("monoToggle");
-        if(btn){
-          btn.textContent = enabled ? "◑ Logo colorida" : "◐ Logo mono";
-          btn.setAttribute("aria-label", enabled ? "Usar logo colorida" : "Usar logo monocromática");
-        }
-      }
-
       document.addEventListener("DOMContentLoaded", function(){
         var currentTheme = document.documentElement.getAttribute("data-theme") || "light";
         setTheme(currentTheme);
-
-        var savedMono = false;
-        try{ savedMono = localStorage.getItem("jaboque-logo-mono") === "1"; }catch(e){}
-        setMonoLogo(savedMono);
-
-        var themeToggle = document.getElementById("themeToggle");
+var themeToggle = document.getElementById("themeToggle");
         if(themeToggle){
           themeToggle.addEventListener("click", function(){
             var theme = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
             setTheme(theme);
           });
         }
-
-        var monoToggle = document.getElementById("monoToggle");
-        if(monoToggle){
-          monoToggle.addEventListener("click", function(){
-            var enabled = !(document.querySelector(".brand-logo-img") || {}).classList?.contains("logo-mono");
-            setMonoLogo(enabled);
-          });
+);
         }
       });
     })();
@@ -5175,18 +5110,6 @@ html[data-theme="dark"] .env-dev{
     }
   }
 
-  function setMonoLogo(enabled){
-    document.querySelectorAll(".brand-logo-img").forEach(function(img){
-      img.classList.toggle("logo-mono", enabled);
-    });
-    try{ localStorage.setItem("jaboque-logo-mono", enabled ? "1" : "0"); }catch(e){}
-    var btn = document.getElementById("monoToggle");
-    if(btn){
-      btn.textContent = enabled ? "◑ Logo colorida" : "◐ Logo mono";
-      btn.setAttribute("aria-label", enabled ? "Usar logo colorida" : "Usar logo monocromática");
-    }
-  }
-
   window.toggleTheme = function(){
     var current = document.documentElement.getAttribute("data-theme") || "light";
     setTheme(current === "dark" ? "light" : "dark");
@@ -5195,26 +5118,14 @@ html[data-theme="dark"] .env-dev{
   document.addEventListener("DOMContentLoaded", function(){
     var currentTheme = document.documentElement.getAttribute("data-theme") || "light";
     setTheme(currentTheme);
-
-    var savedMono = false;
-    try{ savedMono = localStorage.getItem("jaboque-logo-mono") === "1"; }catch(e){}
-    setMonoLogo(savedMono);
-
-    var themeToggle = document.getElementById("themeToggle");
+var themeToggle = document.getElementById("themeToggle");
     if(themeToggle){
       themeToggle.onclick = function(){
         var current = document.documentElement.getAttribute("data-theme") || "light";
         setTheme(current === "dark" ? "light" : "dark");
       };
     }
-
-    var monoToggle = document.getElementById("monoToggle");
-    if(monoToggle){
-      monoToggle.onclick = function(){
-        var firstLogo = document.querySelector(".brand-logo-img");
-        var enabled = !(firstLogo && firstLogo.classList.contains("logo-mono"));
-        setMonoLogo(enabled);
-      };
+;
     }
   });
 })();
@@ -5251,41 +5162,9 @@ html[data-theme="dark"] .env-dev{
     var current = getCurrentTheme();
     applyTheme(current === "dark" ? "light" : "dark");
   }
-
-  function applyMono(enabled){
-    var logos = document.querySelectorAll(
-      ".brand-logo-img, .hero-logo-img, .brand-mark img, .hero-logo-center img"
-    );
-
-    logos.forEach(function(img){
-      img.classList.toggle("logo-mono", enabled);
-    });
-
-    try{
-      localStorage.setItem("jaboque-logo-mono", enabled ? "1" : "0");
-    }catch(e){}
-
-    document.querySelectorAll("#monoToggle, .mono-toggle").forEach(function(btn){
-      btn.textContent = enabled ? "◑ Logo colorida" : "◐ Logo mono";
-      btn.setAttribute("aria-label", enabled ? "Usar logo colorida" : "Usar logo monocromática");
-      btn.setAttribute("type", "button");
-    });
-  }
-
-  function isMonoEnabled(){
-    var firstLogo = document.querySelector(".brand-logo-img, .hero-logo-img, .brand-mark img, .hero-logo-center img");
-    return !!(firstLogo && firstLogo.classList.contains("logo-mono"));
-  }
-
-  function toggleMonoFinal(){
-    applyMono(!isMonoEnabled());
-  }
-
-  window.toggleTheme = toggleThemeFinal;
+window.toggleTheme = toggleThemeFinal;
   window.setJaboqueTheme = applyTheme;
-  window.toggleJaboqueMonoLogo = toggleMonoFinal;
-
-  function initButtons(){
+function initButtons(){
     var savedTheme = null;
     try{
       savedTheme = localStorage.getItem("jaboque-theme");
@@ -5298,11 +5177,7 @@ html[data-theme="dark"] .env-dev{
     applyTheme(savedTheme);
 
     var savedMono = false;
-    try{
-      savedMono = localStorage.getItem("jaboque-logo-mono") === "1";
-    }catch(e){}
-
-    applyMono(savedMono);
+applyMono(savedMono);
 
     document.querySelectorAll("#themeToggle, .theme-toggle").forEach(function(btn){
       btn.onclick = function(event){
@@ -5312,16 +5187,7 @@ html[data-theme="dark"] .env-dev{
         return false;
       };
     });
-
-    document.querySelectorAll("#monoToggle, .mono-toggle").forEach(function(btn){
-      btn.onclick = function(event){
-        event.preventDefault();
-        event.stopPropagation();
-        toggleMonoFinal();
-        return false;
-      };
-    });
-  }
+}
 
   document.addEventListener("click", function(event){
     var themeBtn = event.target.closest("#themeToggle, .theme-toggle");
@@ -5331,14 +5197,7 @@ html[data-theme="dark"] .env-dev{
       toggleThemeFinal();
       return;
     }
-
-    var monoBtn = event.target.closest("#monoToggle, .mono-toggle");
-    if(monoBtn){
-      event.preventDefault();
-      event.stopPropagation();
-      toggleMonoFinal();
-    }
-  }, true);
+}, true);
 
   if(document.readyState === "loading"){
     document.addEventListener("DOMContentLoaded", initButtons);
@@ -5474,6 +5333,30 @@ html[data-theme="dark"] .env-dev{
   }
 
   window.addEventListener("load", applyEnvironmentFinal);
+})();
+</script>
+
+
+<script>
+/* PATCH FINAL — remove qualquer resto de Logo mono em runtime */
+(function(){
+  function removeMonoButton(){
+    document.querySelectorAll("#monoToggle, .mono-toggle").forEach(function(el){
+      el.remove();
+    });
+    document.querySelectorAll(".logo-mono").forEach(function(el){
+      el.classList.remove("logo-mono");
+    });
+    try{ localStorage.removeItem("jaboque-logo-mono"); }catch(e){}
+  }
+
+  if(document.readyState === "loading"){
+    document.addEventListener("DOMContentLoaded", removeMonoButton);
+  }else{
+    removeMonoButton();
+  }
+
+  window.addEventListener("load", removeMonoButton);
 })();
 </script>
 
