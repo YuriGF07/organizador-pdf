@@ -3355,11 +3355,165 @@ html[data-theme="dark"] .env-dev{
   pointer-events:none !important;
 }
 
+
+    /* Login administrativo */
+    .login-screen{
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      background:
+        radial-gradient(circle at top left, rgba(37,99,235,.16), transparent 32%),
+        radial-gradient(circle at bottom right, rgba(56,189,248,.18), transparent 34%),
+        var(--bg);
+    }
+
+    .login-card{
+      width:min(460px,100%);
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:28px;
+      box-shadow:0 28px 70px rgba(15,23,42,.14);
+      padding:28px;
+      animation: fadeUp .28s ease;
+    }
+
+    .login-logo{
+      width:120px;
+      height:120px;
+      margin:0 auto 10px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .login-logo img{
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      filter:drop-shadow(0 12px 22px rgba(15,23,42,.12));
+    }
+
+    .login-title{
+      text-align:center;
+      font-size:24px;
+      font-weight:800;
+      color:#0f172a;
+      letter-spacing:-.02em;
+      margin-bottom:6px;
+    }
+
+    .login-subtitle{
+      text-align:center;
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.55;
+      margin-bottom:20px;
+    }
+
+    .login-field{
+      margin-bottom:12px;
+    }
+
+    .login-field label{
+      display:block;
+      font-size:12px;
+      font-weight:700;
+      color:var(--muted);
+      margin-bottom:6px;
+      text-transform:uppercase;
+      letter-spacing:.035em;
+    }
+
+    .login-actions{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      margin-top:16px;
+    }
+
+    .login-help{
+      margin-top:14px;
+      padding:12px 14px;
+      border-radius:16px;
+      border:1px solid var(--line);
+      background:#fbfdff;
+      color:#475569;
+      font-size:12px;
+      line-height:1.55;
+      text-align:center;
+    }
+
+    .login-error{
+      margin-top:12px;
+      padding:12px 14px;
+      border-radius:16px;
+      background:#fff5f5;
+      color:#991b1b;
+      border:1px solid #fecaca;
+      font-size:13px;
+      line-height:1.5;
+    }
+
+    .app-shell.hidden-before-auth{
+      display:none;
+    }
+
+    .btn-logout{
+      background:#fff5f5;
+      color:#991b1b;
+      border:1px solid #fecaca;
+      padding:10px 12px;
+      font-size:12px;
+    }
+
+    [data-theme="dark"] .login-card,
+    [data-theme="dark"] .login-help{
+      background:#111827;
+      border-color:#263244;
+    }
+
+    [data-theme="dark"] .login-title{
+      color:#f8fafc;
+    }
+
+    [data-theme="dark"] .login-help{
+      color:#cbd5e1;
+    }
+
+
 </style>
 </head>
 <body>
   <div id="toastContainer" class="toast-container"></div>
-  <div class="container">
+
+  <section id="loginScreen" class="login-screen">
+    <div class="login-card">
+      <div class="login-logo"><img src="static/logo.png" alt="Logo Jaboque"></div>
+      <div class="login-title">Acesso administrativo</div>
+      <div class="login-subtitle">Entre para acessar o painel operacional do JABOQUE.</div>
+
+      <form id="loginForm">
+        <div class="login-field">
+          <label for="loginUser">Usuário</label>
+          <input id="loginUser" type="text" value="admin" autocomplete="username" />
+        </div>
+        <div class="login-field">
+          <label for="loginPassword">Senha</label>
+          <input id="loginPassword" type="password" placeholder="Digite a senha" autocomplete="current-password" />
+        </div>
+        <div id="loginError" class="login-error hidden"></div>
+        <div class="login-actions">
+          <button id="btnLogin" class="btn-primary" type="submit">Entrar no painel</button>
+        </div>
+      </form>
+
+      <div class="login-help">Conta padrão registrada no banco: <strong>admin</strong>. A senha fica validada pelo backend e armazenada com hash no PostgreSQL.</div>
+    </div>
+  </section>
+
+  <div class="container app-shell hidden-before-auth" id="appShell">
     <div class="topbar">
       <div class="brand">
         <div class="brand-mark"><img class="brand-logo-img" src="static/logo.png" alt="Logo Jaboque"></div>
@@ -3370,6 +3524,7 @@ html[data-theme="dark"] .env-dev{
       </div>
       <div class="topbar-actions">
         <button type="button" id="themeToggle" class="theme-toggle" title="Alternar tema claro/escuro">🌙 Dark mode</button>
+        <button type="button" id="btnLogout" class="btn-logout" title="Sair do painel">Sair</button>
         <div class="env-pill"><span class="env-dot"></span><span>Ambiente ativo: DEV</span></div>
       </div>
     </div>
@@ -3918,6 +4073,11 @@ html[data-theme="dark"] .env-dev{
     const API_URL = `${API_BASE}/upload`;
     const HISTORY_URL = `${API_BASE}/history`;
     const STORAGE_URL = `${API_BASE}/maintenance/storage`;
+    const LOGIN_URL = `${API_BASE}/auth/login`;
+    const AUTH_ME_URL = `${API_BASE}/auth/me`;
+    const LOGOUT_URL = `${API_BASE}/auth/logout`;
+    const AUTH_TOKEN_KEY = "jaboque-auth-token";
+    const AUTH_USER_KEY = "jaboque-auth-user";
     const MAX_UPLOAD_MB_CLIENT = 25;
     const MAX_UPLOAD_BYTES_CLIENT = MAX_UPLOAD_MB_CLIENT * 1024 * 1024;
 
@@ -3941,6 +4101,136 @@ html[data-theme="dark"] .env-dev{
     const previewFinal = document.getElementById("previewFinal");
     const btnDownload = document.getElementById("btnDownload");
     const btnProcessar = document.getElementById("btnProcessar");
+
+    function getAuthToken(){
+      try { return localStorage.getItem(AUTH_TOKEN_KEY) || ""; } catch(e) { return ""; }
+    }
+
+    function setAuthToken(token, usuario){
+      try {
+        localStorage.setItem(AUTH_TOKEN_KEY, token || "");
+        localStorage.setItem(AUTH_USER_KEY, JSON.stringify(usuario || {}));
+      } catch(e) {}
+    }
+
+    function clearAuthToken(){
+      try {
+        localStorage.removeItem(AUTH_TOKEN_KEY);
+        localStorage.removeItem(AUTH_USER_KEY);
+      } catch(e) {}
+    }
+
+    function authHeaders(extra = {}){
+      const token = getAuthToken();
+      return token ? { ...extra, "Authorization": `Bearer ${token}` } : { ...extra };
+    }
+
+    function authFetch(url, options = {}){
+      const headers = authHeaders(options.headers || {});
+      return fetch(url, { ...options, headers });
+    }
+
+    function showLogin(message = ""){
+      const loginScreen = document.getElementById("loginScreen");
+      const appShell = document.getElementById("appShell");
+      const loginError = document.getElementById("loginError");
+      if (appShell) appShell.classList.add("hidden-before-auth");
+      if (loginScreen) loginScreen.classList.remove("hidden");
+      if (loginError) {
+        if (message) { loginError.textContent = message; loginError.classList.remove("hidden"); }
+        else { loginError.textContent = ""; loginError.classList.add("hidden"); }
+      }
+      setTimeout(() => document.getElementById("loginPassword")?.focus(), 80);
+    }
+
+    function showApp(){
+      document.getElementById("loginScreen")?.classList.add("hidden");
+      document.getElementById("appShell")?.classList.remove("hidden-before-auth");
+    }
+
+    async function validateSession(){
+      const token = getAuthToken();
+      if (!token) return false;
+      try {
+        const response = await authFetch(AUTH_ME_URL);
+        if (!response.ok) return false;
+        const data = await response.json();
+        return !!data?.ok;
+      } catch(e) {
+        return false;
+      }
+    }
+
+    async function handleLogin(event){
+      event.preventDefault();
+      const username = document.getElementById("loginUser")?.value?.trim() || "admin";
+      const password = document.getElementById("loginPassword")?.value || "";
+      const btn = document.getElementById("btnLogin");
+      const errorBox = document.getElementById("loginError");
+
+      if (!password) {
+        if (errorBox) { errorBox.textContent = "Informe a senha para acessar o painel."; errorBox.classList.remove("hidden"); }
+        return;
+      }
+
+      try {
+        if (btn) { btn.disabled = true; btn.textContent = "Entrando..."; }
+        if (errorBox) { errorBox.textContent = ""; errorBox.classList.add("hidden"); }
+
+        const response = await fetch(LOGIN_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password })
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok || !data.token) throw new Error(backendMessage(data) || "Login inválido.");
+
+        setAuthToken(data.token, data.usuario || { username });
+        showApp();
+        initializeAppAfterAuth();
+        showToast("Login realizado", "Painel administrativo liberado.", "success");
+      } catch(error) {
+        clearAuthToken();
+        showLogin(error.message || "Não foi possível fazer login.");
+      } finally {
+        if (btn) { btn.disabled = false; btn.textContent = "Entrar no painel"; }
+      }
+    }
+
+    async function logout(){
+      try { await authFetch(LOGOUT_URL, { method: "POST" }); } catch(e) {}
+      clearAuthToken();
+      showLogin("Sessão encerrada. Faça login novamente para acessar o painel.");
+    }
+
+    let appInitializedAfterAuth = false;
+    function initializeAppAfterAuth(){
+      if (appInitializedAfterAuth) {
+        loadHistory(currentPage || 1);
+        loadStorageInfo();
+        return;
+      }
+      appInitializedAfterAuth = true;
+      resetMainView();
+      ensurePreviewPlaceholder("previewOriginalPanel", "previewOriginal", "Nenhum preview do PDF original disponível.");
+      ensurePreviewPlaceholder("previewFinalPanel", "previewFinal", "Nenhum preview do PDF gerado disponível.");
+      setStatus("Nenhum arquivo enviado ainda.");
+      loadHistory();
+      loadStorageInfo();
+    }
+
+    async function bootAuth(){
+      document.getElementById("loginForm")?.addEventListener("submit", handleLogin);
+      document.getElementById("btnLogout")?.addEventListener("click", logout);
+      const valid = await validateSession();
+      if (valid) {
+        showApp();
+        initializeAppAfterAuth();
+      } else {
+        clearAuthToken();
+        showLogin();
+      }
+    }
 
     function absoluteUrl(url){
       if (!url) return "";
@@ -4318,7 +4608,7 @@ html[data-theme="dark"] .env-dev{
 
     async function loadStorageInfo(){
       try {
-        const response = await fetch(STORAGE_URL);
+        const response = await authFetch(STORAGE_URL);
         const data = await safeJson(response);
         if (!response.ok || !data?.storage) return;
 
@@ -4605,7 +4895,7 @@ html[data-theme="dark"] .env-dev{
 
     async function deleteOneReport(jobId, fileName = "este relatório"){
       try {
-        const response = await fetch(`${API_BASE}/history/${jobId}`, { method: "DELETE" });
+        const response = await authFetch(`${API_BASE}/history/${jobId}`, { method: "DELETE" });
         const data = await safeJson(response);
         if (!response.ok) throw new Error(backendMessage(data));
 
@@ -4632,7 +4922,7 @@ html[data-theme="dark"] .env-dev{
       if (!confirmed) return;
 
       try {
-        const response = await fetch(`${API_BASE}/history`, { method: "DELETE" });
+        const response = await authFetch(`${API_BASE}/history`, { method: "DELETE" });
         const data = await safeJson(response);
         if (!response.ok) throw new Error(backendMessage(data));
 
@@ -4753,7 +5043,7 @@ html[data-theme="dark"] .env-dev{
             </div>
           </div>
         `;
-        const response = await fetch(buildHistoryUrl(page));
+        const response = await authFetch(buildHistoryUrl(page));
         const data = await safeJson(response);
         if (!response.ok) throw new Error(backendMessage(data));
 
@@ -4781,7 +5071,7 @@ html[data-theme="dark"] .env-dev{
 
     async function openReportDetails(reportId){
       try {
-        const response = await fetch(`${HISTORY_URL}/${reportId}`);
+        const response = await authFetch(`${HISTORY_URL}/${reportId}`);
         const data = await safeJson(response);
         if (!response.ok) throw new Error(backendMessage(data));
 
@@ -4872,7 +5162,7 @@ html[data-theme="dark"] .env-dev{
           revisao_origem: "manual"
         };
 
-        const response = await fetch(url, {
+        const response = await authFetch(url, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)
@@ -4968,7 +5258,7 @@ html[data-theme="dark"] .env-dev{
         const formData = new FormData();
         formData.append("file", selectedFile);
 
-        const response = await fetch(API_URL, { method: "POST", body: formData });
+        const response = await authFetch(API_URL, { method: "POST", body: formData });
         const data = await safeJson(response);
 
         if (!response.ok) {
@@ -5062,75 +5352,8 @@ html[data-theme="dark"] .env-dev{
       }
     });
 
-    resetMainView();
-    ensurePreviewPlaceholder("previewOriginalPanel", "previewOriginal", "Nenhum preview do PDF original disponível.");
-    ensurePreviewPlaceholder("previewFinalPanel", "previewFinal", "Nenhum preview do PDF gerado disponível.");
-    setStatus("Nenhum arquivo enviado ainda.");
-    loadHistory();
+    bootAuth();
   </script>
-
-  <script>
-    (function(){
-      function setTheme(theme){
-        document.documentElement.setAttribute("data-theme", theme);
-        try{ localStorage.setItem("jaboque-theme", theme); }catch(e){}
-        var btn = document.getElementById("themeToggle");
-        if(btn){
-          btn.textContent = theme === "dark" ? "☀️ Light mode" : "🌙 Dark mode";
-          btn.setAttribute("aria-label", theme === "dark" ? "Ativar modo claro" : "Ativar modo escuro");
-        }
-      }
-
-      document.addEventListener("DOMContentLoaded", function(){
-        var currentTheme = document.documentElement.getAttribute("data-theme") || "light";
-        setTheme(currentTheme);
-var themeToggle = document.getElementById("themeToggle");
-        if(themeToggle){
-          themeToggle.addEventListener("click", function(){
-            var theme = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
-            setTheme(theme);
-          });
-        }
-);
-        }
-      });
-    })();
-  </script>
-
-
-<script>
-(function(){
-  function setTheme(theme){
-    document.documentElement.setAttribute("data-theme", theme);
-    try{ localStorage.setItem("jaboque-theme", theme); }catch(e){}
-    var btn = document.getElementById("themeToggle");
-    if(btn){
-      btn.textContent = theme === "dark" ? "☀️ Light mode" : "🌙 Dark mode";
-      btn.setAttribute("aria-label", theme === "dark" ? "Ativar modo claro" : "Ativar modo escuro");
-    }
-  }
-
-  window.toggleTheme = function(){
-    var current = document.documentElement.getAttribute("data-theme") || "light";
-    setTheme(current === "dark" ? "light" : "dark");
-  };
-
-  document.addEventListener("DOMContentLoaded", function(){
-    var currentTheme = document.documentElement.getAttribute("data-theme") || "light";
-    setTheme(currentTheme);
-var themeToggle = document.getElementById("themeToggle");
-    if(themeToggle){
-      themeToggle.onclick = function(){
-        var current = document.documentElement.getAttribute("data-theme") || "light";
-        setTheme(current === "dark" ? "light" : "dark");
-      };
-    }
-;
-    }
-  });
-})();
-</script>
-
 <script>
 /* =========================================================
    PATCH FINAL 3 — Botões Logo mono e Light/Dark mode funcionando
@@ -5176,8 +5399,7 @@ function initButtons(){
 
     applyTheme(savedTheme);
 
-    var savedMono = false;
-applyMono(savedMono);
+    document.querySelectorAll("#monoToggle, .mono-toggle").forEach(function(el){ el.remove(); });
 
     document.querySelectorAll("#themeToggle, .theme-toggle").forEach(function(btn){
       btn.onclick = function(event){
