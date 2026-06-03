@@ -3612,11 +3612,11 @@ html[data-theme="dark"] .env-dev{
           </div>
 
           <div id="sellerSelectorPanel" class="seller-selector-panel">
-            <div class="seller-selector-label">Modelo do relatório</div>
+            <div class="seller-selector-label">Download do relatório</div>
             <select id="sellerSelector">
               <option value="__todos__">Relatório completo — todos os vendedores</option>
             </select>
-            <div id="sellerSelectorHelp" class="seller-selector-help">Selecione um PDF de NFe por vendedor para carregar os vendedores disponíveis.</div>
+            <div id="sellerSelectorHelp" class="seller-selector-help">Depois de processar, escolha se deseja baixar o relatório completo ou somente um vendedor.</div>
           </div>
 
           <div class="actions">
@@ -4130,6 +4130,8 @@ html[data-theme="dark"] .env-dev{
     let currentHistorySummary = {};
     let processingInterval = null;
     let sellersForSelectedFile = [];
+    let currentProcessedSeller = "__todos__";
+    let currentDownloadUrl = "";
 
     const dropzone = document.getElementById("dropzone");
     const fileInput = document.getElementById("fileInput");
@@ -4696,6 +4698,8 @@ html[data-theme="dark"] .env-dev{
       previewFinal.src = "";
       btnDownload.classList.add("hidden");
       btnDownload.href = "#";
+      currentProcessedSeller = "__todos__";
+      currentDownloadUrl = "";
       setStatusBadge("aguardando");
     }
 
@@ -4707,7 +4711,7 @@ html[data-theme="dark"] .env-dev{
         sellerSelector.value = "__todos__";
       }
       if (sellerSelectorPanel) sellerSelectorPanel.classList.remove("visible");
-      if (sellerSelectorHelp) sellerSelectorHelp.textContent = "Selecione um PDF de NFe por vendedor para carregar os vendedores disponíveis.";
+      if (sellerSelectorHelp) sellerSelectorHelp.textContent = "Depois de processar, escolha se deseja baixar o relatório completo ou somente um vendedor.";
     }
 
     function renderSellerSelector(vendedores){
@@ -4724,10 +4728,10 @@ html[data-theme="dark"] .env-dev{
 
       if (sellersForSelectedFile.length) {
         sellerSelectorPanel.classList.add("visible");
-        sellerSelectorHelp.textContent = `${sellersForSelectedFile.length} vendedor(es) encontrado(s). Escolha completo ou um vendedor específico antes de processar.`;
+        sellerSelectorHelp.textContent = `${sellersForSelectedFile.length} vendedor(es) encontrado(s). Escolha abaixo e clique em “Baixar PDF gerado”. Se escolher um vendedor, o sistema gera só as vendas dele antes de baixar.`;
       } else {
         sellerSelectorPanel.classList.remove("visible");
-        sellerSelectorHelp.textContent = "Nenhum vendedor carregado para seleção unitária.";
+        sellerSelectorHelp.textContent = "Nenhum vendedor disponível para relatório unitário.";
       }
     }
 
@@ -4755,7 +4759,7 @@ html[data-theme="dark"] .env-dev{
           showToast("Vendedores carregados", `${data.vendedores.length} vendedor(es) disponível(is) para relatório unitário.`, "success", 2600);
         } else {
           resetSellerSelector();
-          setStatus("Arquivo selecionado com sucesso. Clique em “Processar relatório” para enviar.");
+          setStatus("Arquivo selecionado com sucesso. Clique em “Processar relatório” para gerar o relatório completo e carregar a lista de vendedores.");
         }
       } catch (error) {
         resetSellerSelector();
@@ -4789,7 +4793,7 @@ html[data-theme="dark"] .env-dev{
         localPreviewUrl = URL.createObjectURL(selectedFile);
         previewOriginal.src = localPreviewUrl;
         setText("metricArquivo", selectedFile.name);
-        setStatus("Arquivo selecionado com sucesso. Clique em “Processar relatório” para enviar.");
+        setStatus("Arquivo selecionado com sucesso. Clique em “Processar relatório” para gerar o relatório completo e carregar a lista de vendedores.");
         setStatusBadge("arquivo selecionado");
         showToast("Arquivo selecionado", `${selectedFile.name}\n${formatBytesClient(selectedFile.size)}`, "info", 2200);
       }
@@ -4969,8 +4973,17 @@ html[data-theme="dark"] .env-dev{
       ensurePreviewPlaceholder("previewOriginalPanel", "previewOriginal", "Nenhum preview do PDF original disponível.");
       ensurePreviewPlaceholder("previewFinalPanel", "previewFinal", "Nenhum preview do PDF gerado disponível.");
 
+      if (data.tipo_detectado === "relatorio_nfe_vendedor" && Array.isArray(data.vendedores) && data.vendedores.length) {
+        renderSellerSelector(data.vendedores);
+      }
+
+      currentProcessedSeller = data.relatorio_unitario && data.vendedor_selecionado
+        ? data.vendedor_selecionado
+        : "__todos__";
+      currentDownloadUrl = data.download_url ? absoluteUrl(data.download_url) : "";
+
       if (data.download_url) {
-        btnDownload.href = absoluteUrl(data.download_url);
+        btnDownload.href = currentDownloadUrl;
         btnDownload.textContent = "⬇ Baixar PDF gerado";
         btnDownload.classList.remove("hidden");
       } else {
@@ -5347,6 +5360,72 @@ html[data-theme="dark"] .env-dev{
       setStatus(`${title.textContent}\n${message.textContent}`);
     }
 
+    function selectedSellerForDownload(){
+      if (!sellerSelector || !sellerSelectorPanel || !sellerSelectorPanel.classList.contains("visible")) {
+        return "__todos__";
+      }
+      return sellerSelector.value || "__todos__";
+    }
+
+    function sameSellerSelection(a, b){
+      const norm = (value) => String(value || "__todos__").trim().toLowerCase();
+      const va = norm(a);
+      const vb = norm(b);
+      const fullValues = new Set(["", "todos", "completo", "__todos__", "__completo__"]);
+      if (fullValues.has(va) && fullValues.has(vb)) return true;
+      return va === vb;
+    }
+
+    async function processFileForDownload(vendedorParaDownload){
+      if (!selectedFile) {
+        showToast("Arquivo original não disponível", "Selecione novamente o PDF para gerar outra versão.", "warning", 4200);
+        return;
+      }
+
+      const validation = validarArquivoLocal(selectedFile);
+      if (!validation.ok) {
+        showToast("Arquivo recusado", validation.message, "warning", 4200);
+        return;
+      }
+
+      try {
+        hideErrorFeedback();
+        setProcessingState(true);
+        setStatus("Gerando a versão selecionada para download...");
+
+        const formData = new FormData();
+        formData.append("file", selectedFile);
+        formData.append("vendedor", vendedorParaDownload || "__todos__");
+
+        const response = await authFetch(API_URL, { method: "POST", body: formData });
+        const data = await safeJson(response);
+
+        if (!response.ok) {
+          const errorInfo = humanizeError(data, response.status);
+          showErrorFeedback(errorInfo);
+          throw new Error(errorInfo.message);
+        }
+
+        hideErrorFeedback();
+        setStatusErrorVisual(false);
+        applyMainResult(data, true);
+        await loadHistory(1);
+
+        if (data.download_url) {
+          window.open(absoluteUrl(data.download_url), "_blank", "noopener,noreferrer");
+          showToast("Download pronto", "Relatório gerado conforme a seleção.", "success", 2600);
+        }
+      } catch (error) {
+        const errorBox = document.getElementById("errorBox");
+        if (errorBox.classList.contains("hidden")) {
+          const errorInfo = humanizeError({ raw: error.message }, 0);
+          showErrorFeedback(errorInfo);
+        }
+      } finally {
+        setProcessingState(false);
+      }
+    }
+
     async function processFile(){
       if (!selectedFile) {
         showToast("Selecione um arquivo", "Escolha um PDF antes de processar.", "warning");
@@ -5365,9 +5444,7 @@ html[data-theme="dark"] .env-dev{
 
         const formData = new FormData();
         formData.append("file", selectedFile);
-        if (sellerSelector && sellerSelector.value) {
-          formData.append("vendedor", sellerSelector.value);
-        }
+        formData.append("vendedor", "__todos__");
 
         const response = await authFetch(API_URL, { method: "POST", body: formData });
         const data = await safeJson(response);
@@ -5382,7 +5459,7 @@ html[data-theme="dark"] .env-dev{
         setStatusErrorVisual(false);
         applyMainResult(data, true);
         await loadHistory(1);
-        showToast("Processamento concluído", "Relatório processado com sucesso.", "success");
+        showToast("Processamento concluído", "Relatório completo gerado. Agora você pode baixar completo ou escolher um vendedor.", "success");
       } catch (error) {
         const errorBox = document.getElementById("errorBox");
         if (errorBox.classList.contains("hidden")) {
@@ -5421,6 +5498,17 @@ html[data-theme="dark"] .env-dev{
     });
 
     document.getElementById("btnProcessar").addEventListener("click", processFile);
+    btnDownload.addEventListener("click", async (e) => {
+      const vendedorEscolhido = selectedSellerForDownload();
+      if (!sameSellerSelection(vendedorEscolhido, currentProcessedSeller)) {
+        e.preventDefault();
+        await processFileForDownload(vendedorEscolhido);
+        return;
+      }
+      if (currentDownloadUrl) {
+        btnDownload.href = currentDownloadUrl;
+      }
+    });
     document.getElementById("btnLimparArquivo").addEventListener("click", clearSelectedFile);
     document.getElementById("btnAtualizar").addEventListener("click", () => { toggleHistoryPanel(true); loadHistory(currentPage); });
     document.getElementById("btnToggleHistory").addEventListener("click", () => toggleHistoryPanel());
