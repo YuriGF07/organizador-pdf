@@ -1439,6 +1439,121 @@
       line-height:1.5;
     }
 
+    .seller-mode-grid{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:12px;
+      align-items:end;
+    }
+
+    .seller-bulk-panel{
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:12px;
+      background:#ffffff;
+      display:none;
+      gap:10px;
+    }
+
+    .seller-bulk-panel.visible{
+      display:grid;
+    }
+
+    .seller-bulk-head{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+
+    .seller-bulk-title{
+      font-size:12px;
+      color:#0f172a;
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.03em;
+    }
+
+    .seller-bulk-actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .btn-tiny{
+      padding:7px 10px;
+      border-radius:10px;
+      font-size:12px;
+      background:#eef4ff;
+      color:#1d4ed8;
+      border:1px solid #dbeafe;
+    }
+
+    .seller-bulk-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(210px,1fr));
+      gap:8px;
+      max-height:240px;
+      overflow:auto;
+      padding-right:4px;
+    }
+
+    .seller-chip-check{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:9px 10px;
+      background:#f8fafc;
+      color:#0f172a;
+      font-size:12px;
+      font-weight:700;
+      cursor:pointer;
+      user-select:none;
+    }
+
+    .seller-chip-check input{
+      width:auto;
+      min-width:16px;
+      accent-color:#2563eb;
+    }
+
+    .seller-bulk-footer{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+
+    .preview-load-btn{
+      padding:8px 10px;
+      border-radius:10px;
+      font-size:12px;
+      background:#eef4ff;
+      color:#1d4ed8;
+      border:1px solid #dbeafe;
+    }
+
+    .preview-frame.lazy-preview{
+      min-height:180px;
+      height:180px;
+    }
+
+    .preview-empty{
+      margin:14px;
+      padding:18px;
+      border:1px dashed var(--line-strong);
+      border-radius:16px;
+      background:#f8fafc;
+      color:#475569;
+      font-size:13px;
+      text-align:center;
+      line-height:1.5;
+    }
+
     select, textarea{
       width:100%;
       padding:12px 14px;
@@ -1975,6 +2090,33 @@
       border-color:var(--line-strong);
     }
 
+    html[data-theme="dark"] .preview-empty{
+      background:rgba(15,23,42,.72) !important;
+      border-color:rgba(148,163,184,.28) !important;
+      color:#cbd5e1 !important;
+    }
+
+    html[data-theme="dark"] .seller-selector-panel,
+    html[data-theme="dark"] .seller-bulk-panel,
+    html[data-theme="dark"] .seller-chip-check{
+      background:rgba(15,23,42,.86) !important;
+      border-color:rgba(148,163,184,.24) !important;
+      color:#f8fafc !important;
+    }
+
+    html[data-theme="dark"] .seller-selector-help,
+    html[data-theme="dark"] .seller-selector-label,
+    html[data-theme="dark"] .seller-bulk-title{
+      color:#cbd5e1 !important;
+    }
+
+    html[data-theme="dark"] .btn-tiny,
+    html[data-theme="dark"] .preview-load-btn{
+      background:rgba(96,165,250,.16) !important;
+      color:#dbeafe !important;
+      border-color:rgba(96,165,250,.28) !important;
+    }
+
     html[data-theme="dark"] input,
     html[data-theme="dark"] select,
     html[data-theme="dark"] textarea{
@@ -2223,6 +2365,33 @@ html[data-theme="dark"]
     html[data-theme="dark"] .empty-state-title,
     html[data-theme="dark"] .dropzone .main-text{
       color:#f8fafc !important;
+    }
+
+    html[data-theme="dark"] .preview-empty{
+      background:rgba(15,23,42,.72) !important;
+      border-color:rgba(148,163,184,.28) !important;
+      color:#cbd5e1 !important;
+    }
+
+    html[data-theme="dark"] .seller-selector-panel,
+    html[data-theme="dark"] .seller-bulk-panel,
+    html[data-theme="dark"] .seller-chip-check{
+      background:rgba(15,23,42,.86) !important;
+      border-color:rgba(148,163,184,.24) !important;
+      color:#f8fafc !important;
+    }
+
+    html[data-theme="dark"] .seller-selector-help,
+    html[data-theme="dark"] .seller-selector-label,
+    html[data-theme="dark"] .seller-bulk-title{
+      color:#cbd5e1 !important;
+    }
+
+    html[data-theme="dark"] .btn-tiny,
+    html[data-theme="dark"] .preview-load-btn{
+      background:rgba(96,165,250,.16) !important;
+      color:#dbeafe !important;
+      border-color:rgba(96,165,250,.28) !important;
     }
 
     html[data-theme="dark"] input,
@@ -3512,9 +3681,30 @@ html[data-theme="dark"] .env-dev{
     }
 
 
+
+    body.performance-mode .card,
+    body.performance-mode .metric,
+    body.performance-mode .history-item,
+    body.performance-mode .preview-panel,
+    body.performance-mode .detail-block,
+    body.performance-mode .diag-item,
+    body.performance-mode .status-panel,
+    body.performance-mode .feedback-box{
+      animation:none !important;
+    }
+
+    body.performance-mode .metric:hover,
+    body.performance-mode .preview-panel:hover,
+    body.performance-mode .detail-block:hover,
+    body.performance-mode .diag-item:hover,
+    body.performance-mode .history-item:hover,
+    body.performance-mode button:hover,
+    body.performance-mode .link-btn:hover{
+      transform:none !important;
+    }
 </style>
 </head>
-<body>
+<body class="performance-mode">
   <div id="toastContainer" class="toast-container"></div>
 
   <section id="loginScreen" class="login-screen">
@@ -3613,10 +3803,26 @@ html[data-theme="dark"] .env-dev{
 
           <div id="sellerSelectorPanel" class="seller-selector-panel">
             <div class="seller-selector-label">Download do relatório</div>
-            <select id="sellerSelector">
-              <option value="__todos__">Relatório completo — todos os vendedores</option>
-            </select>
-            <div id="sellerSelectorHelp" class="seller-selector-help">Depois de processar, escolha se deseja baixar o relatório completo ou somente um vendedor.</div>
+            <div class="seller-mode-grid">
+              <select id="sellerSelector">
+                <option value="__todos__">Relatório completo — todos os vendedores</option>
+              </select>
+              <button id="btnDownloadMassa" class="btn-secondary hidden" type="button">Baixar selecionados (.zip)</button>
+            </div>
+            <div id="sellerSelectorHelp" class="seller-selector-help">Depois de processar, escolha se deseja baixar o relatório completo, um vendedor ou vários vendedores em massa.</div>
+            <div id="sellerBulkPanel" class="seller-bulk-panel">
+              <div class="seller-bulk-head">
+                <div class="seller-bulk-title">Relatórios unitários em massa</div>
+                <div class="seller-bulk-actions">
+                  <button type="button" class="btn-tiny" id="btnSelectAllSellers">Selecionar todos</button>
+                  <button type="button" class="btn-tiny" id="btnClearSellers">Limpar</button>
+                </div>
+              </div>
+              <div id="sellerBulkGrid" class="seller-bulk-grid"></div>
+              <div class="seller-bulk-footer">
+                <span id="sellerBulkCounter" class="seller-selector-help">Nenhum vendedor selecionado.</span>
+              </div>
+            </div>
           </div>
 
           <div class="actions">
@@ -3724,6 +3930,7 @@ html[data-theme="dark"] .env-dev{
             <div class="preview-panel" id="previewOriginalPanel">
               <div class="preview-panel-head">
                 <h3>Preview do PDF original</h3>
+                <button type="button" id="btnLoadPreviewOriginal" class="preview-load-btn">Carregar preview</button>
                 <span class="badge badge-muted">Original</span>
               </div>
               <iframe id="previewOriginal" class="preview-frame"></iframe>
@@ -3732,6 +3939,7 @@ html[data-theme="dark"] .env-dev{
             <div class="preview-panel" id="previewFinalPanel">
               <div class="preview-panel-head">
                 <h3>Preview do PDF gerado</h3>
+                <button type="button" id="btnLoadPreviewFinal" class="preview-load-btn">Carregar preview</button>
                 <span class="badge badge-info">Gerado</span>
               </div>
               <iframe id="previewFinal" class="preview-frame"></iframe>
@@ -4109,6 +4317,7 @@ html[data-theme="dark"] .env-dev{
     const API_BASE = "https://jaboque.onrender.com";
     const API_URL = `${API_BASE}/upload`;
     const VENDEDORES_NFE_URL = `${API_BASE}/vendedores-nfe`;
+    const DOWNLOAD_MASSA_VENDEDORES_NFE_URL = `${API_BASE}/download-massa-vendedores-nfe`;
     const HISTORY_URL = `${API_BASE}/history`;
     const STORAGE_URL = `${API_BASE}/maintenance/storage`;
     const LOGIN_URL = `${API_BASE}/auth/login`;
@@ -4132,6 +4341,8 @@ html[data-theme="dark"] .env-dev{
     let sellersForSelectedFile = [];
     let currentProcessedSeller = "__todos__";
     let currentDownloadUrl = "";
+    let lastPreviewOriginalUrl = "";
+    let lastPreviewFinalUrl = "";
 
     const dropzone = document.getElementById("dropzone");
     const fileInput = document.getElementById("fileInput");
@@ -4696,6 +4907,8 @@ html[data-theme="dark"] .env-dev{
       });
       previewOriginal.src = "";
       previewFinal.src = "";
+      lastPreviewOriginalUrl = "";
+      lastPreviewFinalUrl = "";
       btnDownload.classList.add("hidden");
       btnDownload.href = "#";
       currentProcessedSeller = "__todos__";
@@ -4711,7 +4924,8 @@ html[data-theme="dark"] .env-dev{
         sellerSelector.value = "__todos__";
       }
       if (sellerSelectorPanel) sellerSelectorPanel.classList.remove("visible");
-      if (sellerSelectorHelp) sellerSelectorHelp.textContent = "Depois de processar, escolha se deseja baixar o relatório completo ou somente um vendedor.";
+      if (sellerSelectorHelp) sellerSelectorHelp.textContent = "Depois de processar, escolha se deseja baixar o relatório completo, um vendedor ou vários vendedores em massa.";
+      renderSellerBulkPanel([]);
     }
 
     function renderSellerSelector(vendedores, selectedValue=null){
@@ -4736,11 +4950,58 @@ html[data-theme="dark"] .env-dev{
 
       if (sellersForSelectedFile.length) {
         sellerSelectorPanel.classList.add("visible");
-        sellerSelectorHelp.textContent = `${sellersForSelectedFile.length} vendedor(es) encontrado(s). Escolha abaixo e clique em “Baixar PDF gerado”. Se escolher um vendedor, o sistema gera só as vendas dele antes de baixar.`;
+        sellerSelectorHelp.textContent = `${sellersForSelectedFile.length} vendedor(es) encontrado(s). Escolha relatório completo, unitário ou marque vários vendedores para baixar tudo em .zip.`;
+        renderSellerBulkPanel(sellersForSelectedFile);
       } else {
         sellerSelectorPanel.classList.remove("visible");
         sellerSelectorHelp.textContent = "Nenhum vendedor disponível para relatório unitário.";
+        renderSellerBulkPanel([]);
       }
+    }
+
+    function selectedBulkSellers(){
+      return Array.from(document.querySelectorAll(".seller-bulk-checkbox:checked")).map((input) => input.value).filter(Boolean);
+    }
+
+    function updateSellerBulkCounter(){
+      const selected = selectedBulkSellers();
+      const counter = document.getElementById("sellerBulkCounter");
+      const btnMass = document.getElementById("btnDownloadMassa");
+      if (counter) {
+        counter.textContent = selected.length
+          ? `${selected.length} vendedor(es) selecionado(s) para baixar em .zip.`
+          : "Nenhum vendedor selecionado.";
+      }
+      if (btnMass) btnMass.classList.toggle("hidden", selected.length === 0);
+    }
+
+    function renderSellerBulkPanel(vendedores){
+      const panel = document.getElementById("sellerBulkPanel");
+      const grid = document.getElementById("sellerBulkGrid");
+      if (!panel || !grid) return;
+      grid.innerHTML = "";
+      const lista = Array.isArray(vendedores) ? vendedores : [];
+      if (!lista.length) {
+        panel.classList.remove("visible");
+        updateSellerBulkCounter();
+        return;
+      }
+      lista.forEach((nome) => {
+        const label = document.createElement("label");
+        label.className = "seller-chip-check";
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.className = "seller-bulk-checkbox";
+        checkbox.value = nome;
+        checkbox.addEventListener("change", updateSellerBulkCounter);
+        const span = document.createElement("span");
+        span.textContent = nome;
+        label.appendChild(checkbox);
+        label.appendChild(span);
+        grid.appendChild(label);
+      });
+      panel.classList.add("visible");
+      updateSellerBulkCounter();
     }
 
     async function loadSellersForSelectedFile(){
@@ -4968,15 +5229,15 @@ html[data-theme="dark"] .env-dev{
       setStatus(resumoStatus);
       setStatusBadge(data.status || data.mensagem || "-");
 
-      if (!keepLocalPreview && data.preview_original_url) {
-        previewOriginal.src = absoluteUrl(data.preview_original_url);
-      } else if (keepLocalPreview && localPreviewUrl) {
-        previewOriginal.src = localPreviewUrl;
-      } else {
-        previewOriginal.src = "";
-      }
+      lastPreviewOriginalUrl = (!keepLocalPreview && data.preview_original_url)
+        ? absoluteUrl(data.preview_original_url)
+        : (keepLocalPreview && localPreviewUrl ? localPreviewUrl : "");
+      lastPreviewFinalUrl = data.preview_gerado_url ? absoluteUrl(data.preview_gerado_url) : "";
 
-      previewFinal.src = data.preview_gerado_url ? absoluteUrl(data.preview_gerado_url) : "";
+      previewOriginal.src = "";
+      previewFinal.src = "";
+      previewOriginal.classList.add("lazy-preview");
+      previewFinal.classList.add("lazy-preview");
 
       ensurePreviewPlaceholder("previewOriginalPanel", "previewOriginal", "Nenhum preview do PDF original disponível.");
       ensurePreviewPlaceholder("previewFinalPanel", "previewFinal", "Nenhum preview do PDF gerado disponível.");
@@ -5398,6 +5659,66 @@ html[data-theme="dark"] .env-dev{
       a.remove();
     }
 
+    function filenameFromContentDisposition(headerValue, fallback){
+      const header = String(headerValue || "");
+      const utfMatch = header.match(/filename\*=UTF-8''([^;]+)/i);
+      if (utfMatch) return decodeURIComponent(utfMatch[1].replace(/"/g, ""));
+      const simpleMatch = header.match(/filename="?([^";]+)"?/i);
+      return simpleMatch ? simpleMatch[1] : fallback;
+    }
+
+    async function downloadBulkSellers(){
+      const vendedores = selectedBulkSellers();
+      if (!selectedFile) {
+        showToast("Arquivo original não disponível", "Selecione novamente o PDF para gerar os relatórios em massa.", "warning", 4200);
+        return;
+      }
+      if (!vendedores.length) {
+        showToast("Selecione vendedores", "Marque um ou mais vendedores para baixar em massa.", "warning", 3200);
+        return;
+      }
+      const validation = validarArquivoLocal(selectedFile);
+      if (!validation.ok) {
+        showToast("Arquivo recusado", validation.message, "warning", 4200);
+        return;
+      }
+      try {
+        hideErrorFeedback();
+        setProcessingState(true);
+        setStatus(`Gerando ${vendedores.length} relatório(s) unitário(s) em massa...`);
+        const formData = new FormData();
+        formData.append("file", selectedFile);
+        formData.append("vendedores", JSON.stringify(vendedores));
+        const response = await authFetch(DOWNLOAD_MASSA_VENDEDORES_NFE_URL, { method: "POST", body: formData });
+        if (!response.ok) {
+          const data = await safeJson(response);
+          const errorInfo = humanizeError(data, response.status);
+          showErrorFeedback(errorInfo);
+          throw new Error(errorInfo.message);
+        }
+        const blob = await response.blob();
+        const filename = filenameFromContentDisposition(response.headers.get("Content-Disposition"), `${selectedFile.name.replace(/\.pdf$/i, "")} Relatorios Vendedores Reformulado.zip`);
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 3000);
+        setStatus(`Download em massa gerado com sucesso.\n${vendedores.length} vendedor(es) selecionado(s).`);
+        showToast("Download em massa pronto", `${vendedores.length} relatório(s) unitário(s) baixado(s) em .zip.`, "success", 3600);
+      } catch (error) {
+        const errorBox = document.getElementById("errorBox");
+        if (errorBox.classList.contains("hidden")) {
+          const errorInfo = humanizeError({ raw: error.message }, 0);
+          showErrorFeedback(errorInfo);
+        }
+      } finally {
+        setProcessingState(false);
+      }
+    }
+
     async function processFileForDownload(vendedorParaDownload){
       if (!selectedFile) {
         showToast("Arquivo original não disponível", "Selecione novamente o PDF para gerar outra versão.", "warning", 4200);
@@ -5527,6 +5848,23 @@ html[data-theme="dark"] .env-dev{
     });
 
     document.getElementById("btnProcessar").addEventListener("click", processFile);
+    document.getElementById("btnDownloadMassa").addEventListener("click", downloadBulkSellers);
+    document.getElementById("btnSelectAllSellers").addEventListener("click", () => { document.querySelectorAll(".seller-bulk-checkbox").forEach((input) => { input.checked = true; }); updateSellerBulkCounter(); });
+    document.getElementById("btnClearSellers").addEventListener("click", () => { document.querySelectorAll(".seller-bulk-checkbox").forEach((input) => { input.checked = false; }); updateSellerBulkCounter(); });
+    document.getElementById("btnLoadPreviewOriginal").addEventListener("click", () => {
+      if (lastPreviewOriginalUrl) {
+        previewOriginal.src = lastPreviewOriginalUrl;
+        previewOriginal.classList.remove("lazy-preview");
+        ensurePreviewPlaceholder("previewOriginalPanel", "previewOriginal", "Nenhum preview do PDF original disponível.");
+      }
+    });
+    document.getElementById("btnLoadPreviewFinal").addEventListener("click", () => {
+      if (lastPreviewFinalUrl) {
+        previewFinal.src = lastPreviewFinalUrl;
+        previewFinal.classList.remove("lazy-preview");
+        ensurePreviewPlaceholder("previewFinalPanel", "previewFinal", "Nenhum preview do PDF gerado disponível.");
+      }
+    });
     btnDownload.addEventListener("click", async (e) => {
       const vendedorEscolhido = selectedSellerForDownload();
       if (!sameSellerSelection(vendedorEscolhido, currentProcessedSeller)) {
