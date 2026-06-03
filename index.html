@@ -1410,6 +1410,35 @@
     }
 
   
+
+    .seller-selector-panel{
+      margin-top:14px;
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:14px;
+      background:#fbfdff;
+      display:none;
+      gap:10px;
+    }
+
+    .seller-selector-panel.visible{
+      display:grid;
+    }
+
+    .seller-selector-label{
+      font-size:12px;
+      color:var(--muted);
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:.03em;
+    }
+
+    .seller-selector-help{
+      font-size:12px;
+      color:#475569;
+      line-height:1.5;
+    }
+
     select, textarea{
       width:100%;
       padding:12px 14px;
@@ -3582,6 +3611,14 @@ html[data-theme="dark"] .env-dev{
             <div id="fileName" class="file-name"></div>
           </div>
 
+          <div id="sellerSelectorPanel" class="seller-selector-panel">
+            <div class="seller-selector-label">Modelo do relatório</div>
+            <select id="sellerSelector">
+              <option value="__todos__">Relatório completo — todos os vendedores</option>
+            </select>
+            <div id="sellerSelectorHelp" class="seller-selector-help">Selecione um PDF de NFe por vendedor para carregar os vendedores disponíveis.</div>
+          </div>
+
           <div class="actions">
             <button class="btn-primary" id="btnProcessar" type="button">Processar relatório</button>
             <button class="btn-secondary" id="btnLimparArquivo" type="button">Limpar seleção</button>
@@ -4071,6 +4108,7 @@ html[data-theme="dark"] .env-dev{
   <script>
     const API_BASE = "https://jaboque.onrender.com";
     const API_URL = `${API_BASE}/upload`;
+    const VENDEDORES_NFE_URL = `${API_BASE}/vendedores-nfe`;
     const HISTORY_URL = `${API_BASE}/history`;
     const STORAGE_URL = `${API_BASE}/maintenance/storage`;
     const LOGIN_URL = `${API_BASE}/auth/login`;
@@ -4091,6 +4129,7 @@ html[data-theme="dark"] .env-dev{
     let currentItems = [];
     let currentHistorySummary = {};
     let processingInterval = null;
+    let sellersForSelectedFile = [];
 
     const dropzone = document.getElementById("dropzone");
     const fileInput = document.getElementById("fileInput");
@@ -4101,6 +4140,9 @@ html[data-theme="dark"] .env-dev{
     const previewFinal = document.getElementById("previewFinal");
     const btnDownload = document.getElementById("btnDownload");
     const btnProcessar = document.getElementById("btnProcessar");
+    const sellerSelectorPanel = document.getElementById("sellerSelectorPanel");
+    const sellerSelector = document.getElementById("sellerSelector");
+    const sellerSelectorHelp = document.getElementById("sellerSelectorHelp");
 
     function getAuthToken(){
       try { return localStorage.getItem(AUTH_TOKEN_KEY) || ""; } catch(e) { return ""; }
@@ -4657,6 +4699,69 @@ html[data-theme="dark"] .env-dev{
       setStatusBadge("aguardando");
     }
 
+
+    function resetSellerSelector(){
+      sellersForSelectedFile = [];
+      if (sellerSelector) {
+        sellerSelector.innerHTML = '<option value="__todos__">Relatório completo — todos os vendedores</option>';
+        sellerSelector.value = "__todos__";
+      }
+      if (sellerSelectorPanel) sellerSelectorPanel.classList.remove("visible");
+      if (sellerSelectorHelp) sellerSelectorHelp.textContent = "Selecione um PDF de NFe por vendedor para carregar os vendedores disponíveis.";
+    }
+
+    function renderSellerSelector(vendedores){
+      sellersForSelectedFile = Array.isArray(vendedores) ? vendedores : [];
+      if (!sellerSelector || !sellerSelectorPanel) return;
+
+      sellerSelector.innerHTML = '<option value="__todos__">Relatório completo — todos os vendedores</option>';
+      sellersForSelectedFile.forEach((nome) => {
+        const option = document.createElement("option");
+        option.value = nome;
+        option.textContent = `Relatório unitário — ${nome}`;
+        sellerSelector.appendChild(option);
+      });
+
+      if (sellersForSelectedFile.length) {
+        sellerSelectorPanel.classList.add("visible");
+        sellerSelectorHelp.textContent = `${sellersForSelectedFile.length} vendedor(es) encontrado(s). Escolha completo ou um vendedor específico antes de processar.`;
+      } else {
+        sellerSelectorPanel.classList.remove("visible");
+        sellerSelectorHelp.textContent = "Nenhum vendedor carregado para seleção unitária.";
+      }
+    }
+
+    async function loadSellersForSelectedFile(){
+      if (!selectedFile) return;
+      resetSellerSelector();
+
+      try {
+        if (sellerSelectorPanel) sellerSelectorPanel.classList.add("visible");
+        if (sellerSelectorHelp) sellerSelectorHelp.textContent = "Lendo vendedores do PDF...";
+
+        const formData = new FormData();
+        formData.append("file", selectedFile);
+        const response = await authFetch(VENDEDORES_NFE_URL, { method: "POST", body: formData });
+        const data = await safeJson(response);
+
+        if (!response.ok || !data.ok) {
+          resetSellerSelector();
+          return;
+        }
+
+        if (data.tipo_detectado === "relatorio_nfe_vendedor" && Array.isArray(data.vendedores) && data.vendedores.length) {
+          renderSellerSelector(data.vendedores);
+          setStatus(`Arquivo selecionado. Foram encontrados ${data.vendedores.length} vendedor(es). Escolha o modelo e clique em “Processar relatório”.`);
+          showToast("Vendedores carregados", `${data.vendedores.length} vendedor(es) disponível(is) para relatório unitário.`, "success", 2600);
+        } else {
+          resetSellerSelector();
+          setStatus("Arquivo selecionado com sucesso. Clique em “Processar relatório” para enviar.");
+        }
+      } catch (error) {
+        resetSellerSelector();
+      }
+    }
+
     function updateSelectedFile(file){
       hideErrorFeedback();
 
@@ -4669,6 +4774,7 @@ html[data-theme="dark"] .env-dev{
         selectedFile = null;
         fileInput.value = "";
         fileName.textContent = "";
+        resetSellerSelector();
         setStatus(validation.message);
         setStatusBadge("erro");
         showToast("Arquivo recusado", validation.message, "warning", 4200);
@@ -4676,6 +4782,7 @@ html[data-theme="dark"] .env-dev{
       }
 
       selectedFile = file || null;
+      resetSellerSelector();
       fileName.textContent = selectedFile ? `Arquivo selecionado: ${selectedFile.name} • ${formatBytesClient(selectedFile.size)}` : "";
 
       if (selectedFile) {
@@ -4693,6 +4800,7 @@ html[data-theme="dark"] .env-dev{
       selectedFile = null;
       fileInput.value = "";
       fileName.textContent = "";
+      resetSellerSelector();
       if (localPreviewUrl) URL.revokeObjectURL(localPreviewUrl);
       localPreviewUrl = "";
       resetMainView();
@@ -4838,7 +4946,7 @@ html[data-theme="dark"] .env-dev{
       renderQualityPanel(data);
 
       const resumoStatus = [
-        data.mensagem || "Relatório processado.",
+        `${data.mensagem || "Relatório processado."}${data.relatorio_unitario && data.vendedor_selecionado ? `\nRelatório unitário: ${data.vendedor_selecionado}` : ""}`,
         "",
         `✔ ${data.qtd_registros || 0} registro(s) encontrados`,
         `✔ Tipo identificado: ${data.tipo_detectado || "-"}`,
@@ -5257,6 +5365,9 @@ html[data-theme="dark"] .env-dev{
 
         const formData = new FormData();
         formData.append("file", selectedFile);
+        if (sellerSelector && sellerSelector.value) {
+          formData.append("vendedor", sellerSelector.value);
+        }
 
         const response = await authFetch(API_URL, { method: "POST", body: formData });
         const data = await safeJson(response);
