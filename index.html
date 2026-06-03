@@ -4714,7 +4714,8 @@ html[data-theme="dark"] .env-dev{
       if (sellerSelectorHelp) sellerSelectorHelp.textContent = "Depois de processar, escolha se deseja baixar o relatório completo ou somente um vendedor.";
     }
 
-    function renderSellerSelector(vendedores){
+    function renderSellerSelector(vendedores, selectedValue=null){
+      const selectedBeforeRender = selectedValue || (sellerSelector ? sellerSelector.value : "__todos__") || "__todos__";
       sellersForSelectedFile = Array.isArray(vendedores) ? vendedores : [];
       if (!sellerSelector || !sellerSelectorPanel) return;
 
@@ -4725,6 +4726,13 @@ html[data-theme="dark"] .env-dev{
         option.textContent = `Relatório unitário — ${nome}`;
         sellerSelector.appendChild(option);
       });
+
+      if (sellersForSelectedFile.some((nome) => sameSellerSelection(nome, selectedBeforeRender))) {
+        const match = sellersForSelectedFile.find((nome) => sameSellerSelection(nome, selectedBeforeRender));
+        sellerSelector.value = match || "__todos__";
+      } else {
+        sellerSelector.value = "__todos__";
+      }
 
       if (sellersForSelectedFile.length) {
         sellerSelectorPanel.classList.add("visible");
@@ -4973,13 +4981,15 @@ html[data-theme="dark"] .env-dev{
       ensurePreviewPlaceholder("previewOriginalPanel", "previewOriginal", "Nenhum preview do PDF original disponível.");
       ensurePreviewPlaceholder("previewFinalPanel", "previewFinal", "Nenhum preview do PDF gerado disponível.");
 
-      if (data.tipo_detectado === "relatorio_nfe_vendedor" && Array.isArray(data.vendedores) && data.vendedores.length) {
-        renderSellerSelector(data.vendedores);
-      }
-
-      currentProcessedSeller = data.relatorio_unitario && data.vendedor_selecionado
+      const processedSellerValue = data.relatorio_unitario && data.vendedor_selecionado
         ? data.vendedor_selecionado
         : "__todos__";
+
+      if (data.tipo_detectado === "relatorio_nfe_vendedor" && Array.isArray(data.vendedores) && data.vendedores.length) {
+        renderSellerSelector(data.vendedores, processedSellerValue);
+      }
+
+      currentProcessedSeller = processedSellerValue;
       currentDownloadUrl = data.download_url ? absoluteUrl(data.download_url) : "";
 
       if (data.download_url) {
@@ -5376,6 +5386,18 @@ html[data-theme="dark"] .env-dev{
       return va === vb;
     }
 
+
+    function baixarUrlDireto(url){
+      if (!url) return;
+      const a = document.createElement("a");
+      a.href = url;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    }
+
     async function processFileForDownload(vendedorParaDownload){
       if (!selectedFile) {
         showToast("Arquivo original não disponível", "Selecione novamente o PDF para gerar outra versão.", "warning", 4200);
@@ -5412,9 +5434,15 @@ html[data-theme="dark"] .env-dev{
         await loadHistory(1);
 
         if (data.download_url) {
-          window.open(absoluteUrl(data.download_url), "_blank", "noopener,noreferrer");
+          const url = absoluteUrl(data.download_url);
+          btnDownload.href = url;
+          currentDownloadUrl = url;
+          currentProcessedSeller = vendedorParaDownload || "__todos__";
+          baixarUrlDireto(url);
           showToast("Download pronto", "Relatório gerado conforme a seleção.", "success", 2600);
+          return url;
         }
+        return "";
       } catch (error) {
         const errorBox = document.getElementById("errorBox");
         if (errorBox.classList.contains("hidden")) {
@@ -5424,6 +5452,7 @@ html[data-theme="dark"] .env-dev{
       } finally {
         setProcessingState(false);
       }
+      return "";
     }
 
     async function processFile(){
@@ -5507,7 +5536,10 @@ html[data-theme="dark"] .env-dev{
       }
       if (currentDownloadUrl) {
         btnDownload.href = currentDownloadUrl;
+        return;
       }
+      e.preventDefault();
+      await processFileForDownload(vendedorEscolhido);
     });
     document.getElementById("btnLimparArquivo").addEventListener("click", clearSelectedFile);
     document.getElementById("btnAtualizar").addEventListener("click", () => { toggleHistoryPanel(true); loadHistory(currentPage); });
