@@ -1492,11 +1492,10 @@
 
     .seller-bulk-grid{
       display:grid;
-      grid-template-columns:repeat(auto-fill,minmax(210px,1fr));
-      gap:8px;
-      max-height:240px;
-      overflow:auto;
-      padding-right:4px;
+      grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+      gap:10px;
+      overflow:visible;
+      padding-right:0;
     }
 
     .seller-chip-check{
@@ -1572,9 +1571,11 @@
     }
 
     .seller-bulk-grid{
-      grid-template-columns:repeat(auto-fill,minmax(245px,1fr)) !important;
-      gap:10px !important;
-      max-height:220px !important;
+      grid-template-columns:repeat(auto-fit,minmax(280px,1fr)) !important;
+      gap:12px !important;
+      max-height:none !important;
+      overflow:visible !important;
+      padding-right:0 !important;
     }
 
     .seller-chip-check{
@@ -1583,6 +1584,7 @@
       padding:11px 14px !important;
       background:#fff !important;
       box-shadow:0 6px 16px rgba(15,23,42,.035) !important;
+      word-break:break-word !important;
     }
 
     .seller-chip-check:hover{
@@ -4415,7 +4417,7 @@ html[data-theme="dark"] .env-dev{
     const API_BASE = "https://jaboque.onrender.com";
     const API_URL = `${API_BASE}/upload`;
     const VENDEDORES_NFE_URL = `${API_BASE}/vendedores-nfe`;
-    const DOWNLOAD_MASSA_VENDEDORES_NFE_URL = `${API_BASE}/gerar-massa-vendedores-nfe`;
+    const DOWNLOAD_MASSA_VENDEDORES_NFE_URL = `${API_BASE}/download-massa-vendedores-nfe`;
     const HISTORY_URL = `${API_BASE}/history`;
     const STORAGE_URL = `${API_BASE}/maintenance/storage`;
     const LOGIN_URL = `${API_BASE}/auth/login`;
@@ -5781,47 +5783,59 @@ html[data-theme="dark"] .env-dev{
         showToast("Arquivo recusado", validation.message, "warning", 4200);
         return;
       }
+
+      let objectUrl = "";
       try {
         hideErrorFeedback();
         setProcessingState(true);
         if (btnMass) {
           btnMass.disabled = true;
-          btnMass.textContent = "Gerando ZIP...";
+          btnMass.textContent = "Preparando .zip...";
         }
         setStatus(`Gerando ZIP com ${vendedores.length} relatório(s) unitário(s). Aguarde...`);
+
         const formData = new FormData();
         formData.append("file", selectedFile);
         formData.append("vendedores", JSON.stringify(vendedores));
+
         const response = await authFetch(DOWNLOAD_MASSA_VENDEDORES_NFE_URL, { method: "POST", body: formData });
-        const data = await safeJson(response);
-        if (!response.ok || !data?.download_url) {
+
+        if (!response.ok) {
+          const data = await safeJson(response);
           const errorInfo = humanizeError(data, response.status);
           showErrorFeedback(errorInfo);
           throw new Error(errorInfo.message);
         }
 
-        const downloadUrl = String(data.download_url || "").startsWith("http")
-          ? data.download_url
-          : `${API_BASE}${data.download_url}`;
+        const blob = await response.blob();
+        if (!blob || blob.size === 0) {
+          throw new Error("O ZIP foi gerado vazio. Tente processar novamente o PDF.");
+        }
+
+        const fallbackName = `${selectedFile.name.replace(/\.pdf$/i, "")} Relatorios Vendedores Reformulado.zip`;
+        const nomeDownload = filenameFromContentDisposition(response.headers.get("Content-Disposition"), fallbackName);
+
+        objectUrl = URL.createObjectURL(blob);
         const a = document.createElement("a");
-        a.href = downloadUrl;
-        a.download = data.nome_download || `${selectedFile.name.replace(/\.pdf$/i, "")} Relatorios Vendedores Reformulado.zip`;
-        a.rel = "noopener noreferrer";
+        a.href = objectUrl;
+        a.download = nomeDownload;
+        a.style.display = "none";
         document.body.appendChild(a);
         a.click();
         a.remove();
 
         setStatus(`ZIP gerado com sucesso.
-${data.qtd_arquivos || vendedores.length} relatório(s) unitário(s) incluído(s).
-Arquivo: ${data.nome_download || "Download em massa"}`);
-        showToast("ZIP pronto", `${data.qtd_arquivos || vendedores.length} relatório(s) unitário(s) disponível(is) para download.`, "success", 4200);
+${vendedores.length} relatório(s) unitário(s) solicitado(s).
+Arquivo: ${nomeDownload}`);
+        showToast("ZIP baixado", `${vendedores.length} relatório(s) unitário(s) enviado(s) para download.`, "success", 4200);
       } catch (error) {
         const errorBox = document.getElementById("errorBox");
-        if (errorBox.classList.contains("hidden")) {
+        if (errorBox && errorBox.classList.contains("hidden")) {
           const errorInfo = humanizeError({ raw: error.message }, 0);
           showErrorFeedback(errorInfo);
         }
       } finally {
+        if (objectUrl) setTimeout(() => URL.revokeObjectURL(objectUrl), 1500);
         if (btnMass) {
           btnMass.disabled = false;
           btnMass.textContent = "Baixar selecionados (.zip)";
